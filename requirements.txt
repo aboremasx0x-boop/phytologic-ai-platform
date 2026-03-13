@@ -11,3 +11,4 @@ torchvision
 gdown
 reportlab
 apscheduler
+arabic_reshaper
