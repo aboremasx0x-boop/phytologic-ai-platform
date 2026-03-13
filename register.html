@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phytologic AI - تسجيل المزارعين</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
+color:#1f2937;
+direction:rtl;
+text-align:right;
+}
+
+.page{
+max-width:1450px;
+margin:16px auto;
+padding:0 14px 28px;
+}
+
+.hero{
+background:
+linear-gradient(135deg,rgba(11,24,68,.97),rgba(17,124,85,.90)),
+radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
+color:white;
+border-radius:26px;
+padding:24px 26px;
+box-shadow:0 18px 40px rgba(0,0,0,.16);
+margin-bottom:16px;
+position:relative;
+overflow:hidden;
+}
+
+.hero:before{
+content:"";
+position:absolute;
+left:-40px;
+top:-40px;
+width:180px;
+height:180px;
+background:rgba(255,255,255,.06);
+border-radius:50%;
+}
+
+.hero:after{
+content:"";
+position:absolute;
+right:-25px;
+bottom:-25px;
+width:230px;
+height:230px;
+background:rgba(255,255,255,.05);
+border-radius:50%;
+}
+
+.hero-title{
+font-size:34px;
+font-weight:800;
+margin:0 0 8px 0;
+position:relative;
+z-index:1;
+}
+
+.hero-sub{
+font-size:14px;
+line-height:1.9;
+opacity:.95;
+position:relative;
+z-index:1;
+max-width:980px;
+}
+
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:14px;
+margin-bottom:16px;
+}
+
+.stat-card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:20px;
+padding:16px 18px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+min-height:108px;
+}
+
+.stat-label{
+font-size:13px;
+color:#6b7280;
+margin-bottom:10px;
+font-weight:700;
+}
+
+.stat-value{
+font-size:28px;
+font-weight:800;
+color:#111827;
+}
+
+.stat-sub{
+font-size:12px;
+color:#94a3b8;
+margin-top:8px;
+line-height:1.6;
+}
+
+.card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:22px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+overflow:hidden;
+margin-bottom:16px;
+}
+
+.section-header{
+padding:14px 16px;
+background:#f8fbff;
+border-bottom:1px solid #e9eef7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.section-title{
+font-size:18px;
+font-weight:800;
+color:#0f172a;
+}
+
+.section-note{
+font-size:12px;
+color:#64748b;
+}
+
+.card-body{
+padding:16px;
+}
+
+.grid-2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.grid-3{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:14px;
+}
+
+.field label{
+display:block;
+font-size:13px;
+color:#64748b;
+margin-bottom:8px;
+font-weight:700;
+}
+
+.field input,
+.field select,
+.field textarea{
+width:100%;
+padding:12px 14px;
+border-radius:14px;
+border:1px solid #dbe4f2;
+background:#fff;
+font-size:14px;
+outline:none;
+transition:.2s;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+border-color:#16a34a;
+box-shadow:0 0 0 4px rgba(22,163,74,.08);
+}
+.toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:14px;
+}
+
+.btn{
+padding:12px 18px;
+border:none;
+border-radius:14px;
+font-size:14px;
+font-weight:800;
+cursor:pointer;
+transition:.2s;
+white-space:nowrap;
+}
+
+.btn-primary{
+background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
+color:white;
+box-shadow:0 8px 16px rgba(21,128,61,.22);
+}
+
+.btn-secondary{
+background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);
+color:white;
+}
+
+.btn-dark{
+background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
+color:white;
+}
+
+.btn-brown{
+background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
+color:white;
+}
+
+.btn:hover{
+transform:translateY(-1px);
+}
+
+.info-box{
+padding:14px;
+border-radius:16px;
+border:1px solid #ecf2fb;
+background:#fbfdff;
+}
+
+.info-title{
+font-size:15px;
+font-weight:800;
+margin-bottom:10px;
+color:#111827;
+}
+
+.kpi{
+font-size:26px;
+font-weight:800;
+color:#111827;
+}
+
+.small{
+font-size:12px;
+color:#64748b;
+line-height:1.8;
+}
+
+.status-bar{
+margin-top:12px;
+padding:11px 12px;
+border-radius:14px;
+font-size:13px;
+background:#eef4ff;
+color:#334155;
+border:1px solid #dbe7ff;
+}
+
+.analysis-box{
+padding:14px;
+border-radius:18px;
+background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+border:1px solid #e7edf8;
+line-height:2;
+font-size:14px;
+}
+
+.list{
+display:grid;
+gap:8px;
+}
+
+.list-item{
+padding:10px 12px;
+border-radius:14px;
+background:#fbfdff;
+border:1px solid #edf2fb;
+font-size:13px;
+}
+
+.highlight{
+color:#0f172a;
+font-weight:800;
+}
+
+.error-box{
+background:#fef2f2;
+border:1px solid #fecaca;
+color:#b91c1c;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+.ok-box{
+background:#ecfdf5;
+border:1px solid #a7f3d0;
+color:#047857;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+@media(max-width:1100px){
+.stats-grid{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:1fr 1fr}
+.grid-2{grid-template-columns:1fr}
+}
+
+@media(max-width:760px){
+.stats-grid,.grid-3{grid-template-columns:1fr}
+.hero-title{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="hero">
+    <h1 class="hero-title">تسجيل المزارعين - Phytologic AI</h1>
+    <div class="hero-sub">
+      صفحة احترافية لتسجيل بيانات المزارعين والمزارع والمحاصيل وربطهم بمنظومة التنبيه والمتابعة الزراعية. هذه الصفحة متوافقة مباشرة مع واجهة API الحالية الخاصة بتسجيل المزارعين.
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">حالة التسجيل</div>
+      <div class="stat-value" id="heroStatus" style="font-size:20px">جاهز</div>
+      <div class="stat-sub">بانتظار إدخال البيانات</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">اسم المزارع</div>
+      <div class="stat-value" id="heroName" style="font-size:20px">-</div>
+      <div class="stat-sub">سيظهر بعد الإدخال</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">المنطقة</div>
+      <div class="stat-value" id="heroRegion" style="font-size:20px">-</div>
+      <div class="stat-sub">المنطقة المستهدفة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">المحصول</div>
+      <div class="stat-value" id="heroCrop" style="font-size:20px">-</div>
+      <div class="stat-sub">المحصول الرئيسي</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">بيانات التسجيل</div>
+      <div class="section-note">متوافقة مع /farmers/register</div>
+    </div>
+    <div class="card-body">
+
+      <div class="grid-3">
+        <div class="field">
+          <label>اسم المزارع</label>
+          <input id="name" type="text" placeholder="أدخل اسم المزارع">
+        </div>
+
+        <div class="field">
+          <label>رقم الجوال</label>
+          <input id="phone" type="text" placeholder="05xxxxxxxx">
+        </div>
+
+        <div class="field">
+          <label>اسم المزرعة</label>
+          <input id="farm_name" type="text" placeholder="أدخل اسم المزرعة">
+        </div>
+
+        <div class="field">
+          <label>المنطقة</label>
+          <input id="region" type="text" placeholder="مثال: الرياض">
+        </div>
+
+        <div class="field">
+          <label>المدينة</label>
+          <input id="city" type="text" placeholder="مثال: الرياض">
+        </div>
+
+        <div class="field">
+          <label>المحصول</label>
+          <input id="crop" type="text" placeholder="مثال: الطماطم">
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="registerFarmer()">تسجيل المزارع</button>
+        <button class="btn btn-secondary" onclick="fillDemoData()">تعبئة تجريبية</button>
+        <button class="btn btn-dark" onclick="clearForm()">إعادة ضبط</button>
+        <button class="btn btn-brown" onclick="previewData()">معاينة البيانات</button>
+      </div>
+
+      <div class="status-bar" id="statusBar">جاهز لتسجيل مزارع جديد.</div>
+    </div>
+  </div>
+<div class="grid-2">
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">معاينة البيانات قبل الإرسال</div>
+        <div class="section-note">مراجعة سريعة للمدخلات</div>
+      </div>
+      <div class="card-body">
+        <div class="analysis-box" id="previewBox">
+          اضغط على "معاينة البيانات" لعرض المدخلات هنا قبل إرسالها.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">نتيجة العملية</div>
+        <div class="section-note">نجاح أو فشل التسجيل</div>
+      </div>
+      <div class="card-body">
+        <div class="analysis-box" id="resultBox">
+          ستظهر هنا نتيجة تسجيل المزارع.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">ملاحظات تشغيلية</div>
+      <div class="section-note">توجيهات مهمة أثناء التسجيل</div>
+    </div>
+    <div class="card-body">
+      <div class="list">
+        <div class="list-item">تأكد من إدخال <span class="highlight">رقم جوال صحيح</span> لأن التنبيهات النصية تعتمد عليه.</div>
+        <div class="list-item">يفضّل استخدام <span class="highlight">اسم المنطقة والمدينة بشكل موحد</span> حتى تظهر البيانات بصورة صحيحة في الخرائط والتنبيهات.</div>
+        <div class="list-item">يفيد إدخال <span class="highlight">المحصول بدقة</span> في تحسين التوصيات والتنبيهات الميدانية.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+function setStatus(msg){
+  document.getElementById("statusBar").textContent = msg;
+}
+
+function safeText(v, fallback="-"){
+  return (v === null || v === undefined || v === "") ? fallback : v;
+}
+
+function getFormData(){
+  return {
+    name: document.getElementById("name").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    farm_name: document.getElementById("farm_name").value.trim(),
+    region: document.getElementById("region").value.trim(),
+    city: document.getElementById("city").value.trim(),
+    crop: document.getElementById("crop").value.trim()
+  };
+}
+
+function updateHero(data, statusText="جاهز"){
+  document.getElementById("heroStatus").textContent = statusText;
+  document.getElementById("heroName").textContent = safeText(data.name);
+  document.getElementById("heroRegion").textContent = safeText(data.region);
+  document.getElementById("heroCrop").textContent = safeText(data.crop);
+}
+
+function fillDemoData(){
+  document.getElementById("name").value = "مزارع تجريبي";
+  document.getElementById("phone").value = "0500000000";
+  document.getElementById("farm_name").value = "مزرعة النخيل النموذجية";
+  document.getElementById("region").value = "الرياض";
+  document.getElementById("city").value = "الرياض";
+  document.getElementById("crop").value = "نخيل";
+  updateHero(getFormData(), "جاهز");
+  setStatus("تمت تعبئة بيانات تجريبية.");
+}
+
+function clearForm(){
+  document.getElementById("name").value = "";
+  document.getElementById("phone").value = "";
+  document.getElementById("farm_name").value = "";
+  document.getElementById("region").value = "";
+  document.getElementById("city").value = "";
+  document.getElementById("crop").value = "";
+
+  updateHero({}, "جاهز");
+  document.getElementById("previewBox").innerHTML = 'اضغط على "معاينة البيانات" لعرض المدخلات هنا قبل إرسالها.';
+  document.getElementById("resultBox").innerHTML = "ستظهر هنا نتيجة تسجيل المزارع.";
+  setStatus("تمت إعادة ضبط النموذج.");
+}
+function previewData(){
+  const data = getFormData();
+  updateHero(data, "مراجعة");
+
+  document.getElementById("previewBox").innerHTML = `
+    <div class="list">
+      <div class="list-item"><span class="highlight">اسم المزارع:</span> ${safeText(data.name)}</div>
+      <div class="list-item"><span class="highlight">رقم الجوال:</span> ${safeText(data.phone)}</div>
+      <div class="list-item"><span class="highlight">اسم المزرعة:</span> ${safeText(data.farm_name)}</div>
+      <div class="list-item"><span class="highlight">المنطقة:</span> ${safeText(data.region)}</div>
+      <div class="list-item"><span class="highlight">المدينة:</span> ${safeText(data.city)}</div>
+      <div class="list-item"><span class="highlight">المحصول:</span> ${safeText(data.crop)}</div>
+    </div>
+  `;
+
+  setStatus("تمت معاينة البيانات.");
+}
+
+async function registerFarmer(){
+  try{
+    const data = getFormData();
+    updateHero(data, "جاري الإرسال");
+
+    if(!data.name || !data.phone || !data.farm_name || !data.region || !data.city || !data.crop){
+      document.getElementById("resultBox").innerHTML = `
+        <div class="error-box">يرجى تعبئة جميع الحقول قبل الإرسال.</div>
+      `;
+      setStatus("فشل التسجيل: توجد حقول ناقصة.");
+      updateHero(data, "ناقص");
+      return;
+    }
+
+    setStatus("جاري إرسال بيانات المزارع إلى النظام...");
+
+    const url = `${API}/farmers/register?name=${encodeURIComponent(data.name)}&phone=${encodeURIComponent(data.phone)}&farm_name=${encodeURIComponent(data.farm_name)}&region=${encodeURIComponent(data.region)}&city=${encodeURIComponent(data.city)}&crop=${encodeURIComponent(data.crop)}`;
+
+    const res = await fetch(url, {
+      method: "POST"
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+      document.getElementById("resultBox").innerHTML = `
+        <div class="ok-box">
+          تم تسجيل المزارع بنجاح.<br>
+          <b>الرسالة:</b> ${safeText(result.message, "Farmer registered successfully")}
+        </div>
+      `;
+      setStatus("تم تسجيل المزارع بنجاح.");
+      updateHero(data, "تم");
+    }else{
+      document.getElementById("resultBox").innerHTML = `
+        <div class="error-box">
+          فشل تسجيل المزارع.<br>
+          <b>السبب:</b> ${safeText(result.error, "خطأ غير معروف")}
+        </div>
+      `;
+      setStatus("فشل تسجيل المزارع.");
+      updateHero(data, "فشل");
+    }
+  }catch(err){
+    console.error(err);
+    document.getElementById("resultBox").innerHTML = `
+      <div class="error-box">
+        حدث خطأ أثناء الاتصال بالخادم.<br>
+        <b>التفاصيل:</b> ${err.message}
+      </div>
+    `;
+    setStatus("تعذر الاتصال بالخادم.");
+    updateHero(getFormData(), "خطأ");
+  }
+}
+
+updateHero({}, "جاهز");
+</script>
+
+</body>
+</html>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phytologic AI - مركز التقارير</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
+color:#1f2937;
+direction:rtl;
+text-align:right;
+}
+
+.page{
+max-width:1500px;
+margin:16px auto;
+padding:0 14px 28px;
+}
+
+.hero{
+background:
+linear-gradient(135deg,rgba(11,24,68,.97),rgba(20,124,85,.90)),
+radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
+color:white;
+border-radius:26px;
+padding:24px 26px;
+box-shadow:0 18px 40px rgba(0,0,0,.16);
+margin-bottom:16px;
+position:relative;
+overflow:hidden;
+}
+
+.hero-title{
+font-size:34px;
+font-weight:800;
+margin:0 0 8px 0;
+}
+
+.hero-sub{
+font-size:14px;
+line-height:1.9;
+opacity:.95;
+max-width:900px;
+}
+
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:14px;
+margin-bottom:16px;
+}
+
+.stat-card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:20px;
+padding:16px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+}
+
+.stat-label{
+font-size:13px;
+color:#6b7280;
+margin-bottom:8px;
+font-weight:700;
+}
+
+.stat-value{
+font-size:28px;
+font-weight:800;
+color:#111827;
+}
+
+.card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:22px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+overflow:hidden;
+margin-bottom:16px;
+}
+
+.section-header{
+padding:14px 16px;
+background:#f8fbff;
+border-bottom:1px solid #e9eef7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.section-title{
+font-size:18px;
+font-weight:800;
+}
+
+.card-body{
+padding:16px;
+}
+
+.grid-3{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:14px;
+}
+
+.field label{
+display:block;
+font-size:13px;
+margin-bottom:8px;
+font-weight:700;
+color:#64748b;
+}
+
+.field input,.field select{
+width:100%;
+padding:12px;
+border-radius:14px;
+border:1px solid #dbe4f2;
+font-size:14px;
+}
+
+.toolbar{
+margin-top:14px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.btn{
+padding:12px 18px;
+border:none;
+border-radius:14px;
+font-weight:800;
+cursor:pointer;
+font-size:14px;
+}
+
+.btn-primary{
+background:#16a34a;
+color:white;
+}
+
+.btn-dark{
+background:#1e293b;
+color:white;
+}
+
+.btn-secondary{
+background:#2563eb;
+color:white;
+}
+
+.table-wrap{
+overflow:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:900px;
+}
+
+th,td{
+padding:11px;
+border-bottom:1px solid #edf2fb;
+font-size:13px;
+}
+
+th{
+background:#f8fbff;
+font-weight:800;
+}
+
+.badge{
+padding:4px 10px;
+border-radius:999px;
+font-size:12px;
+color:white;
+font-weight:700;
+}
+
+.badge-green{background:#16a34a}
+.badge-blue{background:#2563eb}
+.badge-brown{background:#8b5e34}
+.badge-gray{background:#64748b}
+
+.status-bar{
+margin-top:10px;
+padding:10px;
+border-radius:14px;
+background:#eef4ff;
+border:1px solid #dbe7ff;
+font-size:13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page">
+
+<div class="hero">
+<h1 class="hero-title">مركز التقارير الزراعية</h1>
+<div class="hero-sub">
+لوحة تقارير موحدة لعرض وتحليل بيانات المزارعين والمحاصيل والمناطق داخل النظام.
+يمكن إنشاء تقارير يومية وأسبوعية وشهرية وتصديرها.
+</div>
+</div>
+
+<div class="stats-grid">
+
+<div class="stat-card">
+<div class="stat-label">إجمالي المزارعين</div>
+<div class="stat-value" id="totalFarmers">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-label">عدد المناطق</div>
+<div class="stat-value" id="regionsCount">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-label">عدد المحاصيل</div>
+<div class="stat-value" id="cropsCount">0</div>
+</div>
+
+<div class="stat-card">
+<div class="stat-label">آخر تحديث</div>
+<div class="stat-value" id="lastUpdate" style="font-size:20px">-</div>
+</div>
+
+</div>
+<div class="card">
+<div class="section-header">
+<div class="section-title">إعداد التقرير</div>
+</div>
+
+<div class="card-body">
+
+<div class="grid-3">
+
+<div class="field">
+<label>نوع التقرير</label>
+<select id="reportType">
+<option value="daily">يومي</option>
+<option value="weekly">أسبوعي</option>
+<option value="monthly">شهري</option>
+<option value="all">كامل</option>
+</select>
+</div>
+
+<div class="field">
+<label>تصفية المنطقة</label>
+<input id="regionFilter" placeholder="مثال: الرياض">
+</div>
+
+<div class="field">
+<label>تصفية المحصول</label>
+<input id="cropFilter" placeholder="مثال: نخيل">
+</div>
+
+</div>
+
+<div class="toolbar">
+
+<button class="btn btn-primary" onclick="generateReport()">إنشاء التقرير</button>
+
+<button class="btn btn-secondary" onclick="exportCSV()">تصدير CSV</button>
+
+<button class="btn btn-dark" onclick="exportJSON()">تصدير JSON</button>
+
+<button class="btn btn-dark" onclick="printReport()">طباعة التقرير</button>
+
+</div>
+
+<div class="status-bar" id="statusBar">
+جاهز لإنشاء التقرير.
+</div>
+
+</div>
+</div>
+<div class="card">
+
+<div class="section-header">
+<div class="section-title">نتائج التقرير</div>
+</div>
+
+<div class="card-body">
+
+<div class="table-wrap">
+
+<table>
+
+<thead>
+<tr>
+<th>#</th>
+<th>المزارع</th>
+<th>الهاتف</th>
+<th>المزرعة</th>
+<th>المنطقة</th>
+<th>المدينة</th>
+<th>المحصول</th>
+<th>تاريخ التسجيل</th>
+</tr>
+</thead>
+
+<tbody id="reportTable">
+<tr>
+<td colspan="8">لم يتم إنشاء تقرير بعد</td>
+</tr>
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+<script>
+
+const API = "http://127.0.0.1:8000";
+
+let farmersData = [];
+let reportData = [];
+
+function setStatus(msg){
+document.getElementById("statusBar").textContent = msg;
+}
+
+async function loadFarmers(){
+
+setStatus("جاري تحميل البيانات...")
+
+const res = await fetch(API + "/farmers");
+
+farmersData = await res.json();
+
+document.getElementById("totalFarmers").textContent = farmersData.length;
+
+const regions = new Set();
+const crops = new Set();
+
+farmersData.forEach(f=>{
+regions.add(f.region);
+crops.add(f.crop);
+});
+
+document.getElementById("regionsCount").textContent = regions.size;
+document.getElementById("cropsCount").textContent = crops.size;
+
+document.getElementById("lastUpdate").textContent =
+new Date().toLocaleTimeString();
+
+setStatus("تم تحميل البيانات بنجاح");
+
+}
+
+function generateReport(){
+
+let region = document.getElementById("regionFilter").value.trim();
+let crop = document.getElementById("cropFilter").value.trim();
+
+reportData = farmersData.filter(f=>{
+
+if(region && f.region !== region) return false;
+if(crop && f.crop !== crop) return false;
+
+return true;
+
+});
+
+renderTable();
+
+setStatus("تم إنشاء التقرير");
+
+}
+
+function renderTable(){
+
+const table = document.getElementById("reportTable");
+
+if(!reportData.length){
+
+table.innerHTML =
+'<tr><td colspan="8">لا توجد بيانات مطابقة</td></tr>';
+
+return;
+
+}
+
+table.innerHTML = reportData.map((f,i)=>`
+
+<tr>
+
+<td>${i+1}</td>
+<td>${f.name}</td>
+<td>${f.phone}</td>
+<td>${f.farm_name}</td>
+<td><span class="badge badge-green">${f.region}</span></td>
+<td>${f.city}</td>
+<td><span class="badge badge-blue">${f.crop}</span></td>
+<td>${f.created_at}</td>
+
+</tr>
+
+`).join("");
+
+}
+
+function exportJSON(){
+
+const blob =
+new Blob([JSON.stringify(reportData,null,2)],{type:"application/json"});
+
+const a = document.createElement("a");
+
+a.href = URL.createObjectURL(blob);
+
+a.download="farmers_report.json";
+
+a.click();
+
+}
+
+function exportCSV(){
+
+let rows = [
+["name","phone","farm","region","city","crop"]
+];
+
+reportData.forEach(f=>{
+rows.push([
+f.name,
+f.phone,
+f.farm_name,
+f.region,
+f.city,
+f.crop
+]);
+});
+
+let csv = rows.map(r=>r.join(",")).join("\n");
+
+const blob =
+new Blob([csv],{type:"text/csv"});
+
+const a=document.createElement("a");
+
+a.href = URL.createObjectURL(blob);
+
+a.download="farmers_report.csv";
+
+a.click();
+
+}
+
+function printReport(){
+window.print();
+}
+
+loadFarmers();
+
+</script>
+
+</body>
+</html>
