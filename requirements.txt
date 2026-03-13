@@ -8,3 +8,4 @@ requests
 opencv-python-headless
 torch
 torchvision
+gdown
