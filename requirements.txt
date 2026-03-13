@@ -12,4 +12,4 @@ gdown
 reportlab
 apscheduler
 arabic_reshaper
-bidi
+python-bidi
