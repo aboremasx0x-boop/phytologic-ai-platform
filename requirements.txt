@@ -9,3 +9,4 @@ opencv-python-headless
 torch
 torchvision
 gdown
+reportlat
