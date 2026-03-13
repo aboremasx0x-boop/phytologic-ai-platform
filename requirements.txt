@@ -6,3 +6,5 @@ scikit-learn
 pillow
 requests
 opencv-python-headless
+torch
+torchvision
