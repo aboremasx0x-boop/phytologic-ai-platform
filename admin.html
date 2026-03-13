@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phytologic AI - لوحة الجهات</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
+color:#1f2937;
+direction:rtl;
+text-align:right;
+}
+
+.page{
+max-width:1550px;
+margin:16px auto;
+padding:0 14px 28px;
+}
+
+.hero{
+background:
+linear-gradient(135deg,rgba(17,24,39,.97),rgba(30,64,175,.88)),
+radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
+color:white;
+border-radius:26px;
+padding:24px 26px;
+box-shadow:0 18px 40px rgba(0,0,0,.16);
+margin-bottom:16px;
+position:relative;
+overflow:hidden;
+}
+
+.hero:before{
+content:"";
+position:absolute;
+left:-40px;
+top:-40px;
+width:180px;
+height:180px;
+background:rgba(255,255,255,.06);
+border-radius:50%;
+}
+
+.hero:after{
+content:"";
+position:absolute;
+right:-25px;
+bottom:-25px;
+width:230px;
+height:230px;
+background:rgba(255,255,255,.05);
+border-radius:50%;
+}
+
+.hero-title{
+font-size:34px;
+font-weight:800;
+margin:0 0 8px 0;
+position:relative;
+z-index:1;
+}
+
+.hero-sub{
+font-size:14px;
+line-height:1.9;
+opacity:.95;
+position:relative;
+z-index:1;
+max-width:980px;
+}
+
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(6,1fr);
+gap:14px;
+margin-bottom:16px;
+}
+
+.stat-card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:20px;
+padding:16px 18px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+min-height:112px;
+}
+
+.stat-label{
+font-size:13px;
+color:#6b7280;
+margin-bottom:10px;
+font-weight:700;
+}
+
+.stat-value{
+font-size:28px;
+font-weight:800;
+color:#111827;
+}
+
+.stat-sub{
+font-size:12px;
+color:#94a3b8;
+margin-top:8px;
+line-height:1.6;
+}
+
+.card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:22px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+overflow:hidden;
+margin-bottom:16px;
+}
+
+.section-header{
+padding:14px 16px;
+background:#f8fbff;
+border-bottom:1px solid #e9eef7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.section-title{
+font-size:18px;
+font-weight:800;
+color:#0f172a;
+}
+
+.section-note{
+font-size:12px;
+color:#64748b;
+}
+
+.card-body{
+padding:16px;
+}
+
+.grid-2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.grid-3{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:14px;
+}
+
+.grid-4{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:14px;
+}
+
+.field label{
+display:block;
+font-size:13px;
+color:#64748b;
+margin-bottom:8px;
+font-weight:700;
+}
+
+.field input,
+.field select{
+width:100%;
+padding:12px 14px;
+border-radius:14px;
+border:1px solid #dbe4f2;
+background:#fff;
+font-size:14px;
+outline:none;
+transition:.2s;
+}
+
+.field input:focus,
+.field select:focus{
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.08);
+}
+
+.toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:8px;
+}
+
+.btn{
+padding:12px 18px;
+border:none;
+border-radius:14px;
+font-size:14px;
+font-weight:800;
+cursor:pointer;
+transition:.2s;
+white-space:nowrap;
+}
+
+.btn-primary{
+background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
+color:white;
+box-shadow:0 8px 16px rgba(37,99,235,.22);
+}
+
+.btn-secondary{
+background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
+color:white;
+}
+
+.btn-dark{
+background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
+color:white;
+}
+
+.btn-success{
+background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
+color:white;
+}
+
+.btn:hover{
+transform:translateY(-1px);
+}
+
+.info-box{
+padding:14px;
+border-radius:16px;
+border:1px solid #ecf2fb;
+background:#fbfdff;
+}
+
+.info-title{
+font-size:15px;
+font-weight:800;
+margin-bottom:10px;
+color:#111827;
+}
+
+.kpi{
+font-size:28px;
+font-weight:800;
+color:#111827;
+}
+
+.small{
+font-size:12px;
+color:#64748b;
+line-height:1.8;
+}
+
+.status-bar{
+margin-top:12px;
+padding:11px 12px;
+border-radius:14px;
+font-size:13px;
+background:#eef4ff;
+color:#334155;
+border:1px solid #dbe7ff;
+}
+
+.analysis-box{
+padding:14px;
+border-radius:18px;
+background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+border:1px solid #e7edf8;
+line-height:2;
+font-size:14px;
+}
+
+.list{
+display:grid;
+gap:8px;
+}
+
+.list-item{
+padding:10px 12px;
+border-radius:14px;
+background:#fbfdff;
+border:1px solid #edf2fb;
+font-size:13px;
+}
+
+.highlight{
+color:#0f172a;
+font-weight:800;
+}
+
+.table-wrap{
+overflow:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:900px;
+}
+
+th,td{
+padding:11px 10px;
+text-align:right;
+border-bottom:1px solid #edf2fb;
+font-size:13px;
+}
+
+th{
+background:#f8fbff;
+color:#334155;
+font-weight:800;
+}
+
+.badge{
+display:inline-block;
+padding:4px 10px;
+border-radius:999px;
+font-size:12px;
+font-weight:800;
+color:white;
+}
+
+.badge-green{background:#16a34a}
+.badge-orange{background:#d97706}
+.badge-red{background:#dc2626}
+.badge-gray{background:#64748b}
+
+.error-box{
+background:#fef2f2;
+border:1px solid #fecaca;
+color:#b91c1c;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+.ok-box{
+background:#ecfdf5;
+border:1px solid #a7f3d0;
+color:#047857;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+canvas{
+max-height:340px;
+}
+
+@media(max-width:1450px){
+.stats-grid{grid-template-columns:repeat(3,1fr)}
+.grid-4{grid-template-columns:repeat(2,1fr)}
+.grid-3{grid-template-columns:1fr 1fr}
+.grid-2{grid-template-columns:1fr}
+}
+
+@media(max-width:780px){
+.stats-grid,.grid-4,.grid-3{grid-template-columns:1fr}
+.hero-title{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="hero">
+    <h1 class="hero-title">لوحة الجهات - Phytologic AI</h1>
+    <div class="hero-sub">
+      لوحة تشغيل مركزية للجهات الزراعية والإدارية، تعرض مؤشرات الحالات والتنبيهات والمزارعين، وتتيح المتابعة السريعة للمناطق، الأمراض، والتنبيهات مع أدوات تشغيل مباشرة وإرسال رسائل SMS يدويًا.
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">إجمالي الحالات</div>
+      <div class="stat-value" id="totalCases">0</div>
+      <div class="stat-sub">من /stats/summary</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">متوسط الشدة</div>
+      <div class="stat-value" id="avgSeverity">0%</div>
+      <div class="stat-sub">الشدة العامة</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">أكثر مرض</div>
+      <div class="stat-value" id="topDisease" style="font-size:20px">-</div>
+      <div class="stat-sub">الأكثر تكرارًا</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">أكثر منطقة</div>
+      <div class="stat-value" id="topRegion" style="font-size:20px">-</div>
+      <div class="stat-sub">الأعلى تسجيلًا</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">إجمالي التنبيهات</div>
+      <div class="stat-value" id="totalAlerts">0</div>
+      <div class="stat-sub">من /alerts/summary</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">إجمالي المزارعين</div>
+      <div class="stat-value" id="totalFarmers">0</div>
+      <div class="stat-sub">من /farmers</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">أدوات لوحة الجهات</div>
+      <div class="section-note">تحديث وتشغيل وتصدير</div>
+    </div>
+    <div class="card-body">
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="loadAdminDashboard()">تحديث شامل</button>
+        <button class="btn btn-secondary" onclick="exportAdminJson()">تصدير JSON</button>
+        <button class="btn btn-dark" onclick="buildExecutiveAnalysis()">إعادة بناء التحليل</button>
+        <button class="btn btn-success" onclick="toggleAutoRefresh()">تشغيل/إيقاف التحديث التلقائي</button>
+      </div>
+      <div class="status-bar" id="statusBar">جاهز لتحميل لوحة الجهات.</div>
+    </div>
+  </div>
+<div class="grid-2">
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">الملخص التنفيذي السريع</div>
+        <div class="section-note">من الحالات والتنبيهات والمزارعين</div>
+      </div>
+      <div class="card-body">
+
+        <div class="grid-3">
+          <div class="info-box">
+            <div class="info-title">إجمالي الحالات</div>
+            <div class="kpi" id="sumCases">0</div>
+            <div class="small">عدد التشخيصات الكلي</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">التنبيهات المرتفعة</div>
+            <div class="kpi" id="sumHighAlerts">0</div>
+            <div class="small">الحالات الحرجة</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">آخر منطقة متأثرة</div>
+            <div class="kpi" id="sumLatestRegion" style="font-size:18px">-</div>
+            <div class="small">آخر تنبيه مسجل</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="analysis-box" id="summaryNarrative">
+          ستظهر هنا قراءة مختصرة للوضع العام.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">إرسال SMS يدوي</div>
+        <div class="section-note">المسار: /alerts/send-sms</div>
+      </div>
+      <div class="card-body">
+
+        <div class="grid-3">
+          <div class="field">
+            <label>المنطقة</label>
+            <input id="smsRegion" type="text" placeholder="مثال: الرياض">
+          </div>
+          <div class="field">
+            <label>اسم المرض</label>
+            <input id="smsDisease" type="text" placeholder="مثال: لفحة مبكرة">
+          </div>
+          <div class="field">
+            <label>درجة الخطر</label>
+            <input id="smsRisk" type="number" placeholder="مثال: 82">
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <button class="btn btn-primary" onclick="sendSMSAlert()">إرسال الرسائل</button>
+        </div>
+
+        <div style="margin-top:14px" class="analysis-box" id="smsResultBox">
+          نتيجة الإرسال ستظهر هنا.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">الأمراض الأكثر تكرارًا</div>
+        <div class="section-note">المسار: /stats/diseases</div>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:16px">
+          <canvas id="diseasesChart"></canvas>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>المرض</th>
+                <th>العدد</th>
+              </tr>
+            </thead>
+            <tbody id="diseasesTable">
+              <tr><td colspan="3">بانتظار البيانات...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">المناطق الأعلى تسجيلًا</div>
+        <div class="section-note">المسار: /stats/regions</div>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:16px">
+          <canvas id="regionsChart"></canvas>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>المنطقة</th>
+                <th>العدد</th>
+              </tr>
+            </thead>
+            <tbody id="regionsTable">
+              <tr><td colspan="3">بانتظار البيانات...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+<div class="grid-2">
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">المزارعون المسجلون</div>
+        <div class="section-note">المسار: /farmers</div>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:16px">
+          <canvas id="farmersRegionsChart"></canvas>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>الاسم</th>
+                <th>الهاتف</th>
+                <th>المزرعة</th>
+                <th>المنطقة</th>
+                <th>المدينة</th>
+                <th>المحصول</th>
+                <th>التاريخ</th>
+              </tr>
+            </thead>
+            <tbody id="farmersTable">
+              <tr><td colspan="8">بانتظار البيانات...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">التنبيهات الأخيرة</div>
+        <div class="section-note">المسار: /alerts</div>
+      </div>
+      <div class="card-body">
+        <div style="margin-bottom:16px">
+          <canvas id="alertsLevelsChart"></canvas>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>المنطقة</th>
+                <th>المدينة</th>
+                <th>المرض</th>
+                <th>درجة الخطر</th>
+                <th>المستوى</th>
+                <th>التاريخ</th>
+              </tr>
+            </thead>
+            <tbody id="alertsTable">
+              <tr><td colspan="7">بانتظار البيانات...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">التحليل التنفيذي المباشر</div>
+      <div class="section-note">قراءة تشغيلية موجّهة للجهة الإدارية</div>
+    </div>
+    <div class="card-body">
+      <div class="analysis-box" id="executiveAnalysis">
+        بعد تحميل البيانات ستظهر هنا قراءة تنفيذية مباشرة.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+let adminCache = {
+  summary:null,
+  diseases:[],
+  regions:[],
+  alertsSummary:null,
+  alerts:[],
+  farmers:[]
+};
+
+let autoRefresh = false;
+let autoRefreshTimer = null;
+
+let diseasesChart = null;
+let regionsChart = null;
+let farmersRegionsChart = null;
+let alertsLevelsChart = null;
+
+function setStatus(msg){
+  document.getElementById("statusBar").textContent = msg;
+}
+
+function safeText(v, fallback="-"){
+  return (v === null || v === undefined || v === "") ? fallback : v;
+}
+
+function destroyChart(chartObj){
+  if(chartObj){
+    chartObj.destroy();
+  }
+}
+
+function badgeHTML(level){
+  if(level === "مرتفع") return '<span class="badge badge-red">مرتفع</span>';
+  if(level === "متوسط") return '<span class="badge badge-orange">متوسط</span>';
+  if(level === "منخفض") return '<span class="badge badge-green">منخفض</span>';
+  return '<span class="badge badge-gray">غير متاح</span>';
+}
+
+async function fetchJson(url){
+  const res = await fetch(url);
+  return await res.json();
+}
+
+function exportAdminJson(){
+  const blob = new Blob([JSON.stringify(adminCache, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "admin_dashboard_data.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function toggleAutoRefresh(){
+  autoRefresh = !autoRefresh;
+
+  if(autoRefresh){
+    autoRefreshTimer = setInterval(loadAdminDashboard, 180000);
+    setStatus("تم تشغيل التحديث التلقائي كل 3 دقائق.");
+  }else{
+    clearInterval(autoRefreshTimer);
+    setStatus("تم إيقاف التحديث التلقائي.");
+  }
+}
+
+function renderSummary(){
+  const s = adminCache.summary || {};
+  const a = adminCache.alertsSummary || {};
+  const farmers = adminCache.farmers || [];
+
+  document.getElementById("totalCases").textContent = safeText(s.total_cases,0);
+  document.getElementById("avgSeverity").textContent = `${safeText(s.avg_severity,0)}%`;
+  document.getElementById("topDisease").textContent = safeText(s.top_disease?.name,"-");
+  document.getElementById("topRegion").textContent = safeText(s.top_region?.name,"-");
+  document.getElementById("totalAlerts").textContent = safeText(a.total_alerts,0);
+  document.getElementById("totalFarmers").textContent = farmers.length;
+
+  document.getElementById("sumCases").textContent = safeText(s.total_cases,0);
+  document.getElementById("sumHighAlerts").textContent = safeText(a.high_alerts,0);
+  document.getElementById("sumLatestRegion").textContent = safeText(a.latest_alert?.region,"-");
+
+  document.getElementById("summaryNarrative").innerHTML = `
+    <div class="list">
+      <div class="list-item">إجمالي الحالات الحالية هو <span class="highlight">${safeText(s.total_cases,0)}</span> حالة.</div>
+      <div class="list-item">متوسط شدة الإصابة العام هو <span class="highlight">${safeText(s.avg_severity,0)}%</span>.</div>
+      <div class="list-item">المرض الأكثر تكرارًا هو <span class="highlight">${safeText(s.top_disease?.name,"-")}</span>.</div>
+      <div class="list-item">عدد المزارعين المسجلين حاليًا هو <span class="highlight">${farmers.length}</span>.</div>
+    </div>
+  `;
+}
+function renderDiseases(){
+  const rows = adminCache.diseases || [];
+  const tbody = document.getElementById("diseasesTable");
+  tbody.innerHTML = "";
+
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
+    return;
+  }
+
+  rows.forEach((r, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${safeText(r.disease)}</td>
+        <td>${safeText(r.count,0)}</td>
+      </tr>
+    `;
+  });
+
+  destroyChart(diseasesChart);
+  diseasesChart = new Chart(document.getElementById("diseasesChart"),{
+    type:"bar",
+    data:{
+      labels:rows.map(r => r.disease),
+      datasets:[{
+        label:"عدد الحالات",
+        data:rows.map(r => Number(r.count || 0)),
+        borderWidth:1
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+}
+
+function renderRegions(){
+  const rows = adminCache.regions || [];
+  const tbody = document.getElementById("regionsTable");
+  tbody.innerHTML = "";
+
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
+    return;
+  }
+
+  rows.forEach((r, i) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${safeText(r.region)}</td>
+        <td>${safeText(r.count,0)}</td>
+      </tr>
+    `;
+  });
+
+  destroyChart(regionsChart);
+  regionsChart = new Chart(document.getElementById("regionsChart"),{
+    type:"bar",
+    data:{
+      labels:rows.map(r => r.region),
+      datasets:[{
+        label:"عدد الحالات",
+        data:rows.map(r => Number(r.count || 0)),
+        borderWidth:1
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false}
+  });
+}
+
+function renderFarmers(){
+  const rows = adminCache.farmers || [];
+  const tbody = document.getElementById("farmersTable");
+  tbody.innerHTML = "";
+
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="8">لا توجد بيانات.</td></tr>`;
+  }else{
+    rows.forEach((r, i) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(r.name)}</td>
+          <td>${safeText(r.phone)}</td>
+          <td>${safeText(r.farm_name)}</td>
+          <td>${safeText(r.region)}</td>
+          <td>${safeText(r.city)}</td>
+          <td>${safeText(r.crop)}</td>
+          <td>${safeText(r.created_at)}</td>
+        </tr>
+      `;
+    });
+  }
+
+  const regionCounts = {};
+  rows.forEach(r => {
+    const region = safeText(r.region,"غير محدد");
+    regionCounts[region] = (regionCounts[region] || 0) + 1;
+  });
+
+  destroyChart(farmersRegionsChart);
+  farmersRegionsChart = new Chart(document.getElementById("farmersRegionsChart"),{
+    type:"doughnut",
+    data:{
+      labels:Object.keys(regionCounts),
+      datasets:[{
+        data:Object.values(regionCounts)
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:"70%"}
+  });
+}
+
+function renderAlerts(){
+  const rows = adminCache.alerts || [];
+  const tbody = document.getElementById("alertsTable");
+  tbody.innerHTML = "";
+
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="7">لا توجد بيانات.</td></tr>`;
+  }else{
+    rows.slice(0,20).forEach((r, i) => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(r.region)}</td>
+          <td>${safeText(r.city)}</td>
+          <td>${safeText(r.disease_name)}</td>
+          <td>${safeText(r.risk_score,0)}</td>
+          <td>${badgeHTML(r.risk_level)}</td>
+          <td>${safeText(r.created_at)}</td>
+        </tr>
+      `;
+    });
+  }
+
+  const high = rows.filter(r => r.risk_level === "مرتفع").length;
+  const moderate = rows.filter(r => r.risk_level === "متوسط").length;
+  const low = rows.filter(r => r.risk_level === "منخفض").length;
+
+  destroyChart(alertsLevelsChart);
+  alertsLevelsChart = new Chart(document.getElementById("alertsLevelsChart"),{
+    type:"doughnut",
+    data:{
+      labels:["مرتفع","متوسط","منخفض"],
+      datasets:[{
+        data:[high, moderate, low]
+      }]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:"70%"}
+  });
+}
+
+function buildExecutiveAnalysis(){
+  const s = adminCache.summary || {};
+  const a = adminCache.alertsSummary || {};
+  const farmers = adminCache.farmers || [];
+  const alerts = adminCache.alerts || [];
+  const latestAlert = a.latest_alert || null;
+
+  document.getElementById("executiveAnalysis").innerHTML = `
+    <div class="list">
+      <div class="list-item"><span class="highlight">الوضع العام:</span> توجد ${safeText(s.total_cases,0)} حالة مسجلة بمتوسط شدة ${safeText(s.avg_severity,0)}%.</div>
+      <div class="list-item"><span class="highlight">أكثر مرض انتشارًا:</span> ${safeText(s.top_disease?.name,"-")}.</div>
+      <div class="list-item"><span class="highlight">أهم منطقة حاليًا:</span> ${safeText(s.top_region?.name,"-")}.</div>
+      <div class="list-item"><span class="highlight">المزارعون المسجلون:</span> ${farmers.length} مزارعًا.</div>
+      <div class="list-item"><span class="highlight">التنبيهات:</span> الإجمالي ${safeText(a.total_alerts,0)}، المرتفعة ${safeText(a.high_alerts,0)}، المتوسطة ${safeText(a.moderate_alerts,0)}.</div>
+      <div class="list-item"><span class="highlight">آخر تنبيه:</span> ${
+        latestAlert
+        ? `${safeText(latestAlert.region)} - ${safeText(latestAlert.disease_name)} - درجة ${safeText(latestAlert.risk_score,0)}`
+        : "لا يوجد تنبيه مسجل"
+      }</div>
+      <div class="list-item"><span class="highlight">التوصية التشغيلية:</span> ${
+        Number(a.high_alerts || 0) > 0
+        ? "يوصى بتفعيل استجابة ميدانية عاجلة في المناطق ذات التنبيهات المرتفعة وإشعار المزارعين بسرعة."
+        : Number(a.moderate_alerts || 0) > 0
+        ? "الوضع يحتاج متابعة منظمة واستباقية مع توسيع المراقبة في المناطق الأعلى تسجيلًا."
+        : "الوضع مستقر نسبيًا حاليًا مع أهمية استمرار التتبع الروتيني."
+      }</div>
+    </div>
+  `;
+}
+
+async function sendSMSAlert(){
+  try{
+    const region = document.getElementById("smsRegion").value.trim();
+    const disease = document.getElementById("smsDisease").value.trim();
+    const risk = document.getElementById("smsRisk").value.trim();
+
+    if(!region || !disease || !risk){
+      document.getElementById("smsResultBox").innerHTML = `<div class="error-box">يرجى تعبئة المنطقة واسم المرض ودرجة الخطر.</div>`;
+      return;
+    }
+
+    const url = `${API}/alerts/send-sms?region=${encodeURIComponent(region)}&disease_name=${encodeURIComponent(disease)}&risk_score=${encodeURIComponent(risk)}`;
+    const data = await fetchJson(url);
+
+    if(data.success === false){
+      throw new Error(data.error || "فشل الإرسال");
+    }
+
+    document.getElementById("smsResultBox").innerHTML = `
+      <div class="ok-box">
+        تم تنفيذ العملية بنجاح.<br>
+        عدد الرسائل المرسلة: <b>${safeText(data.sent_count,0)}</b>
+      </div>
+    `;
+  }catch(err){
+    console.error(err);
+    document.getElementById("smsResultBox").innerHTML = `<div class="error-box">تعذر إرسال الرسائل: ${err.message}</div>`;
+  }
+}
+
+async function loadAdminDashboard(){
+  try{
+    setStatus("جاري تحميل لوحة الجهات...");
+
+    const [summary, diseases, regions, alertsSummary, alerts, farmers] = await Promise.all([
+      fetchJson(`${API}/stats/summary`),
+      fetchJson(`${API}/stats/diseases`),
+      fetchJson(`${API}/stats/regions`),
+      fetchJson(`${API}/alerts/summary`),
+      fetchJson(`${API}/alerts?limit=100`),
+      fetchJson(`${API}/farmers`)
+    ]);
+
+    adminCache.summary = summary;
+    adminCache.diseases = Array.isArray(diseases) ? diseases : [];
+    adminCache.regions = Array.isArray(regions) ? regions : [];
+    adminCache.alertsSummary = alertsSummary;
+    adminCache.alerts = Array.isArray(alerts) ? alerts : [];
+    adminCache.farmers = Array.isArray(farmers) ? farmers : [];
+
+    renderSummary();
+    renderDiseases();
+    renderRegions();
+    renderFarmers();
+    renderAlerts();
+    buildExecutiveAnalysis();
+
+    setStatus("تم تحميل لوحة الجهات بنجاح.");
+  }catch(err){
+    console.error(err);
+    document.getElementById("executiveAnalysis").innerHTML = `<div class="error-box">تعذر تحميل لوحة الجهات: ${err.message}</div>`;
+    setStatus("تعذر تحميل لوحة الجهات.");
+  }
+}
+
+loadAdminDashboard();
+</script>
+
+</body>
+</html>

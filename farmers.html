@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phytologic AI - المزارعون المسجلون</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
+color:#1f2937;
+direction:rtl;
+text-align:right;
+}
+
+.page{
+max-width:1500px;
+margin:16px auto;
+padding:0 14px 28px;
+}
+
+.hero{
+background:
+linear-gradient(135deg,rgba(11,24,68,.97),rgba(22,124,85,.90)),
+radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
+color:white;
+border-radius:26px;
+padding:24px 26px;
+box-shadow:0 18px 40px rgba(0,0,0,.16);
+margin-bottom:16px;
+position:relative;
+overflow:hidden;
+}
+
+.hero:before{
+content:"";
+position:absolute;
+left:-40px;
+top:-40px;
+width:180px;
+height:180px;
+background:rgba(255,255,255,.06);
+border-radius:50%;
+}
+
+.hero:after{
+content:"";
+position:absolute;
+right:-25px;
+bottom:-25px;
+width:230px;
+height:230px;
+background:rgba(255,255,255,.05);
+border-radius:50%;
+}
+
+.hero-title{
+font-size:34px;
+font-weight:800;
+margin:0 0 8px 0;
+position:relative;
+z-index:1;
+}
+
+.hero-sub{
+font-size:14px;
+line-height:1.9;
+opacity:.95;
+position:relative;
+z-index:1;
+max-width:980px;
+}
+
+.stats-grid{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:14px;
+margin-bottom:16px;
+}
+
+.stat-card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:20px;
+padding:16px 18px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+min-height:110px;
+}
+
+.stat-label{
+font-size:13px;
+color:#6b7280;
+margin-bottom:10px;
+font-weight:700;
+}
+
+.stat-value{
+font-size:28px;
+font-weight:800;
+color:#111827;
+}
+
+.stat-sub{
+font-size:12px;
+color:#94a3b8;
+margin-top:8px;
+line-height:1.6;
+}
+
+.card{
+background:white;
+border:1px solid #e7edf8;
+border-radius:22px;
+box-shadow:0 10px 24px rgba(0,0,0,.05);
+overflow:hidden;
+margin-bottom:16px;
+}
+
+.section-header{
+padding:14px 16px;
+background:#f8fbff;
+border-bottom:1px solid #e9eef7;
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:10px;
+flex-wrap:wrap;
+}
+
+.section-title{
+font-size:18px;
+font-weight:800;
+color:#0f172a;
+}
+
+.section-note{
+font-size:12px;
+color:#64748b;
+}
+
+.card-body{
+padding:16px;
+}
+
+.grid-2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:16px;
+}
+
+.grid-3{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:14px;
+}
+
+.field label{
+display:block;
+font-size:13px;
+color:#64748b;
+margin-bottom:8px;
+font-weight:700;
+}
+
+.field input,
+.field select{
+width:100%;
+padding:12px 14px;
+border-radius:14px;
+border:1px solid #dbe4f2;
+background:#fff;
+font-size:14px;
+outline:none;
+transition:.2s;
+}
+
+.field input:focus,
+.field select:focus{
+border-color:#16a34a;
+box-shadow:0 0 0 4px rgba(22,163,74,.08);
+}
+.toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:14px;
+}
+
+.btn{
+padding:12px 18px;
+border:none;
+border-radius:14px;
+font-size:14px;
+font-weight:800;
+cursor:pointer;
+transition:.2s;
+white-space:nowrap;
+}
+
+.btn-primary{
+background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
+color:white;
+box-shadow:0 8px 16px rgba(21,128,61,.22);
+}
+
+.btn-secondary{
+background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);
+color:white;
+}
+
+.btn-dark{
+background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
+color:white;
+}
+
+.btn-brown{
+background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
+color:white;
+}
+
+.btn:hover{
+transform:translateY(-1px);
+}
+
+.info-box{
+padding:14px;
+border-radius:16px;
+border:1px solid #ecf2fb;
+background:#fbfdff;
+}
+
+.info-title{
+font-size:15px;
+font-weight:800;
+margin-bottom:10px;
+color:#111827;
+}
+
+.kpi{
+font-size:26px;
+font-weight:800;
+color:#111827;
+}
+
+.small{
+font-size:12px;
+color:#64748b;
+line-height:1.8;
+}
+
+.status-bar{
+margin-top:12px;
+padding:11px 12px;
+border-radius:14px;
+font-size:13px;
+background:#eef4ff;
+color:#334155;
+border:1px solid #dbe7ff;
+}
+
+.analysis-box{
+padding:14px;
+border-radius:18px;
+background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+border:1px solid #e7edf8;
+line-height:2;
+font-size:14px;
+}
+
+.list{
+display:grid;
+gap:8px;
+}
+
+.list-item{
+padding:10px 12px;
+border-radius:14px;
+background:#fbfdff;
+border:1px solid #edf2fb;
+font-size:13px;
+}
+
+.highlight{
+color:#0f172a;
+font-weight:800;
+}
+
+.table-wrap{
+overflow:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:980px;
+}
+
+th,td{
+padding:11px 10px;
+text-align:right;
+border-bottom:1px solid #edf2fb;
+font-size:13px;
+}
+
+th{
+background:#f8fbff;
+color:#334155;
+font-weight:800;
+}
+
+.badge{
+display:inline-block;
+padding:4px 10px;
+border-radius:999px;
+font-size:12px;
+font-weight:800;
+color:white;
+}
+
+.badge-green{background:#16a34a}
+.badge-blue{background:#2563eb}
+.badge-brown{background:#8b5e34}
+.badge-gray{background:#64748b}
+
+.error-box{
+background:#fef2f2;
+border:1px solid #fecaca;
+color:#b91c1c;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+.ok-box{
+background:#ecfdf5;
+border:1px solid #a7f3d0;
+color:#047857;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+@media(max-width:1200px){
+.stats-grid{grid-template-columns:repeat(3,1fr)}
+.grid-3{grid-template-columns:1fr 1fr}
+.grid-2{grid-template-columns:1fr}
+}
+
+@media(max-width:760px){
+.stats-grid,.grid-3{grid-template-columns:1fr}
+.hero-title{font-size:26px}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="hero">
+    <h1 class="hero-title">المزارعون المسجلون - Phytologic AI</h1>
+    <div class="hero-sub">
+      صفحة موحدة لعرض جميع المزارعين المسجلين في النظام، مع إمكانيات التصفية والبحث والتحليل السريع، وهي متوافقة مباشرة مع واجهة API الحالية للمزارعين.
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">إجمالي المزارعين</div>
+      <div class="stat-value" id="totalFarmers">0</div>
+      <div class="stat-sub">كل السجلات الحالية</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">المنطقة الأكثر تسجيلًا</div>
+      <div class="stat-value" id="topRegion" style="font-size:20px">-</div>
+      <div class="stat-sub">الأعلى عددًا</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">المحصول الأكثر تكرارًا</div>
+      <div class="stat-value" id="topCrop" style="font-size:20px">-</div>
+      <div class="stat-sub">الأكثر تسجيلًا</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">آخر مزارع مضاف</div>
+      <div class="stat-value" id="latestFarmer" style="font-size:20px">-</div>
+      <div class="stat-sub">أحدث سجل</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">عدد النتائج المعروضة</div>
+      <div class="stat-value" id="shownCount">0</div>
+      <div class="stat-sub">بعد التصفية والبحث</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">أدوات العرض والتصفية</div>
+      <div class="section-note">متوافقة مع /farmers و /farmers?region=...</div>
+    </div>
+    <div class="card-body">
+      <div class="grid-3">
+        <div class="field">
+          <label>تصفية حسب المنطقة</label>
+          <input id="regionFilter" type="text" placeholder="مثال: الرياض">
+        </div>
+
+        <div class="field">
+          <label>بحث سريع</label>
+          <input id="searchInput" type="text" placeholder="ابحث بالاسم أو المزرعة أو المدينة أو المحصول">
+        </div>
+
+        <div class="field">
+          <label>نوع التحميل</label>
+          <select id="loadMode">
+            <option value="all">جميع المزارعين</option>
+            <option value="region">حسب المنطقة فقط</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="loadFarmers()">تحديث البيانات</button>
+        <button class="btn btn-secondary" onclick="applySearch()">تطبيق البحث</button>
+        <button class="btn btn-dark" onclick="resetFilters()">إعادة ضبط</button>
+        <button class="btn btn-brown" onclick="exportFarmersJson()">تصدير JSON</button>
+      </div>
+
+      <div class="status-bar" id="statusBar">جاهز لتحميل بيانات المزارعين.</div>
+    </div>
+  </div>
+<div class="grid-2">
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">ملخص تحليلي سريع</div>
+        <div class="section-note">نظرة تشغيلية مختصرة</div>
+      </div>
+      <div class="card-body">
+        <div class="analysis-box" id="summaryBox">
+          ستظهر هنا قراءة تحليلية مختصرة بعد تحميل البيانات.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-header">
+        <div class="section-title">تفاصيل التصفية الحالية</div>
+        <div class="section-note">الحالة الحالية للعرض</div>
+      </div>
+      <div class="card-body">
+        <div class="analysis-box" id="filterBox">
+          لا توجد تصفية مطبقة حاليًا.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">جدول المزارعين</div>
+      <div class="section-note">عرض كامل للسجلات المسجلة</div>
+    </div>
+    <div class="card-body">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الاسم</th>
+              <th>الهاتف</th>
+              <th>المزرعة</th>
+              <th>المنطقة</th>
+              <th>المدينة</th>
+              <th>المحصول</th>
+              <th>تاريخ التسجيل</th>
+            </tr>
+          </thead>
+          <tbody id="farmersTableBody">
+            <tr>
+              <td colspan="8">بانتظار تحميل البيانات...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+
+let allFarmers = [];
+let displayedFarmers = [];
+
+function setStatus(msg){
+  document.getElementById("statusBar").textContent = msg;
+}
+
+function safeText(v, fallback="-"){
+  return (v === null || v === undefined || v === "") ? fallback : v;
+}
+
+function groupCount(items, key){
+  const counts = {};
+  items.forEach(item => {
+    const value = safeText(item[key], "غير محدد");
+    counts[value] = (counts[value] || 0) + 1;
+  });
+  return counts;
+}
+
+function getTopKey(countsObj){
+  let topKey = "-";
+  let topVal = -1;
+  Object.entries(countsObj).forEach(([k,v]) => {
+    if(v > topVal){
+      topVal = v;
+      topKey = k;
+    }
+  });
+  return topKey;
+}
+
+function renderStats(){
+  const regionCounts = groupCount(displayedFarmers, "region");
+  const cropCounts = groupCount(displayedFarmers, "crop");
+
+  document.getElementById("totalFarmers").textContent = allFarmers.length;
+  document.getElementById("topRegion").textContent = displayedFarmers.length ? getTopKey(regionCounts) : "-";
+  document.getElementById("topCrop").textContent = displayedFarmers.length ? getTopKey(cropCounts) : "-";
+  document.getElementById("latestFarmer").textContent = displayedFarmers.length ? safeText(displayedFarmers[0].name) : "-";
+  document.getElementById("shownCount").textContent = displayedFarmers.length;
+}
+
+function renderSummary(){
+  const regionCounts = groupCount(displayedFarmers, "region");
+  const cropCounts = groupCount(displayedFarmers, "crop");
+
+  document.getElementById("summaryBox").innerHTML = `
+    <div class="list">
+      <div class="list-item"><span class="highlight">إجمالي السجلات الحالية:</span> ${allFarmers.length}</div>
+      <div class="list-item"><span class="highlight">النتائج المعروضة:</span> ${displayedFarmers.length}</div>
+      <div class="list-item"><span class="highlight">أكثر منطقة:</span> ${displayedFarmers.length ? getTopKey(regionCounts) : "-"}</div>
+      <div class="list-item"><span class="highlight">أكثر محصول:</span> ${displayedFarmers.length ? getTopKey(cropCounts) : "-"}</div>
+    </div>
+  `;
+}
+
+function renderTable(){
+  const tbody = document.getElementById("farmersTableBody");
+
+  if(!displayedFarmers.length){
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8">لا توجد بيانات مطابقة.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = displayedFarmers.map((farmer, index) => `
+    <tr>
+      <td>${index + 1}</td>
+      <td>${safeText(farmer.name)}</td>
+      <td>${safeText(farmer.phone)}</td>
+      <td>${safeText(farmer.farm_name)}</td>
+      <td><span class="badge badge-green">${safeText(farmer.region)}</span></td>
+      <td>${safeText(farmer.city)}</td>
+      <td><span class="badge badge-blue">${safeText(farmer.crop)}</span></td>
+      <td>${safeText(farmer.created_at)}</td>
+    </tr>
+  `).join("");
+}
+function renderFilterState(){
+  const regionFilter = document.getElementById("regionFilter").value.trim();
+  const searchInput = document.getElementById("searchInput").value.trim();
+  const loadMode = document.getElementById("loadMode").value;
+
+  document.getElementById("filterBox").innerHTML = `
+    <div class="list">
+      <div class="list-item"><span class="highlight">وضع التحميل:</span> ${loadMode === "region" ? "حسب المنطقة" : "جميع المزارعين"}</div>
+      <div class="list-item"><span class="highlight">تصفية المنطقة:</span> ${regionFilter || "لا يوجد"}</div>
+      <div class="list-item"><span class="highlight">البحث السريع:</span> ${searchInput || "لا يوجد"}</div>
+    </div>
+  `;
+}
+
+async function loadFarmers(){
+  try{
+    setStatus("جاري تحميل بيانات المزارعين...");
+
+    const regionFilter = document.getElementById("regionFilter").value.trim();
+    const loadMode = document.getElementById("loadMode").value;
+
+    let url = `${API}/farmers`;
+
+    if(loadMode === "region" && regionFilter){
+      url += `?region=${encodeURIComponent(regionFilter)}`;
+    }
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if(!Array.isArray(data)){
+      throw new Error("الاستجابة ليست قائمة بيانات صحيحة");
+    }
+
+    allFarmers = data;
+    displayedFarmers = [...allFarmers];
+
+    applySearch(false);
+    setStatus("تم تحميل بيانات المزارعين بنجاح.");
+  }catch(err){
+    console.error(err);
+    document.getElementById("summaryBox").innerHTML = `
+      <div class="error-box">تعذر تحميل بيانات المزارعين: ${err.message}</div>
+    `;
+    document.getElementById("farmersTableBody").innerHTML = `
+      <tr>
+        <td colspan="8">حدث خطأ أثناء التحميل.</td>
+      </tr>
+    `;
+    setStatus("فشل تحميل بيانات المزارعين.");
+  }
+}
+
+function applySearch(showStatus=true){
+  const searchValue = document.getElementById("searchInput").value.trim().toLowerCase();
+
+  if(!searchValue){
+    displayedFarmers = [...allFarmers];
+  }else{
+    displayedFarmers = allFarmers.filter(farmer => {
+      const name = safeText(farmer.name, "").toLowerCase();
+      const farm = safeText(farmer.farm_name, "").toLowerCase();
+      const city = safeText(farmer.city, "").toLowerCase();
+      const crop = safeText(farmer.crop, "").toLowerCase();
+      const region = safeText(farmer.region, "").toLowerCase();
+
+      return (
+        name.includes(searchValue) ||
+        farm.includes(searchValue) ||
+        city.includes(searchValue) ||
+        crop.includes(searchValue) ||
+        region.includes(searchValue)
+      );
+    });
+  }
+
+  renderStats();
+  renderSummary();
+  renderTable();
+  renderFilterState();
+
+  if(showStatus){
+    setStatus("تم تطبيق البحث والتصفية.");
+  }
+}
+
+function resetFilters(){
+  document.getElementById("regionFilter").value = "";
+  document.getElementById("searchInput").value = "";
+  document.getElementById("loadMode").value = "all";
+
+  allFarmers = [];
+  displayedFarmers = [];
+
+  document.getElementById("summaryBox").innerHTML = "ستظهر هنا قراءة تحليلية مختصرة بعد تحميل البيانات.";
+  document.getElementById("filterBox").innerHTML = "لا توجد تصفية مطبقة حاليًا.";
+  document.getElementById("farmersTableBody").innerHTML = `
+    <tr>
+      <td colspan="8">بانتظار تحميل البيانات...</td>
+    </tr>
+  `;
+
+  document.getElementById("totalFarmers").textContent = "0";
+  document.getElementById("topRegion").textContent = "-";
+  document.getElementById("topCrop").textContent = "-";
+  document.getElementById("latestFarmer").textContent = "-";
+  document.getElementById("shownCount").textContent = "0";
+
+  setStatus("تمت إعادة ضبط الصفحة.");
+}
+
+function exportFarmersJson(){
+  if(!displayedFarmers.length){
+    setStatus("لا توجد بيانات لتصديرها.");
+    return;
+  }
+
+  const blob = new Blob([JSON.stringify(displayedFarmers, null, 2)], {type: "application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "farmers.json";
+  a.click();
+  URL.revokeObjectURL(url);
+
+  setStatus("تم تصدير البيانات بنجاح.");
+}
+
+loadFarmers();
+</script>
+
+</body>
+</html>

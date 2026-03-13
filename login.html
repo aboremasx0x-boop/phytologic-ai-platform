@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phytologic AI - تسجيل الدخول</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+font-family:Tahoma,Arial,sans-serif;
+background:
+linear-gradient(135deg, rgba(9,18,48,.96), rgba(13,94,95,.92)),
+linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
+min-height:100vh;
+color:#1f2937;
+direction:rtl;
+text-align:right;
+overflow-x:hidden;
+}
+
+.page{
+min-height:100vh;
+display:grid;
+grid-template-columns:1.1fr .9fr;
+}
+
+.left-side{
+position:relative;
+padding:42px 42px 28px;
+color:white;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+overflow:hidden;
+}
+
+.left-side:before{
+content:"";
+position:absolute;
+top:-80px;
+left:-80px;
+width:240px;
+height:240px;
+border-radius:50%;
+background:rgba(255,255,255,.07);
+}
+
+.left-side:after{
+content:"";
+position:absolute;
+bottom:-100px;
+right:-70px;
+width:280px;
+height:280px;
+border-radius:50%;
+background:rgba(255,255,255,.06);
+}
+
+.brand{
+position:relative;
+z-index:2;
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.brand-badge{
+width:58px;
+height:58px;
+border-radius:18px;
+display:grid;
+place-items:center;
+background:rgba(255,255,255,.12);
+font-size:28px;
+font-weight:800;
+box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+}
+
+.brand-text h1{
+margin:0;
+font-size:28px;
+font-weight:800;
+}
+
+.brand-text p{
+margin:6px 0 0;
+font-size:13px;
+opacity:.88;
+}
+
+.hero{
+position:relative;
+z-index:2;
+max-width:640px;
+margin-top:24px;
+}
+
+.hero h2{
+margin:0 0 12px;
+font-size:38px;
+line-height:1.35;
+font-weight:800;
+}
+
+.hero p{
+margin:0;
+font-size:15px;
+line-height:2;
+opacity:.92;
+}
+
+.features{
+position:relative;
+z-index:2;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:14px;
+margin-top:32px;
+max-width:760px;
+}
+
+.feature{
+background:rgba(255,255,255,.10);
+border:1px solid rgba(255,255,255,.10);
+border-radius:18px;
+padding:16px;
+backdrop-filter:blur(8px);
+}
+
+.feature-title{
+font-size:15px;
+font-weight:800;
+margin-bottom:8px;
+}
+
+.feature-desc{
+font-size:13px;
+line-height:1.9;
+opacity:.92;
+}
+.left-footer{
+position:relative;
+z-index:2;
+font-size:12px;
+opacity:.85;
+margin-top:26px;
+line-height:1.9;
+}
+
+.right-side{
+display:flex;
+align-items:center;
+justify-content:center;
+padding:28px;
+background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
+}
+
+.login-card{
+width:100%;
+max-width:500px;
+background:white;
+border:1px solid #e7edf8;
+border-radius:28px;
+box-shadow:0 18px 42px rgba(0,0,0,.10);
+overflow:hidden;
+}
+
+.card-head{
+padding:22px 24px;
+background:#f8fbff;
+border-bottom:1px solid #e9eef7;
+}
+
+.card-title{
+margin:0;
+font-size:24px;
+font-weight:800;
+color:#0f172a;
+}
+
+.card-subtitle{
+margin-top:8px;
+font-size:13px;
+color:#64748b;
+line-height:1.9;
+}
+
+.card-body{
+padding:24px;
+}
+
+.grid{
+display:grid;
+gap:16px;
+}
+
+.field label{
+display:block;
+font-size:13px;
+font-weight:700;
+color:#64748b;
+margin-bottom:8px;
+}
+
+.field input{
+width:100%;
+padding:14px 15px;
+border-radius:16px;
+border:1px solid #dbe4f2;
+background:#fff;
+font-size:14px;
+outline:none;
+transition:.2s;
+}
+
+.field input:focus{
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.08);
+}
+
+.inline-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:12px;
+flex-wrap:wrap;
+}
+
+.checkbox-wrap{
+display:flex;
+align-items:center;
+gap:8px;
+font-size:13px;
+color:#475569;
+}
+
+.checkbox-wrap input{
+accent-color:#2563eb;
+}
+
+.hint-box{
+padding:13px 14px;
+border-radius:16px;
+background:#fbfdff;
+border:1px solid #edf2fb;
+font-size:13px;
+line-height:1.9;
+color:#475569;
+}
+
+.demo-box{
+padding:13px 14px;
+border-radius:16px;
+background:#eff6ff;
+border:1px solid #bfdbfe;
+font-size:13px;
+line-height:1.9;
+color:#1d4ed8;
+}
+
+.toolbar{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:4px;
+}
+
+.btn{
+padding:14px 18px;
+border:none;
+border-radius:16px;
+font-size:14px;
+font-weight:800;
+cursor:pointer;
+transition:.2s;
+white-space:nowrap;
+}
+
+.btn-primary{
+background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
+color:white;
+box-shadow:0 8px 16px rgba(37,99,235,.22);
+}
+
+.btn-dark{
+background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
+color:white;
+}
+
+.btn-secondary{
+background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
+color:white;
+}
+
+.btn:hover{
+transform:translateY(-1px);
+}
+
+.status-bar{
+margin-top:12px;
+padding:12px 14px;
+border-radius:16px;
+font-size:13px;
+background:#eef4ff;
+color:#334155;
+border:1px solid #dbe7ff;
+}
+
+.result-box{
+margin-top:14px;
+padding:14px;
+border-radius:18px;
+background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
+border:1px solid #e7edf8;
+line-height:2;
+font-size:14px;
+min-height:74px;
+}
+
+.ok-box{
+background:#ecfdf5;
+border:1px solid #a7f3d0;
+color:#047857;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+.error-box{
+background:#fef2f2;
+border:1px solid #fecaca;
+color:#b91c1c;
+padding:12px;
+border-radius:14px;
+font-size:13px;
+}
+
+@media(max-width:1100px){
+.page{
+grid-template-columns:1fr;
+}
+.left-side{
+min-height:auto;
+padding-bottom:10px;
+}
+.hero h2{
+font-size:30px;
+}
+.features{
+grid-template-columns:1fr;
+}
+}
+
+@media(max-width:640px){
+.left-side,
+.right-side{
+padding:18px;
+}
+.hero h2{
+font-size:25px;
+}
+.card-body,
+.card-head{
+padding:18px;
+}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="left-side">
+    <div>
+      <div class="brand">
+        <div class="brand-badge">🌿</div>
+        <div class="brand-text">
+          <h1>Phytologic AI</h1>
+          <p>Unified Plant Health Platform</p>
+        </div>
+      </div>
+
+      <div class="hero">
+        <h2>بوابة دخول موحدة لمنصة التشخيص، التنبؤ، التنبيهات، والمراقبة الوطنية</h2>
+        <p>
+          صفحة دخول احترافية بنفس الهوية الموحدة للمنصة، ومهيأة للعمل الآن بوضع تجريبي محلي،
+          وجاهزة للربط لاحقًا مع أي API حقيقي للمصادقة دون الحاجة لإعادة تصميم الواجهة.
+        </p>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <div class="feature-title">التشخيص الذكي</div>
+          <div class="feature-desc">رفع الصور، تحليل الإصابة، حساب الشدة، والتقرير PDF.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-title">التوقعات الزراعية</div>
+          <div class="feature-desc">طقس حقيقي، توقع حي، مقارنة مناطق، وتحليل AI.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-title">مركز العمليات</div>
+          <div class="feature-desc">متابعة لحظية للتنبيهات والمخاطر على مستوى المناطق.</div>
+        </div>
+        <div class="feature">
+          <div class="feature-title">المنظور الوطني</div>
+          <div class="feature-desc">لوحات وطنية وإدارية ضمن واجهة موحدة ومترابطة.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="left-footer">
+      هذه الصفحة لا تفترض وجود API تسجيل دخول غير موجود. عند إضافة endpoint حقيقي للمصادقة،
+      سيتم تعديل جزء JavaScript فقط مع الإبقاء على نفس التصميم.
+    </div>
+  </div>
+
+  <div class="right-side">
+    <div class="login-card">
+      <div class="card-head">
+        <h3 class="card-title">تسجيل الدخول</h3>
+        <div class="card-subtitle">
+          أدخل بيانات الدخول للوصول إلى المنصة. يمكن تشغيل الصفحة الآن بوضع تجريبي،
+          أو ربطها لاحقًا مع API مصادقة حقيقي.
+        </div>
+      </div>
+<div class="card-body">
+
+        <div class="grid">
+          <div class="field">
+            <label>اسم المستخدم / البريد الإلكتروني</label>
+            <input id="username" type="text" placeholder="example@domain.com أو admin">
+          </div>
+
+          <div class="field">
+            <label>كلمة المرور</label>
+            <input id="password" type="password" placeholder="أدخل كلمة المرور">
+          </div>
+
+          <div class="inline-row">
+            <label class="checkbox-wrap">
+              <input id="rememberMe" type="checkbox">
+              <span>تذكرني</span>
+            </label>
+
+            <label class="checkbox-wrap">
+              <input id="demoMode" type="checkbox" checked>
+              <span>تشغيل الوضع التجريبي</span>
+            </label>
+          </div>
+
+          <div class="hint-box">
+            <b>مهم:</b> حسب الكود الذي أرسلته، لا يوجد حاليًا endpoint حقيقي لتسجيل الدخول داخل الـ API.
+            لذلك هذه الصفحة تعمل الآن بطريقة آمنة كواجهة دخول محلية، ويمكن تحويلها لاحقًا إلى مصادقة حقيقية بسهولة.
+          </div>
+
+          <div class="demo-box">
+            <b>بيانات تجريبية مقترحة:</b><br>
+            المستخدم: <b>admin</b><br>
+            كلمة المرور: <b>123456</b>
+          </div>
+
+          <div class="toolbar">
+            <button class="btn btn-primary" onclick="loginNow()">دخول</button>
+            <button class="btn btn-dark" onclick="fillDemoCredentials()">تعبئة تجريبية</button>
+            <button class="btn btn-secondary" onclick="clearLoginForm()">إعادة ضبط</button>
+          </div>
+
+          <div class="status-bar" id="statusBar">جاهز لتسجيل الدخول.</div>
+
+          <div class="result-box" id="resultBox">
+            ستظهر هنا نتيجة عملية الدخول.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = "http://127.0.0.1:8000";
+const DEFAULT_SUCCESS_PAGE = "layout_shell.html";
+
+function setStatus(msg){
+  document.getElementById("statusBar").textContent = msg;
+}
+
+function safeText(v, fallback="-"){
+  return (v === null || v === undefined || v === "") ? fallback : v;
+}
+
+function fillDemoCredentials(){
+  document.getElementById("username").value = "admin";
+  document.getElementById("password").value = "123456";
+  setStatus("تمت تعبئة بيانات تجريبية.");
+}
+
+function clearLoginForm(){
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("rememberMe").checked = false;
+  document.getElementById("demoMode").checked = true;
+  document.getElementById("resultBox").innerHTML = "ستظهر هنا نتيجة عملية الدخول.";
+  setStatus("تمت إعادة ضبط نموذج الدخول.");
+}
+
+function saveSession(username){
+  const remember = document.getElementById("rememberMe").checked;
+  const payload = {
+    username: username,
+    login_time: new Date().toISOString(),
+    mode: document.getElementById("demoMode").checked ? "demo" : "api"
+  };
+
+  if(remember){
+    localStorage.setItem("phytologic_login_session", JSON.stringify(payload));
+  }else{
+    sessionStorage.setItem("phytologic_login_session", JSON.stringify(payload));
+  }
+}
+async function loginNow(){
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const demoMode = document.getElementById("demoMode").checked;
+
+  if(!username || !password){
+    document.getElementById("resultBox").innerHTML = `
+      <div class="error-box">يرجى إدخال اسم المستخدم وكلمة المرور.</div>
+    `;
+    setStatus("فشل تسجيل الدخول: الحقول ناقصة.");
+    return;
+  }
+
+  setStatus("جاري التحقق من بيانات الدخول...");
+
+  try{
+    if(demoMode){
+      if(
+        (username === "admin" && password === "123456") ||
+        (username === "nalmasoud" && password === "123456")
+      ){
+        saveSession(username);
+
+        document.getElementById("resultBox").innerHTML = `
+          <div class="ok-box">
+            تم تسجيل الدخول بنجاح في الوضع التجريبي.<br>
+            سيتم تحويلك إلى المنصة الرئيسية.
+          </div>
+        `;
+
+        setStatus("تم تسجيل الدخول بنجاح.");
+        setTimeout(() => {
+          window.location.href = DEFAULT_SUCCESS_PAGE;
+        }, 900);
+      }else{
+        document.getElementById("resultBox").innerHTML = `
+          <div class="error-box">
+            بيانات الدخول التجريبية غير صحيحة.<br>
+            جرّب: admin / 123456
+          </div>
+        `;
+        setStatus("بيانات الدخول التجريبية غير صحيحة.");
+      }
+
+      return;
+    }
+
+    /*
+      جاهز للربط لاحقًا مع API حقيقي.
+      عندما تضيف endpoint مثل /login أو /auth/login
+      استبدل هذا الجزء فقط.
+    */
+
+    const guessedEndpoints = [
+      `${API}/login`,
+      `${API}/auth/login`,
+      `${API}/users/login`,
+      `${API}/token`
+    ];
+
+    let foundEndpoint = null;
+
+    for(const ep of guessedEndpoints){
+      try{
+        const testRes = await fetch(ep, {
+          method: "OPTIONS"
+        });
+        if(testRes){
+          foundEndpoint = ep;
+          break;
+        }
+      }catch(e){
+      }
+    }
+
+    if(!foundEndpoint){
+      document.getElementById("resultBox").innerHTML = `
+        <div class="error-box">
+          لا يوجد حاليًا endpoint حقيقي لتسجيل الدخول داخل الـ API الحالي.<br>
+          فعّل "الوضع التجريبي" الآن، أو أضف مسار Login في الخادم ثم اربطه هنا.
+        </div>
+      `;
+      setStatus("لم يتم العثور على API تسجيل دخول.");
+      return;
+    }
+
+    const response = await fetch(foundEndpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: username,
+        password: password
+      })
+    });
+
+    const result = await response.json().catch(() => ({}));
+
+    if(response.ok){
+      saveSession(username);
+
+      document.getElementById("resultBox").innerHTML = `
+        <div class="ok-box">
+          تم تسجيل الدخول عبر API بنجاح.
+        </div>
+      `;
+      setStatus("تم تسجيل الدخول عبر API.");
+      setTimeout(() => {
+        window.location.href = DEFAULT_SUCCESS_PAGE;
+      }, 900);
+    }else{
+      document.getElementById("resultBox").innerHTML = `
+        <div class="error-box">
+          فشل تسجيل الدخول عبر API.<br>
+          ${safeText(result.error, "الاستجابة لا تحتوي على رسالة خطأ واضحة")}
+        </div>
+      `;
+      setStatus("فشل تسجيل الدخول عبر API.");
+    }
+
+  }catch(err){
+    console.error(err);
+    document.getElementById("resultBox").innerHTML = `
+      <div class="error-box">
+        حدث خطأ أثناء محاولة تسجيل الدخول.<br>
+        ${err.message}
+      </div>
+    `;
+    setStatus("تعذر تنفيذ عملية الدخول.");
+  }
+}
+
+fillDemoCredentials();
+</script>
+
+</body>
+</html>
