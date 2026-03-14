@@ -1112,14 +1112,11 @@ if not scheduler.running:
 # Root / Health
 # =========================
 
+from fastapi.responses import FileResponse
+
 @app.get("/")
 def root():
-    return {
-        "message": "Phytologic AI API is running",
-        "model_path": MODEL_PATH,
-        "num_classes": num_classes
-    }
-
+    return FileResponse("index.html")
 
 @app.get("/health")
 def health():
