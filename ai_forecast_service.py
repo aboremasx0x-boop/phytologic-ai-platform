@@ -1,8 +1,13 @@
 import os
 import joblib
-
+import urllib.request
 
 MODEL_PATH = "forecast_model.pkl"
+
+# تحميل النموذج تلقائياً إذا لم يكن موجود
+if not os.path.exists(MODEL_PATH):
+    url = "https://github.com/aboremasx0x-boop/phytologic-ai-platform/releases/download/v2/forecast_model.pkl"
+    urllib.request.urlretrieve(url, MODEL_PATH)
 
 
 class AIForecastService:
