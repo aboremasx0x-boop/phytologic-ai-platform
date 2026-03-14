@@ -48,7 +48,12 @@ def home():
 
 @app.get("/{page_name}")
 def open_page(page_name: str):
-    return FileResponse(page_name)
+    file_path = f"{page_name}.html" if not page_name.endswith(".html") else page_name
+
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+
+    return JSONResponse({"error": "page not found"}, status_code=404)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
