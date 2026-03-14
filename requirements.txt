@@ -13,3 +13,4 @@ reportlab
 apscheduler
 arabic_reshaper
 python-bidi==0.4.2
+python-multipart
