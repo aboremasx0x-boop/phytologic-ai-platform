@@ -41,7 +41,9 @@ from sms_service import SMSService
 app = FastAPI(title="Phytologic AI API")
 
 app.mount("/static", StaticFiles(directory="."), name="static")
-
+@app.get("/")
+def home():
+    return FileResponse("index_home.html")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
