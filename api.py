@@ -71,13 +71,14 @@ MODEL_PATH = "plant_disease_model_v3.pth"
 IMG_SIZE = 160
 
 import os
-import gdown
+import urllib.request
 
-# تحميل النموذج من Google Drive إذا لم يكن موجود
+MODEL_PATH = "plant_disease_model_v3.pth"
+
+# تحميل النموذج من GitHub إذا لم يكن موجود
 if not os.path.exists(MODEL_PATH):
-    url = "https://drive.google.com/uc?id=1O4SQIGsfd_Z_Q9ks6ZB3-LnSx7QFOAHq"
-    gdown.download(url, MODEL_PATH, quiet=False)
-
+    url = "https://github.com/aboremasx0x-boop/phytologic-ai-platform/releases/download/v1/plant_disease_model_v3.pth"
+    urllib.request.urlretrieve(url, MODEL_PATH)
 checkpoint = torch.load(MODEL_PATH, map_location="cpu")
 classes = checkpoint["classes"]
 num_classes = len(classes)
