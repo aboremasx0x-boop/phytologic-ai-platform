@@ -43,7 +43,7 @@ app = FastAPI(title="Phytologic AI API")
 app.mount("/static", StaticFiles(directory="."), name="static")
 @app.get("/")
 def home():
-    return FileResponse("index_home.html")
+    return FileResponse("index.html")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
