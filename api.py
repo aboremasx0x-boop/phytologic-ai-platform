@@ -16,6 +16,7 @@ import torch.nn.functional as F
 from PIL import Image
 
 from fastapi import FastAPI, UploadFile, File, Query
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse, Response
 
@@ -38,6 +39,8 @@ from sms_service import SMSService
 
 
 app = FastAPI(title="Phytologic AI API")
+
+app.mount("/static", StaticFiles(directory="."), name="static")
 
 app.add_middleware(
     CORSMiddleware,
