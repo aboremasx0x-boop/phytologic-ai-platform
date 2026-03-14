@@ -42,8 +42,13 @@ app = FastAPI(title="Phytologic AI API")
 
 app.mount("/static", StaticFiles(directory="."), name="static")
 @app.get("/")
-def root():
-    return {"message": "Phytologic AI API is running"}
+def home():
+    return FileResponse("index.html")
+
+
+@app.get("/{page_name}")
+def open_page(page_name: str):
+    return FileResponse(page_name)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
