@@ -19,7 +19,7 @@ from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse, Response
-
+from fastapi.responses import FileResponse
 from torchvision import transforms, models
 
 from reportlab.lib.pagesizes import A4
