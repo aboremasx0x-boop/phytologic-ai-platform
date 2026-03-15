@@ -15,4 +15,4 @@ arabic_reshaper
 python-bidi==0.4.2
 python-multipart
 joblib
-scikit-learn
+
