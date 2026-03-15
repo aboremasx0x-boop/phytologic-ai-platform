@@ -433,7 +433,8 @@ font-size:13px;
       <div class="stat-sub">سبب الإصابة</div>
     </div>
   </div>
-<div class="card">
+
+  <div class="card">
     <div class="section-header">
       <div class="section-title">بيانات الإدخال</div>
       <div class="section-note">متوافقة مع /predict و /report</div>
@@ -558,6 +559,44 @@ font-size:13px;
           </div>
         </div>
 
+        <div class="grid-4" style="margin-top:14px">
+          <div class="info-box">
+            <div class="info-title">التشخيص الأول</div>
+            <div class="kpi" id="top1Disease" style="font-size:18px">-</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">ثقة التشخيص الأول</div>
+            <div class="kpi" id="top1Confidence">0%</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">التشخيص الثاني</div>
+            <div class="kpi" id="top2Disease" style="font-size:18px">-</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">ثقة التشخيص الثاني</div>
+            <div class="kpi" id="top2Confidence">0%</div>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-top:14px">
+          <div class="info-box">
+            <div class="info-title">مستوى الثقة</div>
+            <div class="kpi" id="confidenceLevel" style="font-size:18px">-</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">حالة القرار</div>
+            <div class="kpi" id="decisionStatus" style="font-size:18px">-</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">حالة التشابه</div>
+            <div class="kpi" id="similarCase" style="font-size:18px">-</div>
+          </div>
+          <div class="info-box">
+            <div class="info-title">Bullseye Pattern</div>
+            <div class="kpi" id="bullseyeDetected" style="font-size:18px">-</div>
+          </div>
+        </div>
+
         <div style="margin-top:14px" class="analysis-box" id="coreInfoBox">
           ستظهر هنا معلومات المرض الأساسية.
         </div>
@@ -566,7 +605,8 @@ font-size:13px;
     </div>
 
   </div>
-<div class="grid-2">
+
+  <div class="grid-2">
 
     <div class="card">
       <div class="section-header">
@@ -672,6 +712,12 @@ function safeText(v, fallback="-"){
   return (v === null || v === undefined || v === "") ? fallback : v;
 }
 
+function safePercent(v){
+  const n = Number(v);
+  if (isNaN(n)) return "0%";
+  return `${n.toFixed(2)}%`;
+}
+
 function severityBadge(levelAr){
   if(levelAr === "مرتفعة") return '<span class="badge badge-red">مرتفعة</span>';
   if(levelAr === "متوسطة") return '<span class="badge badge-orange">متوسطة</span>';
@@ -726,6 +772,15 @@ function clearAll(){
   document.getElementById("plantName").textContent = "-";
   document.getElementById("diseaseName").textContent = "-";
 
+  document.getElementById("top1Disease").textContent = "-";
+  document.getElementById("top1Confidence").textContent = "0%";
+  document.getElementById("top2Disease").textContent = "-";
+  document.getElementById("top2Confidence").textContent = "0%";
+  document.getElementById("confidenceLevel").textContent = "-";
+  document.getElementById("decisionStatus").textContent = "-";
+  document.getElementById("similarCase").textContent = "-";
+  document.getElementById("bullseyeDetected").textContent = "-";
+
   document.getElementById("heroPrediction").textContent = "-";
   document.getElementById("heroConfidence").textContent = "0%";
   document.getElementById("heroSeverity").textContent = "0%";
@@ -742,21 +797,41 @@ function clearAll(){
 
   setStatus("تمت إعادة ضبط الصفحة.");
 }
+
 function renderDiagnosis(data){
   lastDiagnosis = data;
 
   const bestPrediction = safeText(data.best_prediction?.class_name, data.pred_label);
-  const confidence = Number(data.best_prediction?.confidence ?? 0).toFixed(2);
+  const confidence = Number(data.best_prediction?.confidence ?? data.confidence ?? 0).toFixed(2);
   const plant = safeText(data.disease_info?.plant);
-  const disease = safeText(data.disease_info?.disease_ar);
-  const cause = safeText(data.disease_info?.cause);
+  const disease = safeText(data.disease_info?.disease_ar, data.pred_label);
+  const cause = safeText(data.disease_info?.cause, data.pathogen_type);
   const severityPercent = Number(data.severity?.severity_percent_est ?? 0).toFixed(2);
   const severityLevelAr = safeText(data.severity?.label?.ar);
+
+  const top1Disease = safeText(data.top1_disease, data.pred_class);
+  const top1Confidence = Number(data.top1_confidence ?? data.confidence ?? 0) * 100;
+  const top2Disease = safeText(data.top2_disease);
+  const top2Confidence = Number(data.top2_confidence ?? 0) * 100;
+  const confidenceLevel = safeText(data.confidence_level);
+  const decisionStatus = safeText(data.decision_status);
+  const decisionText = safeText(data.decision_text);
+  const similarCase = data.similar_case === true ? "نعم" : "لا";
+  const bullseyeDetected = data.bullseye_detected === true ? "نعم" : "لا";
 
   document.getElementById("bestPrediction").textContent = bestPrediction;
   document.getElementById("confidence").textContent = `${confidence}%`;
   document.getElementById("plantName").textContent = plant;
   document.getElementById("diseaseName").textContent = disease;
+
+  document.getElementById("top1Disease").textContent = top1Disease;
+  document.getElementById("top1Confidence").textContent = `${top1Confidence.toFixed(2)}%`;
+  document.getElementById("top2Disease").textContent = top2Disease;
+  document.getElementById("top2Confidence").textContent = `${top2Confidence.toFixed(2)}%`;
+  document.getElementById("confidenceLevel").textContent = confidenceLevel;
+  document.getElementById("decisionStatus").textContent = decisionStatus;
+  document.getElementById("similarCase").textContent = similarCase;
+  document.getElementById("bullseyeDetected").textContent = bullseyeDetected;
 
   document.getElementById("heroPrediction").textContent = disease;
   document.getElementById("heroConfidence").textContent = `${confidence}%`;
@@ -779,6 +854,12 @@ function renderDiagnosis(data){
       <div class="list-item"><span class="highlight">المرض:</span> ${disease}</div>
       <div class="list-item"><span class="highlight">المسبب:</span> ${cause}</div>
       <div class="list-item"><span class="highlight">شدة الإصابة:</span> ${severityPercent}% - ${severityBadge(severityLevelAr)}</div>
+      <div class="list-item"><span class="highlight">التشخيص الأول:</span> ${top1Disease} (${top1Confidence.toFixed(2)}%)</div>
+      <div class="list-item"><span class="highlight">التشخيص الثاني:</span> ${top2Disease} (${top2Confidence.toFixed(2)}%)</div>
+      <div class="list-item"><span class="highlight">مستوى الثقة:</span> ${confidenceLevel}</div>
+      <div class="list-item"><span class="highlight">حالة القرار:</span> ${decisionStatus}</div>
+      <div class="list-item"><span class="highlight">تفسير القرار:</span> ${decisionText}</div>
+      <div class="list-item"><span class="highlight">Bullseye Pattern:</span> ${bullseyeDetected}</div>
     </div>
   `;
 
@@ -845,6 +926,10 @@ function renderDiagnosis(data){
       <div class="list-item"><span class="highlight">أفضل تشخيص:</span> ${disease} بنسبة ثقة ${confidence}%.</div>
       <div class="list-item"><span class="highlight">الوضع المرضي:</span> المسبب المصنّف هو ${cause} على نبات ${plant}.</div>
       <div class="list-item"><span class="highlight">شدة الإصابة:</span> ${severityPercent}% بمستوى ${severityLevelAr}.</div>
+      <div class="list-item"><span class="highlight">التشخيص الأول:</span> ${top1Disease} (${top1Confidence.toFixed(2)}%).</div>
+      <div class="list-item"><span class="highlight">التشخيص الثاني:</span> ${top2Disease} (${top2Confidence.toFixed(2)}%).</div>
+      <div class="list-item"><span class="highlight">قرار المنصة:</span> ${decisionStatus} - ${decisionText}.</div>
+      <div class="list-item"><span class="highlight">Bullseye Pattern:</span> ${bullseyeDetected}.</div>
       <div class="list-item"><span class="highlight">القرار التنفيذي:</span> ${
         severityLevelAr === "مرتفعة"
         ? "التدخل السريع ميدانيًا ضروري مع تطبيق برنامج مكافحة مناسب."
