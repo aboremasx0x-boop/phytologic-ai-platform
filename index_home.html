@@ -606,6 +606,89 @@ font-size:13px;
 
   </div>
 
+  <!-- بطاقة الأسئلة التأكيدية -->
+  <div class="card" id="questionCard" style="display:none;">
+    <div class="section-header">
+      <div class="section-title">أسئلة تأكيدية للتشخيص</div>
+      <div class="section-note">تظهر عند انخفاض الثقة أو وجود تشابه بين الأمراض</div>
+    </div>
+    <div class="card-body">
+
+      <div class="grid-2">
+        <div class="field">
+          <label>هل توجد حلقات دائرية متراكزة داخل البقع؟</label>
+          <select id="q_rings">
+            <option value="">اختر</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل البقع صغيرة وكثيرة ومتناثرة؟</label>
+          <select id="q_small_spots">
+            <option value="">اختر</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل يوجد مركز فاتح أو رمادي داخل البقعة؟</label>
+          <select id="q_gray_center">
+            <option value="">اختر</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل توجد نقاط سوداء دقيقة داخل مركز البقعة؟</label>
+          <select id="q_black_dots">
+            <option value="">اختر</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل البقع كبيرة نسبيًا وداكنة؟</label>
+          <select id="q_large_dark">
+            <option value="">اختر</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل بدأت الإصابة في الأوراق السفلية أو الأقدم؟</label>
+          <select id="q_lower_leaves">
+            <option value="">اختر</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>هل يوجد اصفرار واضح حول البقع؟</label>
+          <select id="q_yellow_halo">
+            <option value="">اختر</option>
+            <option value="yes">نعم</option>
+            <option value="no">لا</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-primary" onclick="applyDiagnosticQuestions()">تطبيق الإجابات</button>
+      </div>
+
+      <div class="analysis-box" id="questionsResultBox">
+        ستظهر هنا نتيجة الترجيح بعد الإجابة.
+      </div>
+    </div>
+  </div>
+
   <div class="grid-2">
 
     <div class="card">
@@ -794,6 +877,18 @@ function clearAll(){
   document.getElementById("pesticideOptionsTable").innerHTML = `<tr><td colspan="8">لا توجد بيانات بعد.</td></tr>`;
   document.getElementById("top3Table").innerHTML = `<tr><td colspan="3">لا توجد بيانات بعد.</td></tr>`;
   document.getElementById("executiveAnalysis").innerHTML = "بعد تشغيل التشخيص ستظهر هنا قراءة تنفيذية مباشرة.";
+  document.getElementById("questionsResultBox").innerHTML = "ستظهر هنا نتيجة الترجيح بعد الإجابة.";
+  document.getElementById("questionCard").style.display = "none";
+
+  const selects = [
+    "q_rings", "q_small_spots", "q_gray_center", "q_black_dots",
+    "q_large_dark", "q_lower_leaves", "q_yellow_halo"
+  ];
+
+  selects.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = "";
+  });
 
   setStatus("تمت إعادة ضبط الصفحة.");
 }
@@ -937,6 +1032,106 @@ function renderDiagnosis(data){
         ? "تحتاج الحالة إلى متابعة جيدة وبرنامج مكافحة أو وقاية حسب التوصيات."
         : "الوضع منخفض نسبيًا ويكفي غالبًا الالتزام بالمراقبة والتوصيات الوقائية."
       }</div>
+    </div>
+  `;
+
+  if(data.similar_case === true || data.confidence_level === "منخفضة"){
+    document.getElementById("questionCard").style.display = "block";
+  } else {
+    document.getElementById("questionCard").style.display = "none";
+  }
+}
+
+function getAnswerValue(id){
+  return document.getElementById(id)?.value || "";
+}
+
+function applyDiagnosticQuestions(){
+  if(!lastDiagnosis){
+    document.getElementById("questionsResultBox").innerHTML =
+      `<div class="error-box">يجب تشغيل التشخيص أولًا.</div>`;
+    return;
+  }
+
+  let earlyBlightScore = 0;
+  let septoriaScore = 0;
+
+  const rings = getAnswerValue("q_rings");
+  const smallSpots = getAnswerValue("q_small_spots");
+  const grayCenter = getAnswerValue("q_gray_center");
+  const blackDots = getAnswerValue("q_black_dots");
+  const largeDark = getAnswerValue("q_large_dark");
+  const lowerLeaves = getAnswerValue("q_lower_leaves");
+  const yellowHalo = getAnswerValue("q_yellow_halo");
+
+  if(rings === "yes") earlyBlightScore += 3;
+  if(smallSpots === "yes") septoriaScore += 2;
+  if(grayCenter === "yes") septoriaScore += 2;
+  if(blackDots === "yes") septoriaScore += 3;
+  if(largeDark === "yes") earlyBlightScore += 2;
+  if(lowerLeaves === "yes"){
+    earlyBlightScore += 1;
+    septoriaScore += 1;
+  }
+  if(yellowHalo === "yes") earlyBlightScore += 1;
+
+  const imgTop1 = Number(lastDiagnosis.top1_confidence || 0);
+  const imgTop2 = Number(lastDiagnosis.top2_confidence || 0);
+
+  let finalEarly = 0;
+  let finalSeptoria = 0;
+
+  if(
+    lastDiagnosis.top1_disease === "Tomato_Early_blight" ||
+    lastDiagnosis.top2_disease === "Tomato_Early_blight"
+  ){
+    finalEarly += lastDiagnosis.top1_disease === "Tomato_Early_blight" ? imgTop1 : imgTop2;
+  }
+
+  if(
+    lastDiagnosis.top1_disease === "Tomato Septoria leaf spot" ||
+    lastDiagnosis.top2_disease === "Tomato Septoria leaf spot"
+  ){
+    finalSeptoria += lastDiagnosis.top1_disease === "Tomato Septoria leaf spot" ? imgTop1 : imgTop2;
+  }
+
+  finalEarly += (earlyBlightScore * 0.05);
+  finalSeptoria += (septoriaScore * 0.05);
+
+  let finalDiagnosis = "غير مؤكد";
+  let finalNote = "";
+
+  if(finalEarly > finalSeptoria){
+    const diff = finalEarly - finalSeptoria;
+    if(diff >= 0.15){
+      finalDiagnosis = "اللفحة المبكرة في الطماطم";
+      finalNote = "تم ترجيح اللفحة المبكرة بعد دمج الصورة مع الإجابات الوصفية.";
+    } else {
+      finalDiagnosis = "اللفحة المبكرة في الطماطم (ترجيح مبدئي)";
+      finalNote = "اللفحة المبكرة أقرب، لكن ما زال يوجد تشابه.";
+    }
+  } else if(finalSeptoria > finalEarly){
+    const diff = finalSeptoria - finalEarly;
+    if(diff >= 0.15){
+      finalDiagnosis = "تبقع السبتوريا في أوراق الطماطم";
+      finalNote = "تم ترجيح السبتوريا بعد دمج الصورة مع الإجابات الوصفية.";
+    } else {
+      finalDiagnosis = "تبقع السبتوريا في أوراق الطماطم (ترجيح مبدئي)";
+      finalNote = "السبتيوريا أقرب، لكن ما زال يوجد تشابه.";
+    }
+  } else {
+    finalDiagnosis = "ما زال التشخيص غير مؤكد";
+    finalNote = "الإجابات لم تحسم الفرق بين المرضين.";
+  }
+
+  document.getElementById("questionsResultBox").innerHTML = `
+    <div class="list">
+      <div class="list-item"><span class="highlight">نقاط اللفحة المبكرة:</span> ${earlyBlightScore}</div>
+      <div class="list-item"><span class="highlight">نقاط السبتوريا:</span> ${septoriaScore}</div>
+      <div class="list-item"><span class="highlight">ترجيح الصورة + الأسئلة للّفحة:</span> ${finalEarly.toFixed(2)}</div>
+      <div class="list-item"><span class="highlight">ترجيح الصورة + الأسئلة للسبتيوريا:</span> ${finalSeptoria.toFixed(2)}</div>
+      <div class="list-item"><span class="highlight">النتيجة النهائية:</span> ${finalDiagnosis}</div>
+      <div class="list-item"><span class="highlight">التفسير:</span> ${finalNote}</div>
     </div>
   `;
 }
