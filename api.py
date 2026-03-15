@@ -857,27 +857,109 @@ def build_pdf_bytes(result: dict) -> bytes:
     buffer.seek(0)
     return buffer.read()
 
+def detect_bullseye_pattern(img_pil: Image.Image) -> bool:
+    """
+    كشف مبسط لنمط الحلقات المتراكزة لترجيح اللفحة المبكرة
+    """
+    img_bgr = pil_to_cv(img_pil)
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, (7, 7), 0)
 
+    circles = cv2.HoughCircles(
+        gray,
+        cv2.HOUGH_GRADIENT,
+        dp=1.2,
+        minDist=20,
+        param1=50,
+        param2=18,
+        minRadius=6,
+        maxRadius=80
+    )
+
+    return circles is not None
 def infer_result_from_image(img_pil: Image.Image, lang: str = "ar") -> dict:
     x = transform(img_pil).unsqueeze(0)
 
     with torch.no_grad():
         out = model(x)
-        probs = torch.softmax(out, dim=1)
-        top_probs, top_idx = torch.topk(probs, k=3)
+        probs_tensor = torch.softmax(out, dim=1)
 
-    best_idx = top_idx[0][0].item()
-    best_class = classes[best_idx]
-    best_conf = float(top_probs[0][0].item())
+    probs = probs_tensor[0].cpu().numpy()
 
+    # أعلى 3 تنبؤات
+    top_indices_all = np.argsort(probs)[::-1]
+    top3_indices = top_indices_all[:3]
+
+    # أعلى تشخيصين
+    top1_index = int(top_indices_all[0])
+    top2_index = int(top_indices_all[1])
+
+    top1_name = classes[top1_index]
+    top2_name = classes[top2_index]
+
+    top1_conf = float(probs[top1_index])
+    top2_conf = float(probs[top2_index])
+
+    # كشف bullseye pattern لترجيح اللفحة المبكرة
+    bullseye_detected = detect_bullseye_pattern(img_pil)
+
+    if bullseye_detected:
+        if "Early_blight" in top1_name or "Early blight" in top1_name:
+            top1_conf += 0.15
+        if "Early_blight" in top2_name or "Early blight" in top2_name:
+            top2_conf += 0.15
+
+    # إعادة ترتيب أعلى تشخيصين بعد الترجيح
+    if top2_conf > top1_conf:
+        top1_name, top2_name = top2_name, top1_name
+        top1_conf, top2_conf = top2_conf, top1_conf
+        top1_index, top2_index = top2_index, top1_index
+
+    gap = abs(top1_conf - top2_conf)
+
+    # مستوى الثقة
+    if top1_conf >= 0.80:
+        confidence_level = "عالية"
+    elif top1_conf >= 0.60:
+        confidence_level = "متوسطة"
+    else:
+        confidence_level = "منخفضة"
+
+    # حالة القرار
+    if top1_conf < 0.60:
+        decision_status = "غير مؤكد"
+        decision_text = f"الثقة منخفضة ويوجد تشابه بين {top1_name} و {top2_name}"
+        similar_case = True
+    elif gap < 0.15:
+        decision_status = "تشابه بين مرضين"
+        decision_text = f"يوجد تشابه بين {top1_name} و {top2_name}"
+        similar_case = True
+    else:
+        decision_status = "تشخيص محتمل"
+        decision_text = f"التشخيص الأقرب هو {top1_name}"
+        similar_case = False
+
+    # التشخيص الأساسي النهائي
+    best_idx = top1_index
+    best_class = top1_name
+    best_conf = top1_conf
+
+    # أفضل 3 تنبؤات
     top3 = []
     top_3_predictions = []
+    for idx in top3_indices:
+        cls = classes[int(idx)]
+        conf = float(probs[int(idx)])
 
-    for p, i in zip(top_probs[0], top_idx[0]):
-        cls = classes[i.item()]
-        conf = float(p.item())
+        # لو كان هذا هو Early blight وتم كشف bullseye نرفع النسبة المعروضة
+        if cls == best_class:
+            conf = best_conf
 
-        top3.append({"class": cls, "confidence": conf})
+        top3.append({
+            "class": cls,
+            "confidence": conf
+        })
+
         top_3_predictions.append({
             "class_name": cls,
             "confidence": round(conf * 100, 2)
@@ -907,20 +989,36 @@ def infer_result_from_image(img_pil: Image.Image, lang: str = "ar") -> dict:
         "recommendations": info.get("advice", []),
         "severity": severity,
         "gradcam_overlay_b64": gradcam_b64,
+
         "best_prediction": {
             "class_name": best_class,
             "confidence": round(best_conf * 100, 2)
         },
+
         "top3": top3,
         "top_3_predictions": top_3_predictions,
+
         "disease_info": {
             "plant": info.get("plant", "غير معروف"),
             "disease_ar": info.get("disease_ar", best_class),
             "cause": info.get("cause", "غير معروف"),
             "advice": info.get("advice", [])
         },
+
         "pesticide_suggestion": pesticide_program["main"],
-        "pesticide_options": pesticide_program["options"]
+        "pesticide_options": pesticide_program["options"],
+
+        # الحقول الجديدة للواجهة
+        "top1_disease": top1_name,
+        "top1_confidence": round(top1_conf, 4),
+        "top2_disease": top2_name,
+        "top2_confidence": round(top2_conf, 4),
+        "confidence_level": confidence_level,
+        "decision_status": decision_status,
+        "decision_text": decision_text,
+        "similar_case": similar_case,
+        "bullseye_detected": bullseye_detected
+    }
     }
 # =========================
 # التوقع والمخاطر
