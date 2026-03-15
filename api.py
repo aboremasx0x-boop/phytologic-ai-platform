@@ -36,7 +36,33 @@ from disease_info import DISEASE_INFO
 from database import init_db, save_diagnosis, save_alert, save_farmer
 from ai_forecast_service import AIForecastService
 from sms_service import SMSService
+def extract_disease_region(image_pil):
+    img = np.array(image_pil)
 
+    hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
+
+    lower = np.array([10, 50, 50])
+    upper = np.array([35, 255, 255])
+
+    mask = cv2.inRange(hsv, lower, upper)
+
+    kernel = np.ones((5,5),np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    if len(contours) == 0:
+        return image_pil
+
+    largest = max(contours, key=cv2.contourArea)
+
+    x,y,w,h = cv2.boundingRect(largest)
+
+    crop = img[y:y+h, x:x+w]
+
+    crop = cv2.resize(crop,(224,224))
+
+    return Image.fromarray(crop)
 
 app = FastAPI(title="Phytologic AI API")
 
@@ -1162,7 +1188,7 @@ async def predict(
         image_bytes = await file.read()
         image_path = save_upload_file(image_bytes, file.filename or "upload.jpg")
         img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-
+        img = extract_disease_region(img)
         result = infer_result_from_image(img, lang=lang)
         lat, lon, _ = resolve_region_or_city_coords(region=region, city=city, latitude=latitude, longitude=longitude)
 
