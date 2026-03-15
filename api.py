@@ -1019,7 +1019,7 @@ def infer_result_from_image(img_pil: Image.Image, lang: str = "ar") -> dict:
         "similar_case": similar_case,
         "bullseye_detected": bullseye_detected
     }
-    }
+    
 # =========================
 # التوقع والمخاطر
 # =========================
