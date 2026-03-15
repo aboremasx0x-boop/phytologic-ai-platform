@@ -135,7 +135,38 @@ class PredictResult:
     severity: Dict[str, Any]
     gradcam_overlay_b64: str
 
+import cv2
+import numpy as np
+from PIL import Image
+import io
 
+
+def detect_bullseye_pattern(pil_img):
+    """
+    كشف نمط الحلقات المتراكزة في البقع
+    لترجيح اللفحة المبكرة
+    """
+
+    img = np.array(pil_img)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.GaussianBlur(gray, (5,5), 0)
+
+    circles = cv2.HoughCircles(
+        gray,
+        cv2.HOUGH_GRADIENT,
+        dp=1.2,
+        minDist=20,
+        param1=50,
+        param2=18,
+        minRadius=6,
+        maxRadius=80
+    )
+
+    if circles is not None:
+        return True
+    return False
 def predict_image(
     image_bytes: bytes,
     model: nn.Module,
@@ -160,6 +191,32 @@ def predict_image(
         logits = model(x)
 
     probs = _softmax_probs(logits)
+    probs_np = probs
+
+top_indices = np.argsort(probs_np)[::-1][:2]
+
+top1_index = int(top_indices[0])
+top2_index = int(top_indices[1])
+
+top1_conf = float(probs_np[top1_index])
+top2_conf = float(probs_np[top2_index])
+
+top1_name = CLASS_NAMES[top1_index]
+top2_name = CLASS_NAMES[top2_index]
+
+gap = abs(top1_conf - top2_conf)
+
+bullseye_detected = detect_bullseye_pattern(pil_img)
+
+if bullseye_detected:
+    if "Early_blight" in top1_name:
+        top1_conf += 0.15
+    if "Early_blight" in top2_name:
+        top2_conf += 0.15
+
+if top2_conf > top1_conf:
+    top1_name, top2_name = top2_name, top1_name
+    top1_conf, top2_conf = top2_conf, top1_conf
     idx = int(np.argmax(probs))
     pred_class = CLASS_NAMES[idx]
     confidence = float(probs[idx])
@@ -186,13 +243,24 @@ def predict_image(
         device=device
     )
 
-    return {
-        "pred_class": pred_class,
-        "pred_label": pred_label,
-        "pathogen_type": pathogen_type,
-        "confidence": confidence,
-        "probabilities": probabilities,
-        "severity": severity,
-        "recommendations": severity.get("recommendations", []),
-        "gradcam_overlay_b64": gradcam_b64,
-    }
+   return {
+    "pred_class": pred_class,
+    "pred_label": pred_label,
+    "pathogen_type": pathogen_type,
+    "confidence": confidence,
+    "probabilities": probabilities,
+    "severity": severity,
+    "recommendations": severity.get("recommendations", []),
+    "gradcam_overlay_b64": gradcam_b64,
+
+    # إضافات التشخيص المزدوج
+    "top1_disease": top1_name,
+    "top1_confidence": top1_conf,
+    "top2_disease": top2_name,
+    "top2_confidence": top2_conf,
+    "confidence_level": confidence_level,
+    "decision_status": decision_status,
+    "decision_text": decision_text,
+    "similar_case": similar_case,
+    "bullseye_detected": bullseye_detected
+}
