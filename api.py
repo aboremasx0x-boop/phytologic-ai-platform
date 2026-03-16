@@ -126,13 +126,7 @@ def open_page_legacy(page_name: str):
 
     return JSONResponse({"error": f"{file_path} not found"}, status_code=404)
 
-    file_path = f"{page_name}.html" if not page_name.endswith(".html") else page_name
-
-    if os.path.exists(file_path):
-        return FileResponse(file_path)
-
-    return JSONResponse({"error": "page not found"}, status_code=404)
-
+   
 
 # =========================
 # تهيئة الخدمات
@@ -189,8 +183,12 @@ transform = transforms.Compose([
 # دعم الخط العربي في PDF
 # =========================
 
+os.makedirs("fonts", exist_ok=True)
+
 AR_FONT_REGISTERED = False
 for font_path in [
+    "fonts/NotoNaskhArabic-Regular.ttf",
+    "fonts/Amiri-Regular.ttf",
     r"C:\Windows\Fonts\arial.ttf",
     r"C:\Windows\Fonts\tahoma.ttf"
 ]:
@@ -201,6 +199,8 @@ for font_path in [
             break
         except Exception:
             pass
+
+print("AR_FONT_REGISTERED =", AR_FONT_REGISTERED)       
 # =========================
 # إحداثيات المناطق والمدن
 # =========================
@@ -1369,6 +1369,7 @@ async def predict_frame(file: UploadFile = File(...), lang: str = Query("ar")):
     try:
         image_bytes = await file.read()
         img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img = extract_disease_region(img)
         result = infer_result_from_image(img, lang=lang)
 
         return JSONResponse({
@@ -1396,6 +1397,7 @@ async def report(
     try:
         image_bytes = await file.read()
         img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        img = extract_disease_region(img)
         result = infer_result_from_image(img, lang=lang)
 
         result["farmer_name"] = farmer_name
