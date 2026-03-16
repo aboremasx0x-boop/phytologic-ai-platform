@@ -1,860 +1,171 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - التنبيهات</title>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-*{box-sizing:border-box}
-
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
-
-.page{
-max-width:1550px;
-margin:16px auto;
-padding:0 14px 28px;
-}
-
-.hero{
-background:
-linear-gradient(135deg,rgba(56,16,16,.96),rgba(127,29,29,.92)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:26px;
-padding:24px 26px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
-
-.hero:before{
-content:"";
-position:absolute;
-left:-40px;
-top:-40px;
-width:180px;
-height:180px;
-background:rgba(255,255,255,.06);
-border-radius:50%;
-}
-
-.hero:after{
-content:"";
-position:absolute;
-right:-25px;
-bottom:-25px;
-width:230px;
-height:230px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-}
-
-.hero-title{
-font-size:34px;
-font-weight:800;
-margin:0 0 8px 0;
-position:relative;
-z-index:1;
-}
-
-.hero-sub{
-font-size:14px;
-line-height:1.9;
-opacity:.95;
-position:relative;
-z-index:1;
-max-width:980px;
-}
-
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:14px;
-margin-bottom:16px;
-}
-
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px 18px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-min-height:112px;
-}
-
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:10px;
-font-weight:700;
-}
-
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
-
-.stat-sub{
-font-size:12px;
-color:#94a3b8;
-margin-top:8px;
-line-height:1.6;
-}
-
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
-
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.section-title{
-font-size:18px;
-font-weight:800;
-color:#0f172a;
-}
-
-.section-note{
-font-size:12px;
-color:#64748b;
-}
-
-.card-body{
-padding:16px;
-}
-
-.grid-2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
-
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
-
-.grid-4{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:14px;
-}
-
-.field label{
-display:block;
-font-size:13px;
-color:#64748b;
-margin-bottom:8px;
-font-weight:700;
-}
-
-.field input,
-.field select{
-width:100%;
-padding:12px 14px;
-border-radius:14px;
-border:1px solid #dbe4f2;
-background:#fff;
-font-size:14px;
-outline:none;
-transition:.2s;
-}
-
-.field input:focus,
-.field select:focus{
-border-color:#dc2626;
-box-shadow:0 0 0 4px rgba(220,38,38,.08);
-}
-
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:8px;
-}
-
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
-
-.btn-primary{
-background:linear-gradient(180deg,#dc2626 0%,#b91c1c 100%);
-color:white;
-box-shadow:0 8px 16px rgba(220,38,38,.22);
-}
-
-.btn-secondary{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
-
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
-
-.btn-success{
-background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
-color:white;
-}
-
-.btn:hover{
-transform:translateY(-1px);
-}
-
-.info-box{
-padding:14px;
-border-radius:16px;
-border:1px solid #ecf2fb;
-background:#fbfdff;
-}
-
-.info-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:10px;
-color:#111827;
-}
-
-.kpi{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
-
-.small{
-font-size:12px;
-color:#64748b;
-line-height:1.8;
-}
-
-.status-bar{
-margin-top:12px;
-padding:11px 12px;
-border-radius:14px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
-
-.analysis-box{
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-}
-
-.list{
-display:grid;
-gap:8px;
-}
-
-.list-item{
-padding:10px 12px;
-border-radius:14px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-}
-
-.highlight{
-color:#0f172a;
-font-weight:800;
-}
-
-.table-wrap{
-overflow:auto;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-min-width:1100px;
-}
-
-th,td{
-padding:11px 10px;
-text-align:right;
-border-bottom:1px solid #edf2fb;
-font-size:13px;
-}
-
-th{
-background:#f8fbff;
-color:#334155;
-font-weight:800;
-}
-
-.badge{
-display:inline-block;
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-color:white;
-}
-
-.badge-green{background:#16a34a}
-.badge-orange{background:#d97706}
-.badge-red{background:#dc2626}
-.badge-gray{background:#64748b}
-
-.error-box{
-background:#fef2f2;
-border:1px solid #fecaca;
-color:#b91c1c;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
-
-.ok-box{
-background:#ecfdf5;
-border:1px solid #a7f3d0;
-color:#047857;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
-
-canvas{
-max-height:340px;
-}
-
-@media(max-width:1450px){
-.stats-grid{grid-template-columns:repeat(3,1fr)}
-.grid-4{grid-template-columns:repeat(2,1fr)}
-.grid-3{grid-template-columns:1fr 1fr}
-.grid-2{grid-template-columns:1fr}
-}
-
-@media(max-width:780px){
-.stats-grid,.grid-4,.grid-3{grid-template-columns:1fr}
-.hero-title{font-size:26px}
-}
-</style>
-</head>
-<body>
-
-<div class="page">
-
-  <div class="hero">
-    <h1 class="hero-title">لوحة التنبيهات - Phytologic AI</h1>
-    <div class="hero-sub">
-      لوحة تشغيل احترافية لمراقبة التنبيهات الزراعية، تتضمن ملخص المخاطر، آخر تنبيه، توزيع المناطق، جدول التنبيهات الكامل، وإمكانية إرسال رسائل SMS يدويًا للمزارعين في المنطقة المستهدفة.
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">إجمالي التنبيهات</div>
-      <div class="stat-value" id="totalAlerts">0</div>
-      <div class="stat-sub">من /alerts/summary</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">تنبيهات مرتفعة</div>
-      <div class="stat-value" id="highAlerts">0</div>
-      <div class="stat-sub">الخطر المرتفع فقط</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">تنبيهات متوسطة</div>
-      <div class="stat-value" id="moderateAlerts">0</div>
-      <div class="stat-sub">الخطر المتوسط فقط</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">آخر منطقة</div>
-      <div class="stat-value" id="latestRegion" style="font-size:20px">-</div>
-      <div class="stat-sub">آخر تنبيه مسجل</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">آخر مرض</div>
-      <div class="stat-value" id="latestDisease" style="font-size:20px">-</div>
-      <div class="stat-sub">اسم المرض في آخر تنبيه</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">آخر درجة خطر</div>
-      <div class="stat-value" id="latestRiskScore">0</div>
-      <div class="stat-sub">القيمة الرقمية للتنبيه الأخير</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">أدوات اللوحة</div>
-      <div class="section-note">تحديث، تصفية، وتصدير</div>
-    </div>
-    <div class="card-body">
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="loadAlertsDashboard()">تحديث شامل</button>
-        <button class="btn btn-secondary" onclick="exportAlertsJson()">تصدير JSON</button>
-        <button class="btn btn-dark" onclick="applyFilters()">تطبيق الفلاتر</button>
-        <button class="btn btn-success" onclick="clearFilters()">إعادة ضبط</button>
-      </div>
-      <div class="status-bar" id="statusBar">جاهز لتحميل لوحة التنبيهات.</div>
-    </div>
-  </div>
-<div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">ملخص التنبيهات</div>
-        <div class="section-note">المصدر: /alerts/summary</div>
-      </div>
-      <div class="card-body">
-        <div class="grid-3">
-          <div class="info-box">
-            <div class="info-title">إجمالي التنبيهات</div>
-            <div class="kpi" id="sumTotalAlerts">0</div>
-            <div class="small">عدد كل التنبيهات</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">آخر منطقة</div>
-            <div class="kpi" id="sumLatestRegion" style="font-size:18px">-</div>
-            <div class="small">آخر تنبيه مسجل</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">آخر مستوى</div>
-            <div class="kpi" id="sumLatestLevel" style="font-size:18px">-</div>
-            <div class="small">مستوى خطر آخر تنبيه</div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="summaryNarrative">
-          ستظهر هنا قراءة مختصرة لملف التنبيهات.
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">إرسال SMS يدوي</div>
-        <div class="section-note">المسار: /alerts/send-sms</div>
-      </div>
-      <div class="card-body">
-        <div class="grid-3">
-          <div class="field">
-            <label>المنطقة</label>
-            <input id="smsRegion" type="text" placeholder="مثال: الرياض">
-          </div>
-          <div class="field">
-            <label>اسم المرض</label>
-            <input id="smsDisease" type="text" placeholder="مثال: لفحة مبكرة">
-          </div>
-          <div class="field">
-            <label>درجة الخطر</label>
-            <input id="smsRisk" type="number" placeholder="مثال: 78">
-          </div>
-        </div>
-
-        <div class="toolbar">
-          <button class="btn btn-primary" onclick="sendSMSAlert()">إرسال الرسائل</button>
-        </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="smsResultBox">
-          نتيجة إرسال الرسائل ستظهر هنا.
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">فلاتر التنبيهات</div>
-      <div class="section-note">تصفية البيانات داخل الصفحة</div>
-    </div>
-    <div class="card-body">
-      <div class="grid-4">
-        <div class="field">
-          <label>المنطقة</label>
-          <input id="filterRegion" type="text" placeholder="كل المناطق">
-        </div>
-        <div class="field">
-          <label>المرض</label>
-          <input id="filterDisease" type="text" placeholder="كل الأمراض">
-        </div>
-        <div class="field">
-          <label>المستوى</label>
-          <select id="filterLevel">
-            <option value="">الكل</option>
-            <option value="مرتفع">مرتفع</option>
-            <option value="متوسط">متوسط</option>
-            <option value="منخفض">منخفض</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>حد أقصى للتحميل</label>
-          <input id="alertsLimit" type="number" value="100">
-        </div>
-      </div>
-    </div>
-  </div>
-<div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">جدول التنبيهات</div>
-        <div class="section-note">المصدر: /alerts</div>
-      </div>
-      <div class="card-body">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المنطقة</th>
-                <th>المدينة</th>
-                <th>المرض</th>
-                <th>المحصول</th>
-                <th>درجة الخطر</th>
-                <th>المستوى</th>
-                <th>الرسالة</th>
-                <th>التوصية</th>
-                <th>التاريخ</th>
-              </tr>
-            </thead>
-            <tbody id="alertsTable">
-              <tr><td colspan="10">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="card">
-        <div class="section-header">
-          <div class="section-title">تحليل المستويات</div>
-          <div class="section-note">مرتفع / متوسط / منخفض</div>
-        </div>
-        <div class="card-body">
-          <canvas id="levelsChart"></canvas>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="section-header">
-          <div class="section-title">توزيع المناطق</div>
-          <div class="section-note">المصدر: /alerts/regions</div>
-        </div>
-        <div class="card-body">
-          <canvas id="regionsChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">التحليل التنفيذي المباشر</div>
-      <div class="section-note">قراءة تشغيلية للتنبيهات الحالية</div>
-    </div>
-    <div class="card-body">
-      <div class="analysis-box" id="executiveAnalysis">
-        بعد تحميل البيانات ستظهر هنا قراءة تنفيذية مباشرة.
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-const API = "http://127.0.0.1:8000";
-
-let alertsCache = [];
-let filteredAlerts = [];
-let alertsSummaryCache = null;
-let alertsRegionsCache = [];
-
-let levelsChart = null;
-let regionsChart = null;
-
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
-}
-
-function safeText(v, fallback="-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
-
-function destroyChart(chartObj){
-  if(chartObj){
-    chartObj.destroy();
-  }
-}
-
-function badgeHTML(level){
-  if(level === "مرتفع") return '<span class="badge badge-red">مرتفع</span>';
-  if(level === "متوسط") return '<span class="badge badge-orange">متوسط</span>';
-  if(level === "منخفض") return '<span class="badge badge-green">منخفض</span>';
-  return '<span class="badge badge-gray">غير متاح</span>';
-}
-
-async function fetchJson(url){
-  const res = await fetch(url);
-  return await res.json();
-}
-
-function exportAlertsJson(){
-  const blob = new Blob([JSON.stringify({
-    alerts: alertsCache,
-    filteredAlerts,
-    summary: alertsSummaryCache,
-    regions: alertsRegionsCache
-  }, null, 2)], {type:"application/json"});
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "alerts_dashboard.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function renderSummary(){
-  const s = alertsSummaryCache || {};
-
-  document.getElementById("totalAlerts").textContent = safeText(s.total_alerts,0);
-  document.getElementById("highAlerts").textContent = safeText(s.high_alerts,0);
-  document.getElementById("moderateAlerts").textContent = safeText(s.moderate_alerts,0);
-  document.getElementById("latestRegion").textContent = safeText(s.latest_alert?.region,"-");
-  document.getElementById("latestDisease").textContent = safeText(s.latest_alert?.disease_name,"-");
-  document.getElementById("latestRiskScore").textContent = safeText(s.latest_alert?.risk_score,0);
-
-  document.getElementById("sumTotalAlerts").textContent = safeText(s.total_alerts,0);
-  document.getElementById("sumLatestRegion").textContent = safeText(s.latest_alert?.region,"-");
-  document.getElementById("sumLatestLevel").textContent = safeText(s.latest_alert?.risk_level,"-");
-
-  document.getElementById("summaryNarrative").innerHTML = `
-    <div class="list">
-      <div class="list-item">إجمالي التنبيهات الحالية هو <span class="highlight">${safeText(s.total_alerts,0)}</span>.</div>
-      <div class="list-item">عدد التنبيهات المرتفعة هو <span class="highlight">${safeText(s.high_alerts,0)}</span>، والمتوسطة <span class="highlight">${safeText(s.moderate_alerts,0)}</span>.</div>
-      <div class="list-item">آخر تنبيه مسجل كان في منطقة <span class="highlight">${safeText(s.latest_alert?.region,"-")}</span> لمرض <span class="highlight">${safeText(s.latest_alert?.disease_name,"-")}</span>.</div>
-    </div>
-  `;
-}
-function renderAlertsTable(rows){
-  const tbody = document.getElementById("alertsTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="10">لا توجد بيانات مطابقة.</td></tr>`;
-    return;
-  }
-
-  rows.forEach((r, i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${safeText(r.region)}</td>
-        <td>${safeText(r.city)}</td>
-        <td>${safeText(r.disease_name)}</td>
-        <td>${safeText(r.crop)}</td>
-        <td>${safeText(r.risk_score,0)}</td>
-        <td>${badgeHTML(r.risk_level)}</td>
-        <td>${safeText(r.alert_message)}</td>
-        <td>${safeText(r.recommendation)}</td>
-        <td>${safeText(r.created_at)}</td>
-      </tr>
-    `;
-  });
-}
-
-function renderCharts(rows){
-  const high = rows.filter(r => r.risk_level === "مرتفع").length;
-  const moderate = rows.filter(r => r.risk_level === "متوسط").length;
-  const low = rows.filter(r => r.risk_level === "منخفض").length;
-
-  destroyChart(levelsChart);
-  levelsChart = new Chart(document.getElementById("levelsChart"),{
-    type:"doughnut",
-    data:{
-      labels:["مرتفع","متوسط","منخفض"],
-      datasets:[{
-        data:[high, moderate, low]
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      cutout:"70%"
-    }
-  });
-
-  destroyChart(regionsChart);
-  regionsChart = new Chart(document.getElementById("regionsChart"),{
-    type:"bar",
-    data:{
-      labels:alertsRegionsCache.map(r => r.region),
-      datasets:[{
-        label:"عدد التنبيهات",
-        data:alertsRegionsCache.map(r => Number(r.count || 0)),
-        borderWidth:1
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
-    }
-  });
-}
-
-function applyFilters(){
-  const region = document.getElementById("filterRegion").value.trim().toLowerCase();
-  const disease = document.getElementById("filterDisease").value.trim().toLowerCase();
-  const level = document.getElementById("filterLevel").value.trim();
-
-  filteredAlerts = alertsCache.filter(r => {
-    const okRegion = !region || String(r.region || "").toLowerCase().includes(region);
-    const okDisease = !disease || String(r.disease_name || "").toLowerCase().includes(disease);
-    const okLevel = !level || String(r.risk_level || "") === level;
-    return okRegion && okDisease && okLevel;
-  });
-
-  renderAlertsTable(filteredAlerts);
-  renderCharts(filteredAlerts);
-  buildExecutiveAnalysis();
-  setStatus(`تم تطبيق الفلاتر على ${filteredAlerts.length} تنبيه.`);
-}
-
-function clearFilters(){
-  document.getElementById("filterRegion").value = "";
-  document.getElementById("filterDisease").value = "";
-  document.getElementById("filterLevel").value = "";
-  filteredAlerts = [...alertsCache];
-  renderAlertsTable(filteredAlerts);
-  renderCharts(filteredAlerts);
-  buildExecutiveAnalysis();
-  setStatus("تمت إعادة ضبط الفلاتر.");
-}
-
-function buildExecutiveAnalysis(){
-  const rows = filteredAlerts.length ? filteredAlerts : alertsCache;
-
-  if(!rows.length){
-    document.getElementById("executiveAnalysis").innerHTML = "لا توجد تنبيهات متاحة حاليًا.";
-    return;
-  }
-
-  const high = rows.filter(r => r.risk_level === "مرتفع");
-  const moderate = rows.filter(r => r.risk_level === "متوسط");
-  const latest = rows[0];
-
-  document.getElementById("executiveAnalysis").innerHTML = `
-    <div class="list">
-      <div class="list-item"><span class="highlight">عدد التنبيهات المعروضة:</span> ${rows.length}</div>
-      <div class="list-item"><span class="highlight">مرتفعة:</span> ${high.length} | <span class="highlight">متوسطة:</span> ${moderate.length}</div>
-      <div class="list-item"><span class="highlight">أحدث تنبيه:</span> ${safeText(latest.region)} - ${safeText(latest.disease_name)} - درجة ${safeText(latest.risk_score,0)}</div>
-      <div class="list-item"><span class="highlight">التوصية التشغيلية:</span> ${
-        high.length > 0
-        ? "هناك تنبيهات مرتفعة تستدعي متابعة عاجلة وإشعار الفرق الميدانية."
-        : moderate.length > 0
-        ? "لا توجد تنبيهات مرتفعة حاليًا، لكن توجد تنبيهات متوسطة تحتاج متابعة وقائية منظمة."
-        : "الوضع مستقر نسبيًا حاليًا."
-      }</div>
-    </div>
-  `;
-}
-
-async function sendSMSAlert(){
-  try{
-    const region = document.getElementById("smsRegion").value.trim();
-    const disease = document.getElementById("smsDisease").value.trim();
-    const risk = document.getElementById("smsRisk").value.trim();
-
-    if(!region || !disease || !risk){
-      document.getElementById("smsResultBox").innerHTML = `<div class="error-box">يرجى تعبئة المنطقة واسم المرض ودرجة الخطر.</div>`;
-      return;
+# =========================
+# ALERTS ENDPOINTS
+# =========================
+
+from fastapi.responses import JSONResponse
+from typing import List, Dict, Any
+
+
+@app.get("/alerts/all")
+def get_all_alerts():
+    """
+    إرجاع جميع التنبيهات من جدول alerts.
+    """
+    conn = get_db_connection()
+    rows = conn.execute("""
+        SELECT
+            id,
+            region,
+            disease_name,
+            risk_score,
+            risk_level,
+            latitude,
+            longitude,
+            created_at
+        FROM alerts
+        ORDER BY created_at DESC
+    """).fetchall()
+    conn.close()
+
+    return [dict(r) for r in rows]
+
+
+@app.get("/alerts/summary")
+def alerts_summary():
+    """
+    ملخص التنبيهات:
+    - إجمالي التنبيهات
+    - مرتفعة
+    - متوسطة
+    - آخر تنبيه
+    """
+    conn = get_db_connection()
+
+    total_alerts = conn.execute(
+        "SELECT COUNT(*) as c FROM alerts"
+    ).fetchone()["c"]
+
+    high_alerts = conn.execute("""
+        SELECT COUNT(*) as c
+        FROM alerts
+        WHERE risk_level = 'high'
+    """).fetchone()["c"]
+
+    moderate_alerts = conn.execute("""
+        SELECT COUNT(*) as c
+        FROM alerts
+        WHERE risk_level = 'moderate'
+    """).fetchone()["c"]
+
+    latest = conn.execute("""
+        SELECT
+            region,
+            disease_name,
+            risk_score,
+            risk_level,
+            created_at
+        FROM alerts
+        ORDER BY created_at DESC
+        LIMIT 1
+    """).fetchone()
+
+    conn.close()
+
+    return {
+        "total_alerts": total_alerts,
+        "high_alerts": high_alerts,
+        "moderate_alerts": moderate_alerts,
+        "latest_alert": dict(latest) if latest else None
     }
 
-    const url = `${API}/alerts/send-sms?region=${encodeURIComponent(region)}&disease_name=${encodeURIComponent(disease)}&risk_score=${encodeURIComponent(risk)}`;
-    const data = await fetchJson(url);
 
-    if(data.success === false){
-      throw new Error(data.error || "فشل الإرسال");
-    }
+@app.get("/alerts/regions")
+def alerts_by_region():
+    """
+    عدد التنبيهات حسب المنطقة.
+    يستخدم في الرسوم البيانية.
+    """
+    conn = get_db_connection()
 
-    document.getElementById("smsResultBox").innerHTML = `
-      <div class="ok-box">
-        تم تنفيذ العملية بنجاح.<br>
-        عدد الرسائل المرسلة: <b>${safeText(data.sent_count,0)}</b>
-      </div>
-    `;
-  }catch(err){
-    console.error(err);
-    document.getElementById("smsResultBox").innerHTML = `<div class="error-box">تعذر إرسال الرسائل: ${err.message}</div>`;
-  }
-}
+    rows = conn.execute("""
+        SELECT
+            region,
+            COUNT(*) as count
+        FROM alerts
+        GROUP BY region
+        ORDER BY count DESC
+    """).fetchall()
 
-async function loadAlertsDashboard(){
-  try{
-    setStatus("جاري تحميل لوحة التنبيهات...");
+    conn.close()
 
-    const limit = Number(document.getElementById("alertsLimit").value || 100);
+    return [dict(r) for r in rows]
 
-    const [summary, alertsRows, alertsRegions] = await Promise.all([
-      fetchJson(`${API}/alerts/summary`),
-      fetchJson(`${API}/alerts?limit=${limit}`),
-      fetchJson(`${API}/alerts/regions`)
-    ]);
 
-    alertsSummaryCache = summary;
-    alertsCache = Array.isArray(alertsRows) ? alertsRows : [];
-    alertsRegionsCache = Array.isArray(alertsRegions) ? alertsRegions : [];
-    filteredAlerts = [...alertsCache];
+@app.get("/alerts/high")
+def high_risk_alerts():
+    """
+    إرجاع التنبيهات ذات الخطورة المرتفعة فقط.
+    """
+    conn = get_db_connection()
 
-    renderSummary();
-    renderAlertsTable(filteredAlerts);
-    renderCharts(filteredAlerts);
-    buildExecutiveAnalysis();
+    rows = conn.execute("""
+        SELECT
+            id,
+            region,
+            disease_name,
+            risk_score,
+            risk_level,
+            latitude,
+            longitude,
+            created_at
+        FROM alerts
+        WHERE risk_level = 'high'
+        ORDER BY created_at DESC
+    """).fetchall()
 
-    setStatus("تم تحميل لوحة التنبيهات بنجاح.");
-  }catch(err){
-    console.error(err);
-    document.getElementById("executiveAnalysis").innerHTML = `<div class="error-box">تعذر تحميل لوحة التنبيهات: ${err.message}</div>`;
-    setStatus("تعذر تحميل لوحة التنبيهات.");
-  }
-}
+    conn.close()
 
-loadAlertsDashboard();
-</script>
+    return [dict(r) for r in rows]
 
-</body>
-</html>
+
+@app.get("/alerts/moderate")
+def moderate_risk_alerts():
+    """
+    إرجاع التنبيهات ذات الخطورة المتوسطة.
+    """
+    conn = get_db_connection()
+
+    rows = conn.execute("""
+        SELECT
+            id,
+            region,
+            disease_name,
+            risk_score,
+            risk_level,
+            latitude,
+            longitude,
+            created_at
+        FROM alerts
+        WHERE risk_level = 'moderate'
+        ORDER BY created_at DESC
+    """).fetchall()
+
+    conn.close()
+
+    return [dict(r) for r in rows]
+
+
+@app.get("/export/alerts/json")
+def export_alerts_json():
+    """
+    تصدير جميع التنبيهات بصيغة JSON.
+    """
+    conn = get_db_connection()
+    rows = conn.execute("""
+        SELECT *
+        FROM alerts
+        ORDER BY created_at DESC
+    """).fetchall()
+    conn.close()
+
+    return [dict(r) for r in rows]
