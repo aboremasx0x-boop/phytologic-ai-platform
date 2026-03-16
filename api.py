@@ -2025,8 +2025,8 @@ def export_alerts_json():
     conn.close()
     return [dict(r) for r in rows]
     
- @app.get("/{page_name}")
- def open_page_legacy(page_name: str):
+@app.get("/{page_name}"
+def open_page_legacy(page_name: str):
     blocked_prefixes = {
         "predict", "predict-frame", "report",
         "stats", "forecast", "weather",
