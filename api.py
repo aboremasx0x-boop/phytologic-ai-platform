@@ -33,9 +33,11 @@ import arabic_reshaper
 from bidi.algorithm import get_display
 
 from disease_info import DISEASE_INFO
-from database import init_db, save_diagnosis, save_alert, save_farmer
+from database import init_db, save_diagnosis, save_alert, save_farmer, get_connection
 from ai_forecast_service import AIForecastService
 from sms_service import SMSService
+def get_db_connection():
+    return get_connection()
 def extract_disease_region(image_pil):
     img = np.array(image_pil)
 
@@ -99,9 +101,12 @@ sms_service = SMSService(
 # تهيئة قاعدة البيانات + مجلد الصور
 # =========================
 
+DATA_DIR = os.getenv("DATA_DIR", ".")
+os.makedirs(DATA_DIR, exist_ok=True)
+
 init_db()
 
-UPLOAD_DIR = "uploads"
+UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 # =========================
