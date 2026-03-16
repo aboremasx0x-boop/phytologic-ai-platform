@@ -1396,7 +1396,6 @@ async def predict_frame(file: UploadFile = File(...), lang: str = Query("ar")):
     except Exception as e:
         return JSONResponse(status_code=500, content={"success": False, "error": str(e)})
 
-
 @app.post("/report")
 async def report(
     file: UploadFile = File(...),
@@ -2025,8 +2024,9 @@ def export_alerts_json():
     rows = conn.execute("SELECT * FROM alerts").fetchall()
     conn.close()
     return [dict(r) for r in rows]
-    @app.get("/{page_name}")
-def open_page_legacy(page_name: str):
+    
+ @app.get("/{page_name}")
+ def open_page_legacy(page_name: str):
     blocked_prefixes = {
         "predict", "predict-frame", "report",
         "stats", "forecast", "weather",
