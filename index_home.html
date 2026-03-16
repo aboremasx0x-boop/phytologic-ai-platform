@@ -1061,20 +1061,54 @@ function renderDiagnosis(data){
     optionsBody.innerHTML = `<tr><td colspan="8">لا توجد خيارات بديلة.</td></tr>`;
   }
 
-  const top3 = Array.isArray(data.top_3_predictions) ? data.top_3_predictions : [];
+  let top3 = Array.isArray(data.top_3_predictions) ? [...data.top_3_predictions] : [];
+
+  top3.sort((a, b) => Number(b.confidence) - Number(a.confidence));
+
+  if (data.top1_disease) {
+    const idx = top3.findIndex(p => p.class_name === data.top1_disease);
+    if (idx > 0) {
+      const item = top3.splice(idx, 1)[0];
+      top3.unshift(item);
+    }
+  }
+
+  if (
+    data.top1_disease &&
+    !top3.some(p => p.class_name === data.top1_disease)
+  ) {
+    top3.unshift({
+      class_name: data.top1_disease,
+      confidence: Number(data.top1_confidence || 0) * 100
+    });
+  }
+
+  if (
+    data.top2_disease &&
+    !top3.some(p => p.class_name === data.top2_disease)
+  ) {
+    top3.push({
+      class_name: data.top2_disease,
+      confidence: Number(data.top2_confidence || 0) * 100
+    });
+  }
+
+  top3 = top3.slice(0, 3);
+
   const top3Body = document.getElementById("top3Table");
   top3Body.innerHTML = "";
-  if(top3.length){
+
+  if (top3.length) {
     top3.forEach((p, i) => {
       top3Body.innerHTML += `
         <tr>
           <td>${i + 1}</td>
           <td>${safeText(p.class_name)}</td>
-          <td>${safeText(p.confidence,0)}%</td>
+          <td>${Number(p.confidence).toFixed(2)}%</td>
         </tr>
       `;
     });
-  }else{
+  } else {
     top3Body.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
   }
 
@@ -1164,28 +1198,40 @@ function applyDiagnosticQuestions(){
 
   let finalDiagnosis = "غير مؤكد";
   let finalNote = "";
+  let finalStatus = "";
+  let finalAction = "";
 
   if(finalEarly > finalSeptoria){
     const diff = finalEarly - finalSeptoria;
     if(diff >= 0.15){
       finalDiagnosis = "اللفحة المبكرة في الطماطم";
       finalNote = "تم ترجيح اللفحة المبكرة بعد دمج الصورة مع الإجابات الوصفية.";
+      finalStatus = "تشخيص مرجح بقوة";
+      finalAction = "يمكن اعتماد اللفحة المبكرة كتشخيص نهائي عمليًا والبدء بالتوصيات المناسبة.";
     } else {
       finalDiagnosis = "اللفحة المبكرة في الطماطم (ترجيح مبدئي)";
       finalNote = "اللفحة المبكرة أقرب، لكن ما زال يوجد تشابه.";
+      finalStatus = "تشخيص مرجح";
+      finalAction = "يفضل المتابعة الحقلية وصورة أقرب إذا لزم.";
     }
   } else if(finalSeptoria > finalEarly){
     const diff = finalSeptoria - finalEarly;
     if(diff >= 0.15){
       finalDiagnosis = "تبقع السبتوريا في أوراق الطماطم";
       finalNote = "تم ترجيح السبتوريا بعد دمج الصورة مع الإجابات الوصفية.";
+      finalStatus = "تشخيص مرجح بقوة";
+      finalAction = "يمكن اعتماد السبتوريا كتشخيص نهائي عمليًا والبدء بالتوصيات المناسبة.";
     } else {
       finalDiagnosis = "تبقع السبتوريا في أوراق الطماطم (ترجيح مبدئي)";
       finalNote = "السبتيوريا أقرب، لكن ما زال يوجد تشابه.";
+      finalStatus = "تشخيص مرجح";
+      finalAction = "يفضل المتابعة الحقلية وصورة أقرب إذا لزم.";
     }
   } else {
     finalDiagnosis = "ما زال التشخيص غير مؤكد";
     finalNote = "الإجابات لم تحسم الفرق بين المرضين.";
+    finalStatus = "غير مؤكد";
+    finalAction = "يلزم صورة أقرب أو فحص إضافي قبل اتخاذ قرار نهائي.";
   }
 
   document.getElementById("questionsResultBox").innerHTML = `
@@ -1196,6 +1242,24 @@ function applyDiagnosticQuestions(){
       <div class="list-item"><span class="highlight">ترجيح الصورة + الأسئلة للسبتيوريا:</span> ${finalSeptoria.toFixed(2)}</div>
       <div class="list-item"><span class="highlight">النتيجة النهائية:</span> ${finalDiagnosis}</div>
       <div class="list-item"><span class="highlight">التفسير:</span> ${finalNote}</div>
+    </div>
+  `;
+
+  document.getElementById("finalDecisionBox").innerHTML = `
+    <div class="ok-box">
+      <div><strong>${finalStatus}: ${finalDiagnosis}</strong></div>
+      <div style="margin-top:8px;"><strong>الإجراء:</strong> ${finalAction}</div>
+      <div style="margin-top:8px;"><strong>ملاحظة:</strong> ${finalNote}</div>
+    </div>
+  `;
+
+  const currentExec = document.getElementById("executiveAnalysis").innerHTML;
+  document.getElementById("executiveAnalysis").innerHTML = `
+    ${currentExec}
+    <div class="list" style="margin-top:12px;">
+      <div class="list-item"><span class="highlight">نتيجة الأسئلة التأكيدية:</span> ${finalDiagnosis}</div>
+      <div class="list-item"><span class="highlight">الحكم النهائي بعد الدمج:</span> ${finalStatus}</div>
+      <div class="list-item"><span class="highlight">التفسير النهائي:</span> ${finalNote}</div>
     </div>
   `;
 }
