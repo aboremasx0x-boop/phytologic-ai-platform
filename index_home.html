@@ -606,7 +606,18 @@ font-size:13px;
 
   </div>
 
-  <!-- بطاقة الأسئلة التأكيدية -->
+  <div class="card">
+    <div class="section-header">
+      <div class="section-title">القرار التنفيذي النهائي</div>
+      <div class="section-note">خلاصة تشغيلية مباشرة للحالة</div>
+    </div>
+    <div class="card-body">
+      <div class="analysis-box" id="finalDecisionBox">
+        سيظهر هنا القرار التنفيذي النهائي بعد التشخيص.
+      </div>
+    </div>
+  </div>
+
   <div class="card" id="questionCard" style="display:none;">
     <div class="section-header">
       <div class="section-title">أسئلة تأكيدية للتشخيص</div>
@@ -839,6 +850,56 @@ function fillDemoData(){
   setStatus("تمت تعبئة بيانات تجريبية.");
 }
 
+function buildFinalDecision(data){
+  const confidenceLevel = data.confidence_level || "";
+  const similarCase = data.similar_case === true;
+  const bullseyeDetected = data.bullseye_detected === true;
+  const top1 = data.top1_disease || "-";
+  const top2 = data.top2_disease || "-";
+
+  let title = "";
+  let action = "";
+  let note = "";
+  let boxClass = "ok-box";
+
+  if(confidenceLevel === "عالية" && !similarCase){
+    title = `تشخيص قوي: ${top1}`;
+    action = "يمكن البدء بالإجراء العلاجي أو الوقائي المقترح حسب التوصيات.";
+    note = "مستوى اليقين مرتفع ولا يوجد تشابه مؤثر.";
+    boxClass = "ok-box";
+  }
+  else if(confidenceLevel === "متوسطة" && !similarCase){
+    title = `تشخيص مرجح: ${top1}`;
+    action = "ينصح بالبدء في البرنامج المقترح مع المتابعة الحقلية.";
+    note = "النتيجة جيدة لكن يفضل استمرار المتابعة.";
+    boxClass = "ok-box";
+  }
+  else if(similarCase){
+    title = `تشخيص غير مؤكد: ${top1}`;
+    action = "يرجى الإجابة عن الأسئلة التأكيدية أو رفع صورة أقرب قبل اعتماد قرار الرش.";
+    note = `يوجد تشابه بين ${top1} و ${top2}.`;
+    boxClass = "error-box";
+  }
+  else{
+    title = `تشخيص أولي: ${top1}`;
+    action = "يلزم تأكيد إضافي قبل اتخاذ قرار علاجي نهائي.";
+    note = "الثقة منخفضة أو المعطيات غير كافية.";
+    boxClass = "error-box";
+  }
+
+  if(bullseyeDetected){
+    note += " تم رصد نمط بصري داعم (Bullseye Pattern).";
+  }
+
+  return `
+    <div class="${boxClass}">
+      <div><strong>${title}</strong></div>
+      <div style="margin-top:8px;"><strong>الإجراء:</strong> ${action}</div>
+      <div style="margin-top:8px;"><strong>ملاحظة:</strong> ${note}</div>
+    </div>
+  `;
+}
+
 function clearAll(){
   lastDiagnosis = null;
   selectedFile = null;
@@ -877,6 +938,7 @@ function clearAll(){
   document.getElementById("pesticideOptionsTable").innerHTML = `<tr><td colspan="8">لا توجد بيانات بعد.</td></tr>`;
   document.getElementById("top3Table").innerHTML = `<tr><td colspan="3">لا توجد بيانات بعد.</td></tr>`;
   document.getElementById("executiveAnalysis").innerHTML = "بعد تشغيل التشخيص ستظهر هنا قراءة تنفيذية مباشرة.";
+  document.getElementById("finalDecisionBox").innerHTML = "سيظهر هنا القرار التنفيذي النهائي بعد التشخيص.";
   document.getElementById("questionsResultBox").innerHTML = "ستظهر هنا نتيجة الترجيح بعد الإجابة.";
   document.getElementById("questionCard").style.display = "none";
 
@@ -1034,6 +1096,8 @@ function renderDiagnosis(data){
       }</div>
     </div>
   `;
+
+  document.getElementById("finalDecisionBox").innerHTML = buildFinalDecision(data);
 
   if(data.similar_case === true || data.confidence_level === "منخفضة"){
     document.getElementById("questionCard").style.display = "block";
