@@ -2025,7 +2025,229 @@ def export_alerts_json():
     conn.close()
     return [dict(r) for r in rows]
 
+# =========================
+# ALERTS ENDPOINTS
+# =========================
 
+from fastapi.responses import JSONResponse
+
+
+@app.get("/alerts/all")
+def get_all_alerts():
+    """
+    إرجاع جميع التنبيهات من جدول alerts.
+    """
+    try:
+        conn = get_db_connection()
+        rows = conn.execute("""
+            SELECT
+                id,
+                region,
+                city,
+                disease_name,
+                crop,
+                risk_score,
+                risk_level,
+                alert_message,
+                recommendation,
+                created_at
+            FROM alerts
+            ORDER BY id DESC
+        """).fetchall()
+        conn.close()
+
+        return [dict(r) for r in rows]
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+
+@app.get("/alerts/summary")
+def alerts_summary():
+    """
+    ملخص التنبيهات:
+    - إجمالي التنبيهات
+    - مرتفعة
+    - متوسطة
+    - آخر تنبيه
+    """
+    try:
+        conn = get_db_connection()
+
+        total_alerts = conn.execute("""
+            SELECT COUNT(*) as c
+            FROM alerts
+        """).fetchone()["c"]
+
+        high_alerts = conn.execute("""
+            SELECT COUNT(*) as c
+            FROM alerts
+            WHERE risk_level = 'مرتفع'
+        """).fetchone()["c"]
+
+        moderate_alerts = conn.execute("""
+            SELECT COUNT(*) as c
+            FROM alerts
+            WHERE risk_level = 'متوسط'
+        """).fetchone()["c"]
+
+        latest = conn.execute("""
+            SELECT
+                region,
+                city,
+                disease_name,
+                crop,
+                risk_score,
+                risk_level,
+                alert_message,
+                recommendation,
+                created_at
+            FROM alerts
+            ORDER BY id DESC
+            LIMIT 1
+        """).fetchone()
+
+        conn.close()
+
+        return {
+            "total_alerts": total_alerts or 0,
+            "high_alerts": high_alerts or 0,
+            "moderate_alerts": moderate_alerts or 0,
+            "latest_alert": dict(latest) if latest else None
+        }
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+
+@app.get("/alerts/regions")
+def alerts_by_region():
+    """
+    عدد التنبيهات حسب المنطقة.
+    يستخدم في الرسوم البيانية.
+    """
+    try:
+        conn = get_db_connection()
+
+        rows = conn.execute("""
+            SELECT
+                region,
+                COUNT(*) as count
+            FROM alerts
+            GROUP BY region
+            ORDER BY count DESC
+        """).fetchall()
+
+        conn.close()
+
+        return [dict(r) for r in rows]
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+
+@app.get("/alerts/high")
+def high_risk_alerts():
+    """
+    إرجاع التنبيهات ذات الخطورة المرتفعة فقط.
+    """
+    try:
+        conn = get_db_connection()
+
+        rows = conn.execute("""
+            SELECT
+                id,
+                region,
+                city,
+                disease_name,
+                crop,
+                risk_score,
+                risk_level,
+                alert_message,
+                recommendation,
+                created_at
+            FROM alerts
+            WHERE risk_level = 'مرتفع'
+            ORDER BY id DESC
+        """).fetchall()
+
+        conn.close()
+
+        return [dict(r) for r in rows]
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+
+@app.get("/alerts/moderate")
+def moderate_risk_alerts():
+    """
+    إرجاع التنبيهات ذات الخطورة المتوسطة فقط.
+    """
+    try:
+        conn = get_db_connection()
+
+        rows = conn.execute("""
+            SELECT
+                id,
+                region,
+                city,
+                disease_name,
+                crop,
+                risk_score,
+                risk_level,
+                alert_message,
+                recommendation,
+                created_at
+            FROM alerts
+            WHERE risk_level = 'متوسط'
+            ORDER BY id DESC
+        """).fetchall()
+
+        conn.close()
+
+        return [dict(r) for r in rows]
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+
+@app.get("/export/alerts/json")
+def export_alerts_json():
+    """
+    تصدير جميع التنبيهات بصيغة JSON.
+    """
+    try:
+        conn = get_db_connection()
+        rows = conn.execute("""
+            SELECT *
+            FROM alerts
+            ORDER BY id DESC
+        """).fetchall()
+        conn.close()
+
+        return [dict(r) for r in rows]
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
 @app.get("/{page_name}")
 def open_page_legacy(page_name: str):
     blocked_prefixes = {
