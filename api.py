@@ -2024,8 +2024,9 @@ def export_alerts_json():
     rows = conn.execute("SELECT * FROM alerts").fetchall()
     conn.close()
     return [dict(r) for r in rows]
-    
-@app.get("/{page_name}"
+
+
+@app.get("/{page_name}")
 def open_page_legacy(page_name: str):
     blocked_prefixes = {
         "predict", "predict-frame", "report",
