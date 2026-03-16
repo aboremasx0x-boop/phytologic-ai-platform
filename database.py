@@ -1,8 +1,9 @@
+import os
 import sqlite3
 from datetime import datetime
 
-
-DB_PATH = "diagnoses.db"
+BASE_DIR = os.getenv("DATA_DIR", ".")
+DB_PATH = os.path.join(BASE_DIR, "diagnoses.db")
 
 
 def get_connection():
@@ -85,6 +86,7 @@ def create_farmers_table():
 
 
 def init_db():
+    os.makedirs(BASE_DIR, exist_ok=True)
     create_diagnoses_table()
     create_alerts_table()
     create_farmers_table()
