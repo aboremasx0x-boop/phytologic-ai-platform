@@ -2,7 +2,6 @@ import io
 import os
 import uuid
 import base64
-import sqlite3
 import json
 import csv
 import urllib.parse
@@ -18,8 +17,7 @@ from PIL import Image
 from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse, Response
-from fastapi.responses import FileResponse
+from fastapi.responses import JSONResponse, StreamingResponse, Response, FileResponse
 from torchvision import transforms, models
 
 from reportlab.lib.pagesizes import A4
@@ -37,17 +35,24 @@ from database import init_db, save_diagnosis, save_alert, save_farmer, get_conne
 from ai_forecast_service import AIForecastService
 from sms_service import SMSService
 
+
+# =========================
+# أدوات أساسية
+# =========================
+
+def get_db_connection():
+    return get_connection()
+
+
 def extract_disease_region(image_pil):
     img = np.array(image_pil)
-
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HSV)
 
     lower = np.array([10, 50, 50])
     upper = np.array([35, 255, 255])
 
     mask = cv2.inRange(hsv, lower, upper)
-
-    kernel = np.ones((5,5),np.uint8)
+    kernel = np.ones((5, 5), np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
     contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -56,19 +61,39 @@ def extract_disease_region(image_pil):
         return image_pil
 
     largest = max(contours, key=cv2.contourArea)
-
-    x,y,w,h = cv2.boundingRect(largest)
-
+    x, y, w, h = cv2.boundingRect(largest)
     crop = img[y:y+h, x:x+w]
-
-    crop = cv2.resize(crop,(224,224))
+    crop = cv2.resize(crop, (224, 224))
 
     return Image.fromarray(crop)
 
+
+# =========================
+# إنشاء التطبيق
+# =========================
+
 app = FastAPI(title="Phytologic AI API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.mount("/static", StaticFiles(directory="."), name="static")
 
+
+# =========================
+# الصفحات الرئيسية
+# =========================
+
+@app.get("/")
+def root():
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
+    return JSONResponse({"error": "index.html not found"}, status_code=404)
 
 
 @app.get("/pages/{page_name}")
@@ -79,13 +104,39 @@ def open_page(page_name: str):
         return FileResponse(file_path)
 
     return JSONResponse({"error": "page not found"}, status_code=404)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+
+@app.get("/{page_name}")
+def open_page_legacy(page_name: str):
+    blocked_prefixes = {
+        "predict", "predict-frame", "report",
+        "stats", "forecast", "weather",
+        "farmers", "alerts", "map", "export",
+        "health", "static", "pages"
+    }
+
+    first_segment = page_name.split("/")[0]
+    if first_segment in blocked_prefixes:
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+    file_path = page_name if page_name.endswith(".html") else f"{page_name}.html"
+
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+
+    return JSONResponse({"error": f"{file_path} not found"}, status_code=404)
+
+    file_path = f"{page_name}.html" if not page_name.endswith(".html") else page_name
+
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+
+    return JSONResponse({"error": "page not found"}, status_code=404)
+
+
+# =========================
+# تهيئة الخدمات
+# =========================
 
 forecast_ai_service = AIForecastService()
 
@@ -94,8 +145,9 @@ sms_service = SMSService(
     sender="Phytologic"
 )
 
+
 # =========================
-# تهيئة قاعدة البيانات + مجلد الصور
+# تهيئة قاعدة البيانات + التخزين
 # =========================
 
 DATA_DIR = os.getenv("DATA_DIR", ".")
@@ -106,6 +158,7 @@ init_db()
 UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 # =========================
 # إعدادات نموذج الذكاء الاصطناعي
 # =========================
@@ -113,14 +166,10 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 MODEL_PATH = "plant_disease_model_v3.pth"
 IMG_SIZE = 160
 
-
-
-MODEL_PATH = os.path.join(DATA_DIR, "plant_disease_model_v3.pth")
-
-# تحميل النموذج من GitHub إذا لم يكن موجود
 if not os.path.exists(MODEL_PATH):
     url = "https://github.com/aboremasx0x-boop/phytologic-ai-platform/releases/download/v1/plant_disease_model_v3.pth"
     urllib.request.urlretrieve(url, MODEL_PATH)
+
 checkpoint = torch.load(MODEL_PATH, map_location="cpu")
 classes = checkpoint["classes"]
 num_classes = len(classes)
@@ -134,6 +183,7 @@ transform = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
     transforms.ToTensor()
 ])
+
 
 # =========================
 # دعم الخط العربي في PDF
@@ -151,7 +201,6 @@ for font_path in [
             break
         except Exception:
             pass
-
 # =========================
 # إحداثيات المناطق والمدن
 # =========================
@@ -219,8 +268,7 @@ def pil_to_cv(img: Image.Image) -> np.ndarray:
     return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
 
-def get_db_connection():
-    return get_connection()
+
 
 
 def save_upload_file(image_bytes: bytes, original_filename: str) -> str:
@@ -1250,11 +1298,6 @@ if not scheduler.running:
 # Root / Health
 # =========================
 
-from fastapi.responses import FileResponse
-
-@app.get("/")
-def root():
-    return FileResponse("index.html")
 
 @app.get("/health")
 def health():
