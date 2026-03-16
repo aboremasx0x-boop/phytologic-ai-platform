@@ -36,8 +36,7 @@ from disease_info import DISEASE_INFO
 from database import init_db, save_diagnosis, save_alert, save_farmer, get_connection
 from ai_forecast_service import AIForecastService
 from sms_service import SMSService
-def get_db_connection():
-    return get_connection()
+
 def extract_disease_region(image_pil):
     img = np.array(image_pil)
 
@@ -69,12 +68,10 @@ def extract_disease_region(image_pil):
 app = FastAPI(title="Phytologic AI API")
 
 app.mount("/static", StaticFiles(directory="."), name="static")
-@app.get("/")
-def home():
-    return FileResponse("index.html")
 
 
-@app.get("/{page_name}")
+
+@app.get("/pages/{page_name}")
 def open_page(page_name: str):
     file_path = f"{page_name}.html" if not page_name.endswith(".html") else page_name
 
@@ -116,10 +113,9 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 MODEL_PATH = "plant_disease_model_v3.pth"
 IMG_SIZE = 160
 
-import os
-import urllib.request
 
-MODEL_PATH = "plant_disease_model_v3.pth"
+
+MODEL_PATH = os.path.join(DATA_DIR, "plant_disease_model_v3.pth")
 
 # تحميل النموذج من GitHub إذا لم يكن موجود
 if not os.path.exists(MODEL_PATH):
@@ -224,9 +220,7 @@ def pil_to_cv(img: Image.Image) -> np.ndarray:
 
 
 def get_db_connection():
-    conn = sqlite3.connect("diagnoses.db")
-    conn.row_factory = sqlite3.Row
-    return conn
+    return get_connection()
 
 
 def save_upload_file(image_bytes: bytes, original_filename: str) -> str:
