@@ -106,25 +106,7 @@ def open_page(page_name: str):
     return JSONResponse({"error": "page not found"}, status_code=404)
 
 
-@app.get("/{page_name}")
-def open_page_legacy(page_name: str):
-    blocked_prefixes = {
-        "predict", "predict-frame", "report",
-        "stats", "forecast", "weather",
-        "farmers", "alerts", "map", "export",
-        "health", "static", "pages"
-    }
 
-    first_segment = page_name.split("/")[0]
-    if first_segment in blocked_prefixes:
-        return JSONResponse({"detail": "Not Found"}, status_code=404)
-
-    file_path = page_name if page_name.endswith(".html") else f"{page_name}.html"
-
-    if os.path.exists(file_path):
-        return FileResponse(file_path)
-
-    return JSONResponse({"error": f"{file_path} not found"}, status_code=404)
 
    
 
@@ -2043,3 +2025,22 @@ def export_alerts_json():
     rows = conn.execute("SELECT * FROM alerts").fetchall()
     conn.close()
     return [dict(r) for r in rows]
+    @app.get("/{page_name}")
+def open_page_legacy(page_name: str):
+    blocked_prefixes = {
+        "predict", "predict-frame", "report",
+        "stats", "forecast", "weather",
+        "farmers", "alerts", "map", "export",
+        "health", "static", "pages"
+    }
+
+    first_segment = page_name.split("/")[0]
+    if first_segment in blocked_prefixes:
+        return JSONResponse({"detail": "Not Found"}, status_code=404)
+
+    file_path = page_name if page_name.endswith(".html") else f"{page_name}.html"
+
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+
+    return JSONResponse({"error": f"{file_path} not found"}, status_code=404)
