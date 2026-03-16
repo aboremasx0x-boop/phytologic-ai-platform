@@ -183,24 +183,53 @@ transform = transforms.Compose([
 # دعم الخط العربي في PDF
 # =========================
 
-os.makedirs("fonts", exist_ok=True)
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+FONTS_DIR = os.path.join(BASE_PATH, "fonts")
+os.makedirs(FONTS_DIR, exist_ok=True)
+
+def ensure_font_file(local_path: str, download_url: str):
+    if not os.path.exists(local_path):
+        try:
+            urllib.request.urlretrieve(download_url, local_path)
+            print(f"Downloaded font: {local_path}")
+        except Exception as e:
+            print(f"Failed to download font {local_path}: {e}")
+
+# حمّل الخط تلقائيًا إذا لم يكن موجودًا
+ensure_font_file(
+    os.path.join(FONTS_DIR, "NotoNaskhArabic-Regular.ttf"),
+    "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf"
+)
+
+ensure_font_file(
+    os.path.join(FONTS_DIR, "Amiri-Regular.ttf"),
+    "https://github.com/aliftype/amiri/raw/master/fonts/ttf/Amiri-Regular.ttf"
+)
 
 AR_FONT_REGISTERED = False
+AR_FONT_PATH_USED = None
+
 for font_path in [
-    "fonts/NotoNaskhArabic-Regular.ttf",
-    "fonts/Amiri-Regular.ttf",
+    os.path.join(FONTS_DIR, "NotoNaskhArabic-Regular.ttf"),
+    os.path.join(FONTS_DIR, "Amiri-Regular.ttf"),
     r"C:\Windows\Fonts\arial.ttf",
     r"C:\Windows\Fonts\tahoma.ttf"
 ]:
+    print("Checking font path:", font_path, "=>", os.path.exists(font_path))
     if os.path.exists(font_path):
         try:
             pdfmetrics.registerFont(TTFont("ARABIC_FONT", font_path))
             AR_FONT_REGISTERED = True
+            AR_FONT_PATH_USED = font_path
+            print("Arabic font registered successfully:", font_path)
             break
-        except Exception:
-            pass
+        except Exception as e:
+            print("Font registration failed:", font_path, e)
 
-print("AR_FONT_REGISTERED =", AR_FONT_REGISTERED)       
+print("AR_FONT_REGISTERED =", AR_FONT_REGISTERED)
+print("AR_FONT_PATH_USED =", AR_FONT_PATH_USED)
+print("CURRENT_WORKING_DIR =", os.getcwd())
+print("BASE_PATH =", BASE_PATH)
 # =========================
 # إحداثيات المناطق والمدن
 # =========================
@@ -872,32 +901,34 @@ def build_pdf_bytes(result: dict) -> bytes:
     ]
 
     for line in lines:
-        c.drawRightString(w - 40, y, fix_arabic(line))
+        text_to_draw = fix_arabic(line) if AR_FONT_REGISTERED else line
+        c.drawRightString(w - 40, y, text_to_draw)
         y -= 20
 
     for item in result["disease_info"]["advice"]:
-        c.drawRightString(w - 40, y, fix_arabic("- " + item))
+        text_to_draw = fix_arabic("- " + item) if AR_FONT_REGISTERED else "- " + item
+        c.drawRightString(w - 40, y, text_to_draw)
         y -= 18
 
     y -= 10
-    c.drawRightString(w - 40, y, fix_arabic("برنامج المبيد المقترح:"))
+    c.drawRightString(w - 40, y, fix_arabic("برنامج المبيد المقترح:") if AR_FONT_REGISTERED else "برنامج المبيد المقترح:")
     y -= 20
 
-    c.drawRightString(w - 40, y, fix_arabic(result["pesticide_suggestion"]["title_ar"]))
-    y -= 20
-    c.drawRightString(w - 40, y, fix_arabic(f"المادة الفعالة: {result['pesticide_suggestion'].get('active_ingredient', '-')}"))
-    y -= 18
-    c.drawRightString(w - 40, y, fix_arabic(f"الاسم التجاري: {result['pesticide_suggestion'].get('trade_name', '-')}"))
-    y -= 18
-    c.drawRightString(w - 40, y, fix_arabic(f"النوع: {result['pesticide_suggestion'].get('type', '-')}"))
-    y -= 18
-    c.drawRightString(w - 40, y, fix_arabic(f"الجرعة: {result['pesticide_suggestion'].get('dose', '-')}"))
-    y -= 18
-    c.drawRightString(w - 40, y, fix_arabic(f"فترة الأمان: {result['pesticide_suggestion'].get('phi', '-')}"))
-    y -= 25
-    c.drawRightString(w - 40, y, fix_arabic("قرار الرش:"))
-    y -= 18
-    c.drawRightString(w - 40, y, fix_arabic(result["pesticide_suggestion"].get("spray_message_ar", "-")))
+    pesticide_lines = [
+        result["pesticide_suggestion"]["title_ar"],
+        f"المادة الفعالة: {result['pesticide_suggestion'].get('active_ingredient', '-')}",
+        f"الاسم التجاري: {result['pesticide_suggestion'].get('trade_name', '-')}",
+        f"النوع: {result['pesticide_suggestion'].get('type', '-')}",
+        f"الجرعة: {result['pesticide_suggestion'].get('dose', '-')}",
+        f"فترة الأمان: {result['pesticide_suggestion'].get('phi', '-')}",
+        "قرار الرش:",
+        result["pesticide_suggestion"].get("spray_message_ar", "-")
+    ]
+
+    for text in pesticide_lines:
+        text_to_draw = fix_arabic(text) if AR_FONT_REGISTERED else text
+        c.drawRightString(w - 40, y, text_to_draw)
+        y -= 18 if text != "قرار الرش:" else 25
 
     c.showPage()
     c.save()
