@@ -798,18 +798,58 @@ const API = window.location.origin;
 let lastDiagnosis = null;
 let selectedFile = null;
 
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
+/* =========================
+   أدوات عامة
+========================= */
+function byId(id){
+  return document.getElementById(id);
 }
 
-function safeText(v, fallback="-"){
+function setHTML(id, html){
+  const el = byId(id);
+  if(el) el.innerHTML = html;
+}
+
+function setText(id, text){
+  const el = byId(id);
+  if(el) el.textContent = text;
+}
+
+function setValue(id, value){
+  const el = byId(id);
+  if(el) el.value = value;
+}
+
+function show(id){
+  const el = byId(id);
+  if(el) el.style.display = "";
+}
+
+function hide(id){
+  const el = byId(id);
+  if(el) el.style.display = "none";
+}
+
+function safeText(v, fallback = "-"){
   return (v === null || v === undefined || v === "") ? fallback : v;
 }
 
-function safePercent(v){
+function safeNumber(v, fallback = 0){
   const n = Number(v);
-  if (isNaN(n)) return "0%";
-  return `${n.toFixed(2)}%`;
+  return isNaN(n) ? fallback : n;
+}
+
+function safePercent(v){
+  return `${safeNumber(v, 0).toFixed(2)}%`;
+}
+
+function imageFromBase64(base64){
+  return `data:image/png;base64,${base64}`;
+}
+
+function setStatus(msg){
+  const el = byId("statusBar");
+  if(el) el.textContent = msg;
 }
 
 function severityBadge(levelAr){
@@ -822,34 +862,33 @@ function severityBadge(levelAr){
 function fileToPreview(file){
   const reader = new FileReader();
   reader.onload = function(e){
-    document.getElementById("originalPreviewBox").innerHTML = `<img src="${e.target.result}" alt="original">`;
+    setHTML("originalPreviewBox", `<img src="${e.target.result}" alt="original">`);
   };
   reader.readAsDataURL(file);
 }
 
-function imageFromBase64(base64){
-  return `data:image/png;base64,${base64}`;
-}
-
 function currentFormData(){
   return {
-    farmer_name: document.getElementById("farmer_name").value.trim() || "غير محدد",
-    farm_name: document.getElementById("farm_name").value.trim() || "غير محدد",
-    crop: document.getElementById("crop").value.trim() || "غير محدد",
-    region: document.getElementById("region").value.trim() || "غير محدد",
-    city: document.getElementById("city").value.trim() || "غير محدد"
+    farmer_name: byId("farmer_name")?.value?.trim() || "غير محدد",
+    farm_name: byId("farm_name")?.value?.trim() || "غير محدد",
+    crop: byId("crop")?.value?.trim() || "غير محدد",
+    region: byId("region")?.value?.trim() || "غير محدد",
+    city: byId("city")?.value?.trim() || "غير محدد"
   };
 }
 
 function fillDemoData(){
-  document.getElementById("farmer_name").value = "مزارع تجريبي";
-  document.getElementById("farm_name").value = "مزرعة نموذجية";
-  document.getElementById("crop").value = "طماطم";
-  document.getElementById("region").value = "الرياض";
-  document.getElementById("city").value = "الرياض";
+  setValue("farmer_name", "مزارع تجريبي");
+  setValue("farm_name", "مزرعة نموذجية");
+  setValue("crop", "طماطم");
+  setValue("region", "الرياض");
+  setValue("city", "الرياض");
   setStatus("تمت تعبئة بيانات تجريبية.");
 }
 
+/* =========================
+   التشخيص
+========================= */
 function buildFinalDecision(data){
   const confidenceLevel = data.confidence_level || "";
   const similarCase = data.similar_case === true;
@@ -867,20 +906,17 @@ function buildFinalDecision(data){
     action = "يمكن البدء بالإجراء العلاجي أو الوقائي المقترح حسب التوصيات.";
     note = "مستوى اليقين مرتفع ولا يوجد تشابه مؤثر.";
     boxClass = "ok-box";
-  }
-  else if(confidenceLevel === "متوسطة" && !similarCase){
+  } else if(confidenceLevel === "متوسطة" && !similarCase){
     title = `تشخيص مرجح: ${top1}`;
     action = "ينصح بالبدء في البرنامج المقترح مع المتابعة الحقلية.";
     note = "النتيجة جيدة لكن يفضل استمرار المتابعة.";
     boxClass = "ok-box";
-  }
-  else if(similarCase){
+  } else if(similarCase){
     title = `تشخيص غير مؤكد: ${top1}`;
     action = "يرجى الإجابة عن الأسئلة التأكيدية أو رفع صورة أقرب قبل اعتماد قرار الرش.";
     note = `يوجد تشابه بين ${top1} و ${top2}.`;
     boxClass = "error-box";
-  }
-  else{
+  } else {
     title = `تشخيص أولي: ${top1}`;
     action = "يلزم تأكيد إضافي قبل اتخاذ قرار علاجي نهائي.";
     note = "الثقة منخفضة أو المعطيات غير كافية.";
@@ -904,52 +940,50 @@ function clearAll(){
   lastDiagnosis = null;
   selectedFile = null;
 
-  document.getElementById("imageInput").value = "";
-  document.getElementById("fileState").value = "لم يتم اختيار صورة بعد";
+  setValue("imageInput", "");
+  setValue("fileState", "لم يتم اختيار صورة بعد");
 
-  document.getElementById("originalPreviewBox").innerHTML = "<span>لا توجد صورة بعد</span>";
-  document.getElementById("gradcamPreviewBox").innerHTML = "<span>ستظهر صورة Grad-CAM هنا</span>";
-  document.getElementById("severityPreviewBox").innerHTML = "<span>ستظهر صورة الشدة هنا</span>";
+  setHTML("originalPreviewBox", "<span>لا توجد صورة بعد</span>");
+  setHTML("gradcamPreviewBox", "<span>ستظهر صورة Grad-CAM هنا</span>");
+  setHTML("severityPreviewBox", "<span>ستظهر صورة الشدة هنا</span>");
 
-  document.getElementById("bestPrediction").textContent = "-";
-  document.getElementById("confidence").textContent = "0%";
-  document.getElementById("plantName").textContent = "-";
-  document.getElementById("diseaseName").textContent = "-";
+  setText("bestPrediction", "-");
+  setText("confidence", "0%");
+  setText("plantName", "-");
+  setText("diseaseName", "-");
 
-  document.getElementById("top1Disease").textContent = "-";
-  document.getElementById("top1Confidence").textContent = "0%";
-  document.getElementById("top2Disease").textContent = "-";
-  document.getElementById("top2Confidence").textContent = "0%";
-  document.getElementById("confidenceLevel").textContent = "-";
-  document.getElementById("decisionStatus").textContent = "-";
-  document.getElementById("similarCase").textContent = "-";
-  document.getElementById("bullseyeDetected").textContent = "-";
+  setText("top1Disease", "-");
+  setText("top1Confidence", "0%");
+  setText("top2Disease", "-");
+  setText("top2Confidence", "0%");
+  setText("confidenceLevel", "-");
+  setText("decisionStatus", "-");
+  setText("similarCase", "-");
+  setText("bullseyeDetected", "-");
 
-  document.getElementById("heroPrediction").textContent = "-";
-  document.getElementById("heroConfidence").textContent = "0%";
-  document.getElementById("heroSeverity").textContent = "0%";
-  document.getElementById("heroSeverityLevel").textContent = "-";
-  document.getElementById("heroPlant").textContent = "-";
-  document.getElementById("heroCause").textContent = "-";
+  setText("heroPrediction", "-");
+  setText("heroConfidence", "0%");
+  setText("heroSeverity", "0%");
+  setText("heroSeverityLevel", "-");
+  setText("heroPlant", "-");
+  setText("heroCause", "-");
 
-  document.getElementById("coreInfoBox").innerHTML = "ستظهر هنا معلومات المرض الأساسية.";
-  document.getElementById("adviceBox").innerHTML = "ستظهر هنا التوصيات بعد التشخيص.";
-  document.getElementById("pesticideMainBox").innerHTML = "ستظهر هنا توصية المبيد الأساسية.";
-  document.getElementById("pesticideOptionsTable").innerHTML = `<tr><td colspan="8">لا توجد بيانات بعد.</td></tr>`;
-  document.getElementById("top3Table").innerHTML = `<tr><td colspan="3">لا توجد بيانات بعد.</td></tr>`;
-  document.getElementById("executiveAnalysis").innerHTML = "بعد تشغيل التشخيص ستظهر هنا قراءة تنفيذية مباشرة.";
-  document.getElementById("finalDecisionBox").innerHTML = "سيظهر هنا القرار التنفيذي النهائي بعد التشخيص.";
-  document.getElementById("questionsResultBox").innerHTML = "ستظهر هنا نتيجة الترجيح بعد الإجابة.";
-  document.getElementById("questionCard").style.display = "none";
+  setHTML("coreInfoBox", "ستظهر هنا معلومات المرض الأساسية.");
+  setHTML("adviceBox", "ستظهر هنا التوصيات بعد التشخيص.");
+  setHTML("pesticideMainBox", "ستظهر هنا توصية المبيد الأساسية.");
+  setHTML("pesticideOptionsTable", `<tr><td colspan="8">لا توجد بيانات بعد.</td></tr>`);
+  setHTML("top3Table", `<tr><td colspan="3">لا توجد بيانات بعد.</td></tr>`);
+  setHTML("executiveAnalysis", "بعد تشغيل التشخيص ستظهر هنا قراءة تنفيذية مباشرة.");
+  setHTML("finalDecisionBox", "سيظهر هنا القرار التنفيذي النهائي بعد التشخيص.");
+  setHTML("questionsResultBox", "ستظهر هنا نتيجة الترجيح بعد الإجابة.");
 
-  const selects = [
+  hide("questionCard");
+
+  [
     "q_rings", "q_small_spots", "q_gray_center", "q_black_dots",
     "q_large_dark", "q_lower_leaves", "q_yellow_halo"
-  ];
-
-  selects.forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.value = "";
+  ].forEach(id => {
+    if(byId(id)) byId(id).value = "";
   });
 
   setStatus("تمت إعادة ضبط الصفحة.");
@@ -959,53 +993,53 @@ function renderDiagnosis(data){
   lastDiagnosis = data;
 
   const bestPrediction = safeText(data.best_prediction?.class_name, data.pred_label);
-  const confidence = Number(data.best_prediction?.confidence ?? data.confidence ?? 0).toFixed(2);
+  const confidence = safeNumber(data.best_prediction?.confidence ?? (safeNumber(data.confidence) * 100), 0).toFixed(2);
   const plant = safeText(data.disease_info?.plant);
   const disease = safeText(data.disease_info?.disease_ar, data.pred_label);
-  const cause = safeText(data.disease_info?.cause, data.pathogen_type);
-  const severityPercent = Number(data.severity?.severity_percent_est ?? 0).toFixed(2);
+  const cause = safeText(data.disease_info?.cause);
+  const severityPercent = safeNumber(data.severity?.severity_percent_est, 0).toFixed(2);
   const severityLevelAr = safeText(data.severity?.label?.ar);
 
   const top1Disease = safeText(data.top1_disease, data.pred_class);
-  const top1Confidence = Number(data.top1_confidence ?? data.confidence ?? 0) * 100;
+  const top1Confidence = safeNumber(data.top1_confidence, 0) * 100;
   const top2Disease = safeText(data.top2_disease);
-  const top2Confidence = Number(data.top2_confidence ?? 0) * 100;
+  const top2Confidence = safeNumber(data.top2_confidence, 0) * 100;
   const confidenceLevel = safeText(data.confidence_level);
   const decisionStatus = safeText(data.decision_status);
   const decisionText = safeText(data.decision_text);
   const similarCase = data.similar_case === true ? "نعم" : "لا";
   const bullseyeDetected = data.bullseye_detected === true ? "نعم" : "لا";
 
-  document.getElementById("bestPrediction").textContent = bestPrediction;
-  document.getElementById("confidence").textContent = `${confidence}%`;
-  document.getElementById("plantName").textContent = plant;
-  document.getElementById("diseaseName").textContent = disease;
+  setText("bestPrediction", bestPrediction);
+  setText("confidence", `${confidence}%`);
+  setText("plantName", plant);
+  setText("diseaseName", disease);
 
-  document.getElementById("top1Disease").textContent = top1Disease;
-  document.getElementById("top1Confidence").textContent = `${top1Confidence.toFixed(2)}%`;
-  document.getElementById("top2Disease").textContent = top2Disease;
-  document.getElementById("top2Confidence").textContent = `${top2Confidence.toFixed(2)}%`;
-  document.getElementById("confidenceLevel").textContent = confidenceLevel;
-  document.getElementById("decisionStatus").textContent = decisionStatus;
-  document.getElementById("similarCase").textContent = similarCase;
-  document.getElementById("bullseyeDetected").textContent = bullseyeDetected;
+  setText("top1Disease", top1Disease);
+  setText("top1Confidence", `${top1Confidence.toFixed(2)}%`);
+  setText("top2Disease", top2Disease);
+  setText("top2Confidence", `${top2Confidence.toFixed(2)}%`);
+  setText("confidenceLevel", confidenceLevel);
+  setText("decisionStatus", decisionStatus);
+  setText("similarCase", similarCase);
+  setText("bullseyeDetected", bullseyeDetected);
 
-  document.getElementById("heroPrediction").textContent = disease;
-  document.getElementById("heroConfidence").textContent = `${confidence}%`;
-  document.getElementById("heroSeverity").textContent = `${severityPercent}%`;
-  document.getElementById("heroSeverityLevel").innerHTML = severityBadge(severityLevelAr);
-  document.getElementById("heroPlant").textContent = plant;
-  document.getElementById("heroCause").textContent = cause;
+  setText("heroPrediction", disease);
+  setText("heroConfidence", `${confidence}%`);
+  setText("heroSeverity", `${severityPercent}%`);
+  setHTML("heroSeverityLevel", severityBadge(severityLevelAr));
+  setText("heroPlant", plant);
+  setText("heroCause", cause);
 
   if(data.gradcam_overlay_b64){
-    document.getElementById("gradcamPreviewBox").innerHTML = `<img src="${imageFromBase64(data.gradcam_overlay_b64)}" alt="gradcam">`;
+    setHTML("gradcamPreviewBox", `<img src="${imageFromBase64(data.gradcam_overlay_b64)}" alt="gradcam">`);
   }
 
   if(data.severity?.severity_overlay_b64){
-    document.getElementById("severityPreviewBox").innerHTML = `<img src="${imageFromBase64(data.severity.severity_overlay_b64)}" alt="severity">`;
+    setHTML("severityPreviewBox", `<img src="${imageFromBase64(data.severity.severity_overlay_b64)}" alt="severity">`);
   }
 
-  document.getElementById("coreInfoBox").innerHTML = `
+  setHTML("coreInfoBox", `
     <div class="list">
       <div class="list-item"><span class="highlight">النبات:</span> ${plant}</div>
       <div class="list-item"><span class="highlight">المرض:</span> ${disease}</div>
@@ -1018,16 +1052,16 @@ function renderDiagnosis(data){
       <div class="list-item"><span class="highlight">تفسير القرار:</span> ${decisionText}</div>
       <div class="list-item"><span class="highlight">Bullseye Pattern:</span> ${bullseyeDetected}</div>
     </div>
-  `;
+  `);
 
   const advice = Array.isArray(data.disease_info?.advice) ? data.disease_info.advice : [];
-  document.getElementById("adviceBox").innerHTML =
-    advice.length
-    ? advice.map(a => `<div class="list-item">${a}</div>`).join("")
-    : "لا توجد توصيات متاحة.";
+  setHTML(
+    "adviceBox",
+    advice.length ? advice.map(a => `<div class="list-item">${a}</div>`).join("") : "لا توجد توصيات متاحة."
+  );
 
   const mainP = data.pesticide_suggestion || {};
-  document.getElementById("pesticideMainBox").innerHTML = `
+  setHTML("pesticideMainBox", `
     <div class="list">
       <div class="list-item"><span class="highlight">العنوان:</span> ${safeText(mainP.title_ar)}</div>
       <div class="list-item"><span class="highlight">المادة الفعالة:</span> ${safeText(mainP.active_ingredient)}</div>
@@ -1037,33 +1071,28 @@ function renderDiagnosis(data){
       <div class="list-item"><span class="highlight">فترة الأمان:</span> ${safeText(mainP.phi)}</div>
       <div class="list-item"><span class="highlight">قرار الرش:</span> ${safeText(mainP.spray_message_ar)}</div>
     </div>
-  `;
+  `);
 
   const options = Array.isArray(data.pesticide_options) ? data.pesticide_options : [];
-  const optionsBody = document.getElementById("pesticideOptionsTable");
-  optionsBody.innerHTML = "";
   if(options.length){
-    options.forEach((o, i) => {
-      optionsBody.innerHTML += `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(o.title_ar)}</td>
-          <td>${safeText(o.active_ingredient)}</td>
-          <td>${safeText(o.trade_name)}</td>
-          <td>${safeText(o.type)}</td>
-          <td>${safeText(o.dose)}</td>
-          <td>${safeText(o.phi)}</td>
-          <td>${safeText(o.spray_message_ar)}</td>
-        </tr>
-      `;
-    });
-  }else{
-    optionsBody.innerHTML = `<tr><td colspan="8">لا توجد خيارات بديلة.</td></tr>`;
+    setHTML("pesticideOptionsTable", options.map((o, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${safeText(o.title_ar)}</td>
+        <td>${safeText(o.active_ingredient)}</td>
+        <td>${safeText(o.trade_name)}</td>
+        <td>${safeText(o.type)}</td>
+        <td>${safeText(o.dose)}</td>
+        <td>${safeText(o.phi)}</td>
+        <td>${safeText(o.spray_message_ar)}</td>
+      </tr>
+    `).join(""));
+  } else {
+    setHTML("pesticideOptionsTable", `<tr><td colspan="8">لا توجد خيارات بديلة.</td></tr>`);
   }
 
   let top3 = Array.isArray(data.top_3_predictions) ? [...data.top_3_predictions] : [];
-
-  top3.sort((a, b) => Number(b.confidence) - Number(a.confidence));
+  top3.sort((a, b) => safeNumber(b.confidence) - safeNumber(a.confidence));
 
   if (data.top1_disease) {
     const idx = top3.findIndex(p => p.class_name === data.top1_disease);
@@ -1073,46 +1102,35 @@ function renderDiagnosis(data){
     }
   }
 
-  if (
-    data.top1_disease &&
-    !top3.some(p => p.class_name === data.top1_disease)
-  ) {
+  if (data.top1_disease && !top3.some(p => p.class_name === data.top1_disease)) {
     top3.unshift({
       class_name: data.top1_disease,
-      confidence: Number(data.top1_confidence || 0) * 100
+      confidence: safeNumber(data.top1_confidence) * 100
     });
   }
 
-  if (
-    data.top2_disease &&
-    !top3.some(p => p.class_name === data.top2_disease)
-  ) {
+  if (data.top2_disease && !top3.some(p => p.class_name === data.top2_disease)) {
     top3.push({
       class_name: data.top2_disease,
-      confidence: Number(data.top2_confidence || 0) * 100
+      confidence: safeNumber(data.top2_confidence) * 100
     });
   }
 
   top3 = top3.slice(0, 3);
 
-  const top3Body = document.getElementById("top3Table");
-  top3Body.innerHTML = "";
-
   if (top3.length) {
-    top3.forEach((p, i) => {
-      top3Body.innerHTML += `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(p.class_name)}</td>
-          <td>${Number(p.confidence).toFixed(2)}%</td>
-        </tr>
-      `;
-    });
+    setHTML("top3Table", top3.map((p, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${safeText(p.class_name)}</td>
+        <td>${safeNumber(p.confidence).toFixed(2)}%</td>
+      </tr>
+    `).join(""));
   } else {
-    top3Body.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
+    setHTML("top3Table", `<tr><td colspan="3">لا توجد بيانات.</td></tr>`);
   }
 
-  document.getElementById("executiveAnalysis").innerHTML = `
+  setHTML("executiveAnalysis", `
     <div class="list">
       <div class="list-item"><span class="highlight">أفضل تشخيص:</span> ${disease} بنسبة ثقة ${confidence}%.</div>
       <div class="list-item"><span class="highlight">الوضع المرضي:</span> المسبب المصنّف هو ${cause} على نبات ${plant}.</div>
@@ -1123,31 +1141,30 @@ function renderDiagnosis(data){
       <div class="list-item"><span class="highlight">Bullseye Pattern:</span> ${bullseyeDetected}.</div>
       <div class="list-item"><span class="highlight">القرار التنفيذي:</span> ${
         severityLevelAr === "مرتفعة"
-        ? "التدخل السريع ميدانيًا ضروري مع تطبيق برنامج مكافحة مناسب."
-        : severityLevelAr === "متوسطة"
-        ? "تحتاج الحالة إلى متابعة جيدة وبرنامج مكافحة أو وقاية حسب التوصيات."
-        : "الوضع منخفض نسبيًا ويكفي غالبًا الالتزام بالمراقبة والتوصيات الوقائية."
+          ? "التدخل السريع ميدانيًا ضروري مع تطبيق برنامج مكافحة مناسب."
+          : severityLevelAr === "متوسطة"
+          ? "تحتاج الحالة إلى متابعة جيدة وبرنامج مكافحة أو وقاية حسب التوصيات."
+          : "الوضع منخفض نسبيًا ويكفي غالبًا الالتزام بالمراقبة والتوصيات الوقائية."
       }</div>
     </div>
-  `;
+  `);
 
-  document.getElementById("finalDecisionBox").innerHTML = buildFinalDecision(data);
+  setHTML("finalDecisionBox", buildFinalDecision(data));
 
   if(data.similar_case === true || data.confidence_level === "منخفضة"){
-    document.getElementById("questionCard").style.display = "block";
+    show("questionCard");
   } else {
-    document.getElementById("questionCard").style.display = "none";
+    hide("questionCard");
   }
 }
 
 function getAnswerValue(id){
-  return document.getElementById(id)?.value || "";
+  return byId(id)?.value || "";
 }
 
 function applyDiagnosticQuestions(){
   if(!lastDiagnosis){
-    document.getElementById("questionsResultBox").innerHTML =
-      `<div class="error-box">يجب تشغيل التشخيص أولًا.</div>`;
+    setHTML("questionsResultBox", `<div class="error-box">يجب تشغيل التشخيص أولًا.</div>`);
     return;
   }
 
@@ -1167,29 +1184,20 @@ function applyDiagnosticQuestions(){
   if(grayCenter === "yes") septoriaScore += 2;
   if(blackDots === "yes") septoriaScore += 3;
   if(largeDark === "yes") earlyBlightScore += 2;
-  if(lowerLeaves === "yes"){
-    earlyBlightScore += 1;
-    septoriaScore += 1;
-  }
+  if(lowerLeaves === "yes"){ earlyBlightScore += 1; septoriaScore += 1; }
   if(yellowHalo === "yes") earlyBlightScore += 1;
 
-  const imgTop1 = Number(lastDiagnosis.top1_confidence || 0);
-  const imgTop2 = Number(lastDiagnosis.top2_confidence || 0);
+  const imgTop1 = safeNumber(lastDiagnosis.top1_confidence);
+  const imgTop2 = safeNumber(lastDiagnosis.top2_confidence);
 
   let finalEarly = 0;
   let finalSeptoria = 0;
 
-  if(
-    lastDiagnosis.top1_disease === "Tomato_Early_blight" ||
-    lastDiagnosis.top2_disease === "Tomato_Early_blight"
-  ){
+  if(lastDiagnosis.top1_disease === "Tomato_Early_blight" || lastDiagnosis.top2_disease === "Tomato_Early_blight"){
     finalEarly += lastDiagnosis.top1_disease === "Tomato_Early_blight" ? imgTop1 : imgTop2;
   }
 
-  if(
-    lastDiagnosis.top1_disease === "Tomato Septoria leaf spot" ||
-    lastDiagnosis.top2_disease === "Tomato Septoria leaf spot"
-  ){
+  if(lastDiagnosis.top1_disease === "Tomato Septoria leaf spot" || lastDiagnosis.top2_disease === "Tomato Septoria leaf spot"){
     finalSeptoria += lastDiagnosis.top1_disease === "Tomato Septoria leaf spot" ? imgTop1 : imgTop2;
   }
 
@@ -1234,7 +1242,7 @@ function applyDiagnosticQuestions(){
     finalAction = "يلزم صورة أقرب أو فحص إضافي قبل اتخاذ قرار نهائي.";
   }
 
-  document.getElementById("questionsResultBox").innerHTML = `
+  setHTML("questionsResultBox", `
     <div class="list">
       <div class="list-item"><span class="highlight">نقاط اللفحة المبكرة:</span> ${earlyBlightScore}</div>
       <div class="list-item"><span class="highlight">نقاط السبتوريا:</span> ${septoriaScore}</div>
@@ -1243,25 +1251,15 @@ function applyDiagnosticQuestions(){
       <div class="list-item"><span class="highlight">النتيجة النهائية:</span> ${finalDiagnosis}</div>
       <div class="list-item"><span class="highlight">التفسير:</span> ${finalNote}</div>
     </div>
-  `;
+  `);
 
-  document.getElementById("finalDecisionBox").innerHTML = `
+  setHTML("finalDecisionBox", `
     <div class="ok-box">
       <div><strong>${finalStatus}: ${finalDiagnosis}</strong></div>
       <div style="margin-top:8px;"><strong>الإجراء:</strong> ${finalAction}</div>
       <div style="margin-top:8px;"><strong>ملاحظة:</strong> ${finalNote}</div>
     </div>
-  `;
-
-  const currentExec = document.getElementById("executiveAnalysis").innerHTML;
-  document.getElementById("executiveAnalysis").innerHTML = `
-    ${currentExec}
-    <div class="list" style="margin-top:12px;">
-      <div class="list-item"><span class="highlight">نتيجة الأسئلة التأكيدية:</span> ${finalDiagnosis}</div>
-      <div class="list-item"><span class="highlight">الحكم النهائي بعد الدمج:</span> ${finalStatus}</div>
-      <div class="list-item"><span class="highlight">التفسير النهائي:</span> ${finalNote}</div>
-    </div>
-  `;
+  `);
 }
 
 async function runDiagnosis(){
@@ -1275,7 +1273,6 @@ async function runDiagnosis(){
 
     const formValues = currentFormData();
     const params = new URLSearchParams(formValues);
-
     const formData = new FormData();
     formData.append("file", selectedFile);
 
@@ -1286,15 +1283,20 @@ async function runDiagnosis(){
 
     const data = await res.json();
 
-    if(data.success === false){
+    if(!res.ok || data.success === false){
       throw new Error(data.error || "فشل التشخيص");
     }
 
     renderDiagnosis(data);
     setStatus("تم التشخيص بنجاح.");
+
+    // تحديث الأقسام التابعة بعد التشخيص
+    loadStatsSummary();
+    loadAlertsSummary();
+    loadMapSummary();
   }catch(err){
     console.error(err);
-    document.getElementById("executiveAnalysis").innerHTML = `<div class="error-box">تعذر تشغيل التشخيص: ${err.message}</div>`;
+    setHTML("executiveAnalysis", `<div class="error-box">تعذر تشغيل التشخيص: ${err.message}</div>`);
     setStatus("تعذر تشغيل التشخيص.");
   }
 }
@@ -1310,7 +1312,6 @@ async function downloadReport(){
 
     const formValues = currentFormData();
     const params = new URLSearchParams(formValues);
-
     const formData = new FormData();
     formData.append("file", selectedFile);
 
@@ -1338,14 +1339,333 @@ async function downloadReport(){
   }
 }
 
-document.getElementById("imageInput").addEventListener("change", function(e){
-  const file = e.target.files[0];
-  if(file){
-    selectedFile = file;
-    document.getElementById("fileState").value = file.name;
-    fileToPreview(file);
-    setStatus("تم اختيار الصورة بنجاح.");
+/* =========================
+   الإحصاءات
+========================= */
+async function loadStatsSummary(){
+  try{
+    const res = await fetch(`${API}/stats/summary`);
+    const data = await res.json();
+    if(!res.ok) throw new Error(data.error || "فشل تحميل الإحصاءات");
+
+    setText("totalCases", safeText(data.total_cases, "0"));
+    setText("avgSeverity", safePercent(data.avg_severity || 0));
+    setText("topDiseaseName", safeText(data.top_disease?.name, "-"));
+    setText("topRegionName", safeText(data.top_region?.name, "-"));
+  }catch(err){
+    console.error(err);
   }
+}
+
+async function loadStatsDiseases(){
+  try{
+    const res = await fetch(`${API}/stats/diseases`);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل أمراض الإحصاءات");
+
+    if(Array.isArray(data) && data.length){
+      setHTML("statsDiseasesTable", data.map((row, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${safeText(row.disease)}</td>
+          <td>${safeText(row.count, 0)}</td>
+        </tr>
+      `).join(""));
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+async function loadStatsRegions(){
+  try{
+    const res = await fetch(`${API}/stats/regions`);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل المناطق");
+
+    if(Array.isArray(data) && data.length){
+      setHTML("statsRegionsTable", data.map((row, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.count, 0)}</td>
+        </tr>
+      `).join(""));
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+async function loadStatsSeverity(){
+  try{
+    const res = await fetch(`${API}/stats/severity`);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل شدة الأمراض");
+
+    if(Array.isArray(data) && data.length){
+      setHTML("statsSeverityTable", data.map((row, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${safeText(row.disease)}</td>
+          <td>${safePercent(row.avg_severity)}</td>
+        </tr>
+      `).join(""));
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+/* =========================
+   التنبيهات
+========================= */
+async function loadAlertsSummary(){
+  try{
+    const res = await fetch(`${API}/alerts/summary`);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل ملخص التنبيهات");
+
+    setText("totalAlerts", safeText(data.total_alerts, "0"));
+    setText("highAlerts", safeText(data.high_alerts, "0"));
+    setText("moderateAlerts", safeText(data.moderate_alerts, "0"));
+    setText("latestAlertRegion", safeText(data.latest_alert?.region, "-"));
+    setText("latestAlertDisease", safeText(data.latest_alert?.disease_name, "-"));
+  }catch(err){
+    console.error(err);
+  }
+}
+
+async function loadAlerts(limit = 50){
+  try{
+    const res = await fetch(`${API}/alerts?limit=${limit}`);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل التنبيهات");
+
+    if(Array.isArray(data) && data.length){
+      setHTML("alertsTable", data.map((row, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.city)}</td>
+          <td>${safeText(row.disease_name)}</td>
+          <td>${safeNumber(row.risk_score).toFixed(2)}%</td>
+          <td>${safeText(row.risk_level)}</td>
+          <td>${safeText(row.created_at)}</td>
+        </tr>
+      `).join(""));
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+/* =========================
+   المزارعون
+========================= */
+async function loadFarmers(region = ""){
+  try{
+    const url = region ? `${API}/farmers?region=${encodeURIComponent(region)}` : `${API}/farmers`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل المزارعين");
+
+    if(Array.isArray(data) && data.length){
+      setHTML("farmersTable", data.map((row, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${safeText(row.name)}</td>
+          <td>${safeText(row.phone)}</td>
+          <td>${safeText(row.farm_name)}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.city)}</td>
+          <td>${safeText(row.crop)}</td>
+        </tr>
+      `).join(""));
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+async function registerFarmer(){
+  try{
+    const name = byId("farmerRegName")?.value?.trim() || "";
+    const phone = byId("farmerRegPhone")?.value?.trim() || "";
+    const farm_name = byId("farmerRegFarm")?.value?.trim() || "";
+    const region = byId("farmerRegRegion")?.value?.trim() || "";
+    const city = byId("farmerRegCity")?.value?.trim() || "";
+    const crop = byId("farmerRegCrop")?.value?.trim() || "";
+
+    if(!name || !phone || !farm_name || !region || !city || !crop){
+      alert("يرجى تعبئة جميع حقول تسجيل المزارع");
+      return;
+    }
+
+    const params = new URLSearchParams({name, phone, farm_name, region, city, crop});
+    const res = await fetch(`${API}/farmers/register?${params.toString()}`, {
+      method: "POST"
+    });
+    const data = await res.json();
+
+    if(!res.ok || data.success === false){
+      throw new Error(data.error || "فشل تسجيل المزارع");
+    }
+
+    alert("تم تسجيل المزارع بنجاح");
+    loadFarmers();
+  }catch(err){
+    console.error(err);
+    alert(err.message);
+  }
+}
+
+/* =========================
+   التوقعات والطقس
+========================= */
+async function loadWeatherCurrent(){
+  try{
+    const region = byId("region")?.value?.trim() || "غير محدد";
+    const city = byId("city")?.value?.trim() || "غير محدد";
+    const res = await fetch(`${API}/weather/current?region=${encodeURIComponent(region)}&city=${encodeURIComponent(city)}`);
+    const data = await res.json();
+    if(!res.ok || data.success === false) throw new Error(data.error || "فشل تحميل الطقس");
+
+    setText("weatherTemp", `${safeNumber(data.weather?.temperature).toFixed(1)}°C`);
+    setText("weatherHumidity", `${safeNumber(data.weather?.humidity).toFixed(1)}%`);
+    setText("weatherRain", `${safeNumber(data.weather?.rainfall).toFixed(1)} mm`);
+  }catch(err){
+    console.error(err);
+  }
+}
+
+async function loadForecastLiveRisk(){
+  try{
+    const form = currentFormData();
+    const disease = lastDiagnosis?.disease_info?.disease_ar || "الكل";
+    const params = new URLSearchParams({
+      region: form.region,
+      city: form.city,
+      disease: disease,
+      crop: form.crop,
+      save_if_high: "true"
+    });
+
+    const res = await fetch(`${API}/forecast/live-risk?${params.toString()}`);
+    const data = await res.json();
+    if(!res.ok || data.success === false) throw new Error(data.error || "فشل تحميل التوقع الحي");
+
+    setText("forecastScore", `${safeNumber(data.final_score).toFixed(2)}%`);
+    setText("forecastLevel", safeText(data.risk_level?.level_ar, "-"));
+    setHTML("forecastRecommendations",
+      Array.isArray(data.recommendations)
+        ? data.recommendations.map(x => `<div class="list-item">${x}</div>`).join("")
+        : "-"
+    );
+  }catch(err){
+    console.error(err);
+  }
+}
+
+/* =========================
+   الخريطة
+========================= */
+async function loadMapSummary(){
+  try{
+    const res = await fetch(`${API}/map/summary`);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل ملخص الخريطة");
+
+    if(Array.isArray(data) && data.length){
+      setHTML("mapSummaryTable", data.map((row, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.count, 0)}</td>
+          <td>${safePercent(row.avg_severity)}</td>
+          <td>${safeText(row.latitude)}</td>
+          <td>${safeText(row.longitude)}</td>
+        </tr>
+      `).join(""));
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+async function loadMapData(){
+  try{
+    const res = await fetch(`${API}/map/data`);
+    const data = await res.json();
+    if(!res.ok) throw new Error("فشل تحميل بيانات الخريطة");
+
+    if(Array.isArray(data) && data.length){
+      setHTML("mapDataTable", data.map((row, i) => `
+        <tr>
+          <td>${i+1}</td>
+          <td>${safeText(row.farmer_name)}</td>
+          <td>${safeText(row.farm_name)}</td>
+          <td>${safeText(row.crop)}</td>
+          <td>${safeText(row.disease)}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.city)}</td>
+          <td>${safePercent((safeNumber(row.confidence) * 100))}</td>
+          <td>${safePercent(row.severity)}</td>
+        </tr>
+      `).join(""));
+    }
+  }catch(err){
+    console.error(err);
+  }
+}
+
+/* =========================
+   التصدير
+========================= */
+function exportDiagnosesCSV(){
+  window.open(`${API}/export/diagnoses/csv`, "_blank");
+}
+
+function exportDiagnosesJSON(){
+  window.open(`${API}/export/diagnoses/json`, "_blank");
+}
+
+function exportAlertsCSV(){
+  window.open(`${API}/export/alerts/csv`, "_blank");
+}
+
+function exportAlertsJSON(){
+  window.open(`${API}/export/alerts/json`, "_blank");
+}
+
+/* =========================
+   تحميل تلقائي
+========================= */
+document.addEventListener("DOMContentLoaded", function(){
+  if(byId("imageInput")){
+    byId("imageInput").addEventListener("change", function(e){
+      const file = e.target.files[0];
+      if(file){
+        selectedFile = file;
+        setValue("fileState", file.name);
+        fileToPreview(file);
+        setStatus("تم اختيار الصورة بنجاح.");
+      }
+    });
+  }
+
+  // تحميل الأقسام إن وجدت في الصفحة
+  loadStatsSummary();
+  loadStatsDiseases();
+  loadStatsRegions();
+  loadStatsSeverity();
+  loadAlertsSummary();
+  loadAlerts();
+  loadFarmers();
+  loadWeatherCurrent();
+  loadForecastLiveRisk();
+  loadMapSummary();
+  loadMapData();
 });
 </script>
 
