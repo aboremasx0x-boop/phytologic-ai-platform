@@ -1,620 +1,1151 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Phytologic AI - Platform Shell</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | Layout Shell Ultra</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
 
-:root{
-  --bg:#eef4ff;
-  --panel:#ffffff;
-  --panel-2:#f8fbff;
-  --line:#e7edf8;
-  --text:#0f172a;
-  --muted:#64748b;
-  --brand1:#0b1f52;
-  --brand2:#0c7a66;
-  --accent:#2563eb;
-  --shadow:0 12px 28px rgba(15,23,42,.08);
-  --sidebar-w:300px;
-  --sidebar-collapsed:92px;
-}
+    :root{
+      --bg:#f4f7fb;
+      --bg-soft:#eef5ff;
+      --card:#ffffff;
+      --card-2:#fbfdff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --danger:#dc2626;
+      --warning:#d97706;
+      --success:#15803d;
+      --info:#2563eb;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+      --radius:22px;
+      --sidebar-width:290px;
+      --topbar-height:78px;
+      --dock-height:64px;
+    }
 
-html,body{
-  margin:0;
-  height:100%;
-  font-family:Tahoma,Arial,sans-serif;
-  background:linear-gradient(180deg,var(--bg) 0%,#f8fbff 100%);
-  color:var(--text);
-}
+    body.dark{
+      --bg:#0b1220;
+      --bg-soft:#0f172a;
+      --card:#111827;
+      --card-2:#182131;
+      --text:#e5eefb;
+      --muted:#9fb0c8;
+      --border:#243041;
+      --primary:#14b8a6;
+      --primary-dark:#0f8f83;
+      --secondary:#60a5fa;
+      --danger:#f87171;
+      --warning:#f59e0b;
+      --success:#34d399;
+      --info:#60a5fa;
+      --shadow:0 18px 40px rgba(0,0,0,.28);
+    }
 
-.app{
-  display:grid;
-  grid-template-columns:var(--sidebar-w) 1fr;
-  min-height:100vh;
-  transition:.25s;
-}
+    body{
+      font-family:Tahoma,Arial,sans-serif;
+      background:linear-gradient(180deg,var(--bg-soft) 0%,var(--bg) 100%);
+      color:var(--text);
+      min-height:100vh;
+      transition:.2s ease;
+      overflow-x:hidden;
+    }
 
-.app.collapsed{
-  grid-template-columns:var(--sidebar-collapsed) 1fr;
-}
+    .app{
+      display:grid;
+      grid-template-columns:var(--sidebar-width) 1fr;
+      min-height:100vh;
+    }
 
-.sidebar{
-  background:
-    linear-gradient(180deg,rgba(9,18,48,.98),rgba(13,94,95,.94)),
-    radial-gradient(circle at top left,rgba(255,255,255,.08),transparent 34%);
-  color:#fff;
-  padding:18px 14px;
-  position:sticky;
-  top:0;
-  height:100vh;
-  overflow:auto;
-  box-shadow:0 0 0 1px rgba(255,255,255,.04) inset;
-}
+    .sidebar{
+      background:linear-gradient(180deg,var(--card) 0%,var(--card-2) 100%);
+      border-left:1px solid var(--border);
+      padding:18px;
+      position:sticky;
+      top:0;
+      height:100vh;
+      overflow:auto;
+      box-shadow:var(--shadow);
+      z-index:30;
+    }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:10px 10px 18px;
-  border-bottom:1px solid rgba(255,255,255,.10);
-  margin-bottom:14px;
-}
+    .brand{
+      background:
+        linear-gradient(135deg, rgba(15,118,110,.96), rgba(29,78,216,.92));
+      color:#fff;
+      border-radius:24px;
+      padding:20px 18px;
+      margin-bottom:18px;
+      box-shadow:var(--shadow);
+    }
 
-.brand-badge{
-  width:48px;
-  height:48px;
-  border-radius:16px;
-  display:grid;
-  place-items:center;
-  font-size:22px;
-  font-weight:800;
-  background:rgba(255,255,255,.12);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-  flex:0 0 auto;
-}
+    .brand h1{
+      font-size:24px;
+      margin-bottom:8px;
+      line-height:1.2;
+    }
 
-.brand-text{
-  min-width:0;
-}
+    .brand p{
+      font-size:13px;
+      line-height:1.8;
+      color:rgba(255,255,255,.9);
+    }
 
-.brand-title{
-  font-size:20px;
-  font-weight:800;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+    .side-section{
+      margin-bottom:18px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:14px;
+    }
 
-.brand-sub{
-  font-size:12px;
-  opacity:.85;
-  margin-top:4px;
-}
+    .side-title{
+      font-size:14px;
+      font-weight:800;
+      color:var(--muted);
+      margin-bottom:12px;
+    }
 
-.app.collapsed .brand-text,
-.app.collapsed .section-label,
-.app.collapsed .nav-text,
-.app.collapsed .sidebar-footer{
-  display:none;
-}
+    .side-menu{
+      display:grid;
+      gap:10px;
+    }
 
-.nav-section{
-  margin:14px 0 10px;
-}
+    .side-link{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:14px;
+      text-decoration:none;
+      color:var(--text);
+      background:var(--card-2);
+      border:1px solid var(--border);
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      width:100%;
+    }
 
-.section-label{
-  font-size:11px;
-  letter-spacing:.4px;
-  text-transform:uppercase;
-  opacity:.7;
-  padding:0 12px 8px;
-}
+    .side-link:hover,
+    .side-link.active{
+      background:rgba(29,78,216,.08);
+      border-color:rgba(29,78,216,.25);
+      transform:translateY(-1px);
+    }
 
-.nav{
-  display:grid;
-  gap:8px;
-}
+    .side-mini{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-.nav-btn{
-  border:none;
-  width:100%;
-  text-align:right;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:13px 12px;
-  border-radius:16px;
-  background:transparent;
-  color:#fff;
-  cursor:pointer;
-  transition:.2s;
-  font-size:14px;
-  font-weight:700;
-}
+    .workspace{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+      padding-bottom:calc(var(--dock-height) + 12px);
+    }
 
-.nav-btn:hover{
-  background:rgba(255,255,255,.10);
-}
+    .topbar{
+      height:var(--topbar-height);
+      position:sticky;
+      top:0;
+      z-index:25;
+      background:rgba(255,255,255,.82);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 20px;
+    }
 
-.nav-btn.active{
-  background:rgba(255,255,255,.16);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.10);
-}
+    body.dark .topbar{
+      background:rgba(17,24,39,.82);
+    }
 
-.nav-icon{
-  width:42px;
-  height:42px;
-  border-radius:14px;
-  display:grid;
-  place-items:center;
-  background:rgba(255,255,255,.10);
-  font-size:18px;
-  flex:0 0 auto;
-}
+    .topbar-left{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      flex-wrap:wrap;
+    }
 
-.nav-text{
-  min-width:0;
-}
+    .page-title{
+      font-size:22px;
+      font-weight:800;
+    }
 
-.nav-title{
-  font-size:14px;
-  font-weight:800;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+    .page-subtitle{
+      font-size:13px;
+      color:var(--muted);
+    }
 
-.nav-desc{
-  font-size:11px;
-  opacity:.8;
-  margin-top:4px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
+    .topbar-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.sidebar-footer{
-  margin-top:18px;
-  padding:14px 12px;
-  border-top:1px solid rgba(255,255,255,.10);
-  font-size:12px;
-  opacity:.85;
-  line-height:1.8;
-}
-.main{
-  display:flex;
-  flex-direction:column;
-  min-width:0;
-}
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:11px 14px;
+      font-size:13px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
 
-.topbar{
-  position:sticky;
-  top:0;
-  z-index:20;
-  backdrop-filter:blur(10px);
-  background:rgba(248,251,255,.82);
-  border-bottom:1px solid var(--line);
-  padding:14px 18px;
-}
+    .btn:hover{ transform:translateY(-1px); }
 
-.topbar-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
 
-.left-tools,
-.right-tools{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-}
+    .btn-primary:hover{ background:var(--primary-dark); }
 
-.icon-btn{
-  border:none;
-  background:#fff;
-  border:1px solid var(--line);
-  width:46px;
-  height:46px;
-  border-radius:14px;
-  cursor:pointer;
-  box-shadow:var(--shadow);
-  font-size:18px;
-}
+    .btn-outline{
+      background:var(--card);
+      color:var(--secondary);
+      border:1px solid var(--border);
+    }
 
-.header-chip{
-  background:#fff;
-  border:1px solid var(--line);
-  padding:11px 14px;
-  border-radius:14px;
-  box-shadow:var(--shadow);
-  font-size:13px;
-  color:var(--muted);
-}
+    .btn-outline:hover{ background:var(--card-2); }
 
-.header-chip strong{
-  color:var(--text);
-}
+    .btn-ghost{
+      background:transparent;
+      color:var(--text);
+      border:1px solid var(--border);
+    }
 
-.title-box{
-  background:#fff;
-  border:1px solid var(--line);
-  padding:12px 16px;
-  border-radius:16px;
-  box-shadow:var(--shadow);
-  min-width:280px;
-}
+    .btn-ghost:hover{ background:var(--card); }
 
-.page-title{
-  margin:0;
-  font-size:18px;
-  font-weight:800;
-  color:var(--text);
-}
+    .icon-badge{
+      position:relative;
+    }
 
-.page-subtitle{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--muted);
-}
+    .notif-count{
+      position:absolute;
+      top:-6px;
+      left:-6px;
+      min-width:20px;
+      height:20px;
+      border-radius:999px;
+      background:var(--danger);
+      color:#fff;
+      font-size:11px;
+      font-weight:900;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:0 6px;
+    }
 
-.content{
-  padding:16px;
-  min-height:calc(100vh - 92px);
-}
+    .content{
+      padding:18px;
+      display:grid;
+      gap:18px;
+    }
 
-.viewer-card{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:24px;
-  box-shadow:var(--shadow);
-  overflow:hidden;
-  min-height:calc(100vh - 140px);
-  display:flex;
-  flex-direction:column;
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(8,47,73,.98), rgba(15,118,110,.92)),
+        radial-gradient(circle at top left, rgba(255,255,255,.16), transparent 35%);
+      color:#fff;
+      border-radius:28px;
+      padding:26px;
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:18px;
+      flex-wrap:wrap;
+    }
 
-.viewer-head{
-  padding:14px 16px;
-  border-bottom:1px solid var(--line);
-  background:var(--panel-2);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
+    .hero h2{
+      font-size:30px;
+      margin-bottom:10px;
+    }
 
-.viewer-head .meta{
-  font-size:12px;
-  color:var(--muted);
-}
+    .hero p{
+      max-width:920px;
+      font-size:15px;
+      line-height:1.9;
+      color:rgba(255,255,255,.92);
+    }
 
-.viewer-actions{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
+    .hero-badges{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
 
-.action-btn{
-  border:none;
-  background:#fff;
-  border:1px solid var(--line);
-  padding:10px 14px;
-  border-radius:12px;
-  cursor:pointer;
-  font-size:13px;
-  font-weight:700;
-}
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.12);
+      color:#fff;
+    }
 
-.frame-wrap{
-  flex:1;
-  background:#fff;
-}
+    .grid{
+      display:grid;
+      gap:18px;
+    }
 
-#iframePage{
-  width:100%;
-  height:calc(100vh - 225px);
-  border:none;
-  display:block;
-  background:#fff;
-}
+    .grid-2{ grid-template-columns:1fr 1fr; }
+    .grid-3{ grid-template-columns:repeat(3,1fr); }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
 
-.mobile-nav{
-  display:none;
-  margin-top:10px;
-}
+    .card{
+      background:linear-gradient(180deg,var(--card) 0%,var(--card-2) 100%);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-.mobile-nav select{
-  width:100%;
-  padding:12px 14px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:#fff;
-  font-size:14px;
-}
+    .card-header{
+      padding:18px 20px 12px;
+      border-bottom:1px solid var(--border);
+    }
 
-@media(max-width:1100px){
-  .app{
-    grid-template-columns:var(--sidebar-collapsed) 1fr;
-  }
+    .card-header h3{
+      font-size:20px;
+      margin-bottom:8px;
+    }
 
-  .brand-text,
-  .section-label,
-  .nav-text,
-  .sidebar-footer{
-    display:none;
-  }
-}
+    .card-header p{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-@media(max-width:860px){
-  .app,
-  .app.collapsed{
-    grid-template-columns:1fr;
-  }
+    .card-body{
+      padding:20px;
+    }
 
-  .sidebar{
-    display:none;
-  }
+    .kpi{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      min-height:116px;
+      box-shadow:var(--shadow);
+    }
 
-  .mobile-nav{
-    display:block;
-  }
+    .kpi-label{
+      color:var(--muted);
+      font-size:14px;
+      margin-bottom:8px;
+    }
 
-  #iframePage{
-    height:calc(100vh - 285px);
-  }
-}
-</style>
+    .kpi-value{
+      font-size:28px;
+      font-weight:900;
+      line-height:1.2;
+    }
+
+    .kpi-sub{
+      margin-top:8px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .quick-links{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+
+    .quick-card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:var(--card);
+      transition:.2s ease;
+      cursor:pointer;
+    }
+
+    .quick-card:hover{
+      transform:translateY(-2px);
+      box-shadow:var(--shadow);
+    }
+
+    .quick-card h4{
+      font-size:17px;
+      margin-bottom:8px;
+    }
+
+    .quick-card p{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    .widget-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+
+    .widget{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:var(--card);
+    }
+
+    .widget-title{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:10px;
+      font-weight:800;
+    }
+
+    .widget-value{
+      font-size:24px;
+      font-weight:900;
+      margin-bottom:8px;
+    }
+
+    .widget-sub{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.7;
+    }
+
+    .chart-placeholder{
+      height:260px;
+      border:1px dashed var(--border);
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--card);
+      color:var(--muted);
+      font-size:14px;
+      text-align:center;
+      line-height:1.8;
+      padding:20px;
+    }
+
+    .info-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .info-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 0;
+      border-bottom:1px dashed var(--border);
+    }
+
+    .info-item:last-child{ border-bottom:none; }
+
+    .key{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .value{
+      font-size:14px;
+      font-weight:800;
+      text-align:left;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .pill-low{ background:#ecfdf5; color:#166534; }
+    .pill-moderate{ background:#fff7ed; color:#9a3412; }
+    .pill-high{ background:#fef2f2; color:#991b1b; }
+    .pill-neutral{ background:#eff6ff; color:#1d4ed8; }
+
+    .live-bar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .live-chip{
+      padding:10px 12px;
+      border-radius:14px;
+      background:var(--card);
+      border:1px solid var(--border);
+      font-size:13px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .embed-shell{
+      width:100%;
+      min-height:680px;
+      border:1px solid var(--border);
+      border-radius:20px;
+      overflow:hidden;
+      background:var(--card);
+      position:relative;
+    }
+
+    .embedded-frame{
+      width:100%;
+      height:680px;
+      border:none;
+      background:#fff;
+    }
+
+    .skeleton-wrap{
+      display:grid;
+      gap:12px;
+      padding:20px;
+    }
+
+    .skeleton{
+      height:18px;
+      border-radius:10px;
+      background:linear-gradient(90deg,var(--card-2) 25%,rgba(148,163,184,.18) 50%,var(--card-2) 75%);
+      background-size:200% 100%;
+      animation:shimmer 1.2s infinite linear;
+    }
+
+    .skeleton.big{ height:120px; }
+    .skeleton.mid{ height:42px; }
+    .skeleton.w70{ width:70%; }
+    .skeleton.w50{ width:50%; }
+    .skeleton.w30{ width:30%; }
+
+    @keyframes shimmer{
+      0%{ background-position:200% 0; }
+      100%{ background-position:-200% 0; }
+    }
+
+    .toast-wrap{
+      position:fixed;
+      top:22px;
+      left:22px;
+      z-index:999;
+      display:grid;
+      gap:10px;
+      width:min(340px, calc(100vw - 24px));
+    }
+
+    .toast{
+      padding:14px 16px;
+      border-radius:16px;
+      color:#fff;
+      font-size:14px;
+      font-weight:800;
+      box-shadow:var(--shadow);
+      animation:slideIn .22s ease;
+    }
+
+    .toast.success{ background:var(--success); }
+    .toast.error{ background:var(--danger); }
+    .toast.info{ background:var(--info); }
+    .toast.warn{ background:var(--warning); }
+
+    @keyframes slideIn{
+      from{ opacity:0; transform:translateY(-8px); }
+      to{ opacity:1; transform:translateY(0); }
+    }
+
+    .dock{
+      position:fixed;
+      bottom:0;
+      left:0;
+      right:0;
+      height:var(--dock-height);
+      z-index:40;
+      background:rgba(255,255,255,.88);
+      backdrop-filter:blur(12px);
+      border-top:1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:10px 18px;
+      gap:12px;
+    }
+
+    body.dark .dock{
+      background:rgba(17,24,39,.88);
+    }
+
+    .dock-left,
+    .dock-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .dock-item{
+      padding:8px 12px;
+      border-radius:12px;
+      background:var(--card);
+      border:1px solid var(--border);
+      font-size:12px;
+      font-weight:800;
+    }
+
+    .footer{
+      padding:18px;
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    .mobile-toggle{
+      display:none;
+    }
+
+    @media (max-width:1280px){
+      .grid-4{ grid-template-columns:repeat(2,1fr); }
+      .grid-3{ grid-template-columns:1fr; }
+      .quick-links,
+      .widget-grid{ grid-template-columns:1fr 1fr; }
+    }
+
+    @media (max-width:980px){
+      .app{ grid-template-columns:1fr; }
+
+      .sidebar{
+        position:fixed;
+        top:0;
+        right:-100%;
+        width:min(92vw, 340px);
+        transition:.25s ease;
+        height:100vh;
+      }
+
+      .sidebar.open{ right:0; }
+
+      .mobile-toggle{ display:inline-flex; }
+
+      .grid-2,
+      .grid-4,
+      .quick-links,
+      .widget-grid{ grid-template-columns:1fr; }
+
+      .embedded-frame{ height:760px; }
+
+      .dock{
+        height:auto;
+        min-height:var(--dock-height);
+        padding:10px;
+        flex-direction:column;
+        align-items:stretch;
+      }
+
+      .dock-left, .dock-right{
+        justify-content:center;
+      }
+    }
+  </style>
 </head>
 <body>
 
-<div class="app" id="appShell">
+  <div class="toast-wrap" id="toastWrap"></div>
 
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-badge">🌿</div>
-      <div class="brand-text">
-        <div class="brand-title">Phytologic AI</div>
-        <div class="brand-sub">Unified Control Platform</div>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <h1>Phytologic AI</h1>
+        <p>هيكل Ultra شامل لربط كل واجهات المنصة داخل shell واحد متقدم مع مراقبة تشغيلية وإشعارات وauto refresh.</p>
       </div>
-    </div>
 
-    <div class="nav-section">
-      <div class="section-label">الواجهة الرئيسية</div>
-      <div class="nav">
-        <button class="nav-btn active" data-page="index_home.html" data-title="التشخيص الذكي" data-subtitle="رفع الصور وتحليل المرض والتقرير">
-          <div class="nav-icon">🧪</div>
-          <div class="nav-text">
-            <div class="nav-title">index_home</div>
-            <div class="nav-desc">التشخيص والتقرير</div>
-          </div>
-        </button>
-
-        <button class="nav-btn" data-page="dashboard.html" data-title="لوحة الإحصاءات" data-subtitle="الحالات والأمراض والمناطق">
-          <div class="nav-icon">📊</div>
-          <div class="nav-text">
-            <div class="nav-title">dashboard</div>
-            <div class="nav-desc">إحصاءات عامة</div>
-          </div>
-        </button>
-
-        <button class="nav-btn" data-page="alerts.html" data-title="لوحة التنبيهات" data-subtitle="التنبيهات والرسائل والإشعارات">
-          <div class="nav-icon">🚨</div>
-          <div class="nav-text">
-            <div class="nav-title">alerts</div>
-            <div class="nav-desc">التنبيهات</div>
-          </div>
-        </button>
+      <div class="side-section">
+        <div class="side-title">الوحدات</div>
+        <div class="side-menu">
+          <button class="side-link active" onclick="openEmbeddedPage('/pages/dashboard', 'لوحة التحكم', this)">
+            <span>لوحة التحكم</span><span class="side-mini">Dashboard</span>
+          </button>
+          <button class="side-link" onclick="openEmbeddedPage('/pages/report_center', 'مركز التقارير', this)">
+            <span>مركز التقارير</span><span class="side-mini">Reports</span>
+          </button>
+          <button class="side-link" onclick="openEmbeddedPage('/pages/alerts', 'التنبيهات', this)">
+            <span>التنبيهات</span><span class="side-mini">Alerts</span>
+          </button>
+          <button class="side-link" onclick="openEmbeddedPage('/pages/farmers', 'المزارعون', this)">
+            <span>المزارعون</span><span class="side-mini">Farmers</span>
+          </button>
+          <button class="side-link" onclick="openEmbeddedPage('/pages/admin', 'الإدارة العليا', this)">
+            <span>الإدارة العليا</span><span class="side-mini">Admin</span>
+          </button>
+          <button class="side-link" onclick="openEmbeddedPage('/pages/national_center', 'المركز الوطني', this)">
+            <span>المركز الوطني</span><span class="side-mini">National</span>
+          </button>
+          <button class="side-link" onclick="openEmbeddedPage('/pages/ops', 'العمليات التشغيلية', this)">
+            <span>العمليات</span><span class="side-mini">OPS</span>
+          </button>
+          <button class="side-link" onclick="openEmbeddedPage('/pages/forecast_ai', 'Forecast AI', this)">
+            <span>Forecast AI</span><span class="side-mini">AI</span>
+          </button>
+        </div>
       </div>
-    </div>
-<div class="nav-section">
-      <div class="section-label">الإدارة الوطنية</div>
-      <div class="nav">
-        <button class="nav-btn" data-page="admin.html" data-title="لوحة الجهات" data-subtitle="إدارة الحالات والمزارعين والتنبيهات">
-          <div class="nav-icon">🏢</div>
-          <div class="nav-text">
-            <div class="nav-title">admin</div>
-            <div class="nav-desc">الإدارة المركزية</div>
-          </div>
-        </button>
 
-        <button class="nav-btn" data-page="national_center.html" data-title="المركز الوطني" data-subtitle="قراءة وطنية عليا للمملكة">
-          <div class="nav-icon">🇸🇦</div>
-          <div class="nav-text">
-            <div class="nav-title">national_center</div>
-            <div class="nav-desc">المنظور الوطني</div>
-          </div>
-        </button>
-
-        <button class="nav-btn" data-page="ops.html" data-title="مركز العمليات الحي" data-subtitle="متابعة لحظية للمخاطر والتنبيهات">
-          <div class="nav-icon">🛰️</div>
-          <div class="nav-text">
-            <div class="nav-title">ops</div>
-            <div class="nav-desc">المتابعة اللحظية</div>
-          </div>
-        </button>
+      <div class="side-section">
+        <div class="side-title">التحكم</div>
+        <div class="side-menu">
+          <button class="side-link" onclick="toggleTheme()">
+            <span>تبديل الوضع</span><span class="side-mini">Dark / Light</span>
+          </button>
+          <button class="side-link" onclick="refreshEmbeddedFrame()">
+            <span>تحديث الصفحة الحالية</span><span class="side-mini">Refresh</span>
+          </button>
+          <button class="side-link" onclick="toggleAutoRefresh()">
+            <span id="autoRefreshLabel">تشغيل Auto Refresh</span><span class="side-mini" id="autoRefreshState">OFF</span>
+          </button>
+          <button class="side-link" onclick="goHome()">
+            <span>العودة للرئيسية</span><span class="side-mini">Home</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </aside>
 
-    <div class="nav-section">
-      <div class="section-label">التنبؤ والمراقبة</div>
-      <div class="nav">
-        <button class="nav-btn" data-page="forecast.html" data-title="التوقع الزراعي الذكي" data-subtitle="الطقس الحقيقي والتوقع الحي والمقارنة">
-          <div class="nav-icon">🌦️</div>
-          <div class="nav-text">
-            <div class="nav-title">forecast</div>
-            <div class="nav-desc">التوقعات المباشرة</div>
+    <section class="workspace">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="btn btn-ghost mobile-toggle" onclick="toggleSidebar()">☰</button>
+          <div>
+            <div class="page-title" id="pageTitle">لوحة التحكم</div>
+            <div class="page-subtitle">Ultra Shell لإدارة جميع الواجهات داخل إطار موحّد</div>
           </div>
-        </button>
-<button class="nav-btn" 
-data-page="reports_center.html" 
-data-title="مركز التقارير" 
-data-subtitle="تقارير الحالات والإحصاءات والتصدير">
+        </div>
 
-  <div class="nav-icon">📑</div>
+        <div class="topbar-right">
+          <div class="icon-badge">
+            <button class="btn btn-outline" onclick="showToast('لا توجد إشعارات جديدة', 'info')">الإشعارات</button>
+            <span class="notif-count" id="notifCount">0</span>
+          </div>
+          <button class="btn btn-outline" onclick="checkSystemHealth()">فحص النظام</button>
+          <button class="btn btn-primary" onclick="openEmbeddedPage('/pages/report_center', 'مركز التقارير')">ابدأ الآن</button>
+        </div>
+      </header>
 
-  <div class="nav-text">
-    <div class="nav-title">reports_center</div>
-    <div class="nav-desc">التقارير والتحليلات</div>
+      <main class="content">
+        <section class="hero">
+          <div>
+            <h2>Layout Shell Ultra</h2>
+            <p>
+              هذه النسخة تمثل طبقة واجهة متقدمة جدًا للمنصة، تجمع بين shell موحّد، status dock،
+              تنبيهات حيّة، auto refresh، widgets سريعة، ومنطقة محتوى مدمجة لعرض الوحدات المختلفة
+              بدون الحاجة للخروج من الإطار الرئيسي.
+            </p>
+
+            <div class="hero-badges">
+              <span class="badge">Live Status</span>
+              <span class="badge">Auto Refresh</span>
+              <span class="badge">Toast Notifications</span>
+              <span class="badge">Embedded Modules</span>
+              <span class="badge">Dark Mode</span>
+            </div>
+          </div>
+
+          <div class="live-bar">
+            <span class="badge" id="liveClock">--:--:--</span>
+            <span class="badge" id="liveMode">Mode: Light</span>
+            <span class="badge" id="liveRoute">/pages/dashboard</span>
+          </div>
+        </section>
+
+        <section class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">الحالة العامة</div>
+            <div class="kpi-value" id="kpiStatus">--</div>
+            <div class="kpi-sub">فحص الخدمة الأساسية</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">نموذج الصور</div>
+            <div class="kpi-value" id="kpiAiModel">--</div>
+            <div class="kpi-sub">AI diagnosis model</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">نموذج التنبؤ</div>
+            <div class="kpi-value" id="kpiForecast">--</div>
+            <div class="kpi-sub">forecast model</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">الإصدار</div>
+            <div class="kpi-value" id="kpiVersion" style="font-size:20px;">--</div>
+            <div class="kpi-sub">إصدار النظام الحالي</div>
+          </div>
+        </section>
+
+        <section class="grid grid-2">
+          <div class="card">
+            <div class="card-header">
+              <h3>الوصول السريع</h3>
+              <p>تنقل سريع بين أهم الوحدات.</p>
+            </div>
+            <div class="card-body">
+              <div class="quick-links">
+                <div class="quick-card" onclick="openEmbeddedPage('/pages/dashboard', 'لوحة التحكم')">
+                  <h4>Dashboard</h4>
+                  <p>إحصائيات وتشغيل ومتابعة عامة.</p>
+                </div>
+                <div class="quick-card" onclick="openEmbeddedPage('/pages/report_center', 'مركز التقارير')">
+                  <h4>Reports</h4>
+                  <p>رفع صور وتشخيص وتنزيل PDF.</p>
+                </div>
+                <div class="quick-card" onclick="openEmbeddedPage('/pages/alerts', 'التنبيهات')">
+                  <h4>Alerts</h4>
+                  <p>مراجعة مستويات الخطورة والتنبيهات.</p>
+                </div>
+                <div class="quick-card" onclick="openEmbeddedPage('/pages/admin', 'الإدارة العليا')">
+                  <h4>Admin</h4>
+                  <p>تحكم إداري أعلى ومراقبة النظام.</p>
+                </div>
+                <div class="quick-card" onclick="openEmbeddedPage('/pages/national_center', 'المركز الوطني')">
+                  <h4>National</h4>
+                  <p>رؤية وطنية للحالات والتنبيهات.</p>
+                </div>
+                <div class="quick-card" onclick="openEmbeddedPage('/pages/forecast_ai', 'Forecast AI')">
+                  <h4>Forecast</h4>
+                  <p>تشغيل نموذج التنبؤ والخطر.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>معلومات الجلسة</h3>
+              <p>قراءات حية عن shell الحالي.</p>
+            </div>
+            <div class="card-body">
+              <div class="info-list">
+                <div class="info-item">
+                  <div class="key">الوضع الحالي</div>
+                  <div class="value" id="themeStatus">Light</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">الصفحة المعروضة</div>
+                  <div class="value" id="currentRoute">/pages/dashboard</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">Auto Refresh</div>
+                  <div class="value" id="autoRefreshText">OFF</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">آخر تحديث</div>
+                  <div class="value" id="lastRefreshText">--</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid grid-3">
+          <div class="widget">
+            <div class="widget-title">عدد التنبيهات</div>
+            <div class="widget-value" id="widgetAlerts">--</div>
+            <div class="widget-sub">إجمالي التنبيهات المسجلة حاليًا.</div>
+          </div>
+
+          <div class="widget">
+            <div class="widget-title">التنبيهات العالية</div>
+            <div class="widget-value" id="widgetHighAlerts">--</div>
+            <div class="widget-sub">عدد التنبيهات ذات مستوى الخطر العالي.</div>
+          </div>
+
+          <div class="widget">
+            <div class="widget-title">إجمالي الحالات</div>
+            <div class="widget-value" id="widgetCases">--</div>
+            <div class="widget-sub">إجمالي التشخيصات المسجلة داخل النظام.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h3>مساحة الرسم والتحليلات</h3>
+            <p>مكان مخصص لاحقًا لإضافة Charts أو Widgets تفاعلية.</p>
+          </div>
+          <div class="card-body">
+            <div class="chart-placeholder">
+              منطقة مخصصة للرسوم البيانية المباشرة أو مؤشرات الأداء التفاعلية.<br>
+              يمكن لاحقًا ربطها بـ Chart.js أو ApexCharts أو أي مكتبة رسومية.
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h3>منطقة المحتوى الديناميكي</h3>
+            <p>سيتم تحميل الصفحات المختارة داخل هذا الإطار.</p>
+          </div>
+          <div class="card-body">
+            <div class="embed-shell">
+              <div class="skeleton-wrap" id="shellLoader">
+                <div class="skeleton mid w30"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton w70"></div>
+                <div class="skeleton big"></div>
+                <div class="skeleton"></div>
+                <div class="skeleton w50"></div>
+              </div>
+
+              <iframe
+                id="embeddedFrame"
+                class="embedded-frame"
+                src="/pages/dashboard"
+                onload="handleFrameLoaded()"
+                style="display:none;">
+              </iframe>
+            </div>
+          </div>
+        </section>
+
+        <footer class="footer">
+          Phytologic AI Layout Shell Ultra — هيكل واجهات موحّد متقدم جدًا لإدارة كل وحدات المنصة داخل إطار واحد.
+        </footer>
+      </main>
+    </section>
   </div>
 
-</button>
-        <button class="nav-btn" data-page="forecast_ai.html" data-title="تنبؤ الذكاء الاصطناعي" data-subtitle="تحليل AI للحالات المستقبلية">
-          <div class="nav-icon">🤖</div>
-          <div class="nav-text">
-            <div class="nav-title">forecast_ai</div>
-            <div class="nav-desc">AI Forecast</div>
-          </div>
-        </button>
-      </div>
+  <div class="dock">
+    <div class="dock-left">
+      <div class="dock-item">Route: <span id="dockRoute">/pages/dashboard</span></div>
+      <div class="dock-item">System: <span id="dockSystem">--</span></div>
+      <div class="dock-item">Forecast: <span id="dockForecast">--</span></div>
     </div>
 
-    <div class="sidebar-footer">
-      منصة موحدة لربط التشخيص، الإحصاءات، التنبيهات، التوقعات، والمتابعة الوطنية داخل واجهة واحدة.
+    <div class="dock-right">
+      <div class="dock-item">Alerts: <span id="dockAlerts">--</span></div>
+      <div class="dock-item">High: <span id="dockHighAlerts">--</span></div>
+      <div class="dock-item">Last refresh: <span id="dockRefresh">--</span></div>
     </div>
-  </aside>
+  </div>
 
-  <main class="main">
-    <div class="topbar">
-      <div class="topbar-row">
-        <div class="right-tools">
-          <button class="icon-btn" id="toggleSidebarBtn" title="طي/فتح القائمة">☰</button>
+  <script>
+    let currentEmbeddedUrl = "/pages/dashboard";
+    let autoRefreshEnabled = false;
+    let autoRefreshTimer = null;
 
-          <div class="title-box">
-            <h2 class="page-title" id="pageTitle">التشخيص الذكي</h2>
-            <div class="page-subtitle" id="pageSubtitle">رفع الصور وتحليل المرض والتقرير</div>
-          </div>
-        </div>
+    function showToast(message, type = "info", duration = 2600){
+      const wrap = document.getElementById("toastWrap");
+      const toast = document.createElement("div");
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      wrap.appendChild(toast);
 
-        <div class="left-tools">
-          <div class="header-chip"><strong>الوقت:</strong> <span id="liveTime">-</span></div>
-          <div class="header-chip"><strong>التاريخ:</strong> <span id="liveDate">-</span></div>
-          <div class="header-chip"><strong>الصفحة الحالية:</strong> <span id="currentFile">index_home.html</span></div>
-        </div>
-      </div>
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-8px)";
+        setTimeout(() => toast.remove(), 220);
+      }, duration);
+    }
 
-      <div class="mobile-nav">
-        <select id="mobilePageSelect">
-          <option value="index_home.html">index_home.html</option>
-          <option value="dashboard.html">dashboard.html</option>
-          <option value="alerts.html">alerts.html</option>
-          <option value="admin.html">admin.html</option>
-          <option value="national_center.html">national_center.html</option>
-          <option value="ops.html">ops.html</option>
-          <option value="forecast.html">forecast.html</option>
-          <option value="forecast_ai.html">forecast_ai.html</option>
-        </select>
-      </div>
-    </div>
+    function setActiveLink(clickedEl){
+      document.querySelectorAll(".side-link").forEach(el => el.classList.remove("active"));
+      if(clickedEl) clickedEl.classList.add("active");
+    }
 
-    <div class="content">
-      <div class="viewer-card">
-        <div class="viewer-head">
-          <div class="meta">
-            يتم تحميل الصفحات داخل إطار موحد. تأكد أن جميع الملفات موجودة في نفس المجلد.
-          </div>
+    function setNowTexts(){
+      const now = new Date();
+      const text = now.toLocaleString("ar-SA");
+      document.getElementById("lastRefreshText").textContent = text;
+      document.getElementById("dockRefresh").textContent = text;
+    }
 
-          <div class="viewer-actions">
-            <button class="action-btn" id="reloadFrameBtn">إعادة تحميل الصفحة</button>
-            <button class="action-btn" id="openDirectBtn">فتح مباشر</button>
-            <button class="action-btn" id="goHomeBtn">العودة للرئيسية</button>
-          </div>
-        </div>
+    function updateClock(){
+      const now = new Date();
+      document.getElementById("liveClock").textContent = now.toLocaleTimeString("ar-SA");
+    }
 
-        <div class="frame-wrap">
-          <iframe id="iframePage" src="index_home.html"></iframe>
-        </div>
-      </div>
-    </div>
-  </main>
-</div>
-<script>
-const appShell = document.getElementById("appShell");
-const iframePage = document.getElementById("iframePage");
-const navButtons = document.querySelectorAll(".nav-btn");
-const pageTitle = document.getElementById("pageTitle");
-const pageSubtitle = document.getElementById("pageSubtitle");
-const currentFile = document.getElementById("currentFile");
-const mobilePageSelect = document.getElementById("mobilePageSelect");
+    function openEmbeddedPage(url, title = "صفحة", clickedEl = null){
+      const frame = document.getElementById("embeddedFrame");
+      const loader = document.getElementById("shellLoader");
 
-let currentPage = "index_home.html";
+      currentEmbeddedUrl = url;
+      document.getElementById("pageTitle").textContent = title;
+      document.getElementById("currentRoute").textContent = url;
+      document.getElementById("dockRoute").textContent = url;
+      document.getElementById("liveRoute").textContent = url;
 
-function updateClock(){
-  const now = new Date();
-  document.getElementById("liveTime").textContent = now.toLocaleTimeString("ar-SA");
-  document.getElementById("liveDate").textContent = now.toLocaleDateString("ar-SA");
-}
+      setActiveLink(clickedEl);
 
-function setActiveButton(page){
-  navButtons.forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.page === page);
-  });
-}
+      loader.style.display = "grid";
+      frame.style.display = "none";
+      frame.src = url;
 
-function pageMetaByFile(file){
-  const btn = [...navButtons].find(b => b.dataset.page === file);
-  if(btn){
-    return {
-      title: btn.dataset.title || file,
-      subtitle: btn.dataset.subtitle || ""
-    };
-  }
-  return {
-    title: file,
-    subtitle: ""
-  };
-}
+      if(window.innerWidth <= 980){
+        document.getElementById("sidebar").classList.remove("open");
+      }
+    }
 
-function loadPage(file){
-  currentPage = file;
-  iframePage.src = file;
-  currentFile.textContent = file;
-  mobilePageSelect.value = file;
+    function handleFrameLoaded(){
+      const frame = document.getElementById("embeddedFrame");
+      const loader = document.getElementById("shellLoader");
+      loader.style.display = "none";
+      frame.style.display = "block";
+      setNowTexts();
+    }
 
-  const meta = pageMetaByFile(file);
-  pageTitle.textContent = meta.title;
-  pageSubtitle.textContent = meta.subtitle;
-  setActiveButton(file);
-}
+    function refreshEmbeddedFrame(silent = false){
+      openEmbeddedPage(currentEmbeddedUrl, document.getElementById("pageTitle").textContent);
+      if(!silent){
+        showToast("تم تحديث الصفحة الحالية", "success", 1600);
+      }
+    }
 
-navButtons.forEach(btn => {
-  btn.addEventListener("click", () => {
-    loadPage(btn.dataset.page);
-  });
-});
+    function toggleSidebar(){
+      document.getElementById("sidebar").classList.toggle("open");
+    }
 
-mobilePageSelect.addEventListener("change", function(){
-  loadPage(this.value);
-});
+    function toggleTheme(){
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("layout_shell_ultra_theme", isDark ? "dark" : "light");
+      document.getElementById("themeStatus").textContent = isDark ? "Dark" : "Light";
+      document.getElementById("liveMode").textContent = `Mode: ${isDark ? "Dark" : "Light"}`;
+      showToast(isDark ? "تم تفعيل الوضع الداكن" : "تم تفعيل الوضع الفاتح", "info");
+    }
 
-document.getElementById("toggleSidebarBtn").addEventListener("click", () => {
-  appShell.classList.toggle("collapsed");
-});
+    function loadSavedTheme(){
+      const saved = localStorage.getItem("layout_shell_ultra_theme");
+      if(saved === "dark"){
+        document.body.classList.add("dark");
+        document.getElementById("themeStatus").textContent = "Dark";
+        document.getElementById("liveMode").textContent = "Mode: Dark";
+      }else{
+        document.getElementById("themeStatus").textContent = "Light";
+        document.getElementById("liveMode").textContent = "Mode: Light";
+      }
+    }
 
-document.getElementById("reloadFrameBtn").addEventListener("click", () => {
-  iframePage.src = currentPage;
-});
+    function toggleAutoRefresh(){
+      autoRefreshEnabled = !autoRefreshEnabled;
 
-document.getElementById("openDirectBtn").addEventListener("click", () => {
-  window.open(currentPage, "_blank");
-});
+      document.getElementById("autoRefreshText").textContent = autoRefreshEnabled ? "ON" : "OFF";
+      document.getElementById("autoRefreshState").textContent = autoRefreshEnabled ? "ON" : "OFF";
+      document.getElementById("autoRefreshLabel").textContent =
+        autoRefreshEnabled ? "إيقاف Auto Refresh" : "تشغيل Auto Refresh";
 
-document.getElementById("goHomeBtn").addEventListener("click", () => {
-  loadPage("index_home.html");
-});
+      if(autoRefreshEnabled){
+        autoRefreshTimer = setInterval(() => {
+          refreshEmbeddedFrame(true);
+          refreshWidgets(true);
+        }, 30000);
+        showToast("تم تشغيل Auto Refresh كل 30 ثانية", "success");
+      }else{
+        clearInterval(autoRefreshTimer);
+        autoRefreshTimer = null;
+        showToast("تم إيقاف Auto Refresh", "warn");
+      }
+    }
 
-updateClock();
-setInterval(updateClock, 1000);
-loadPage("index_home.html");
-</script>
+    function goHome(){
+      window.location.href = "/";
+    }
 
+    async function fetchJson(url){
+      const res = await fetch(url);
+      const data = await res.json();
+      if(!res.ok){
+        throw new Error(data.error || `Request failed: ${url}`);
+      }
+      return data;
+    }
+
+    async function checkSystemHealth(){
+      try{
+        const data = await fetchJson("/system/health");
+
+        document.getElementById("kpiStatus").textContent = data.status || "--";
+        document.getElementById("kpiAiModel").textContent = data.ai_model || "--";
+        document.getElementById("kpiForecast").textContent = data.forecast_model || "--";
+        document.getElementById("kpiVersion").textContent = data.version || "--";
+
+        document.getElementById("dockSystem").textContent = data.status || "--";
+        document.getElementById("dockForecast").textContent = data.forecast_model || "--";
+
+        setNowTexts();
+      }catch(err){
+        document.getElementById("kpiStatus").textContent = "error";
+        showToast("تعذر فحص حالة النظام", "error");
+      }
+    }
+
+    async function refreshWidgets(silent = false){
+      try{
+        const stats = await fetchJson("/stats/summary");
+        const alerts = await fetchJson("/alerts/summary");
+
+        document.getElementById("widgetCases").textContent = stats.total_cases ?? "--";
+        document.getElementById("widgetAlerts").textContent = alerts.total_alerts ?? "--";
+        document.getElementById("widgetHighAlerts").textContent = alerts.high_alerts ?? "--";
+
+        document.getElementById("dockAlerts").textContent = alerts.total_alerts ?? "--";
+        document.getElementById("dockHighAlerts").textContent = alerts.high_alerts ?? "--";
+        document.getElementById("notifCount").textContent = alerts.high_alerts ?? 0;
+
+        setNowTexts();
+
+        if(!silent){
+          showToast("تم تحديث المؤشرات السريعة", "success", 1400);
+        }
+      }catch(err){
+        if(!silent){
+          showToast("تعذر تحديث المؤشرات", "error");
+        }
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      loadSavedTheme();
+      updateClock();
+      setInterval(updateClock, 1000);
+      await checkSystemHealth();
+      await refreshWidgets(true);
+      setNowTexts();
+    });
+  </script>
 </body>
 </html>
