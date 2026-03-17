@@ -17,7 +17,7 @@ import torch
 import torch.nn.functional as F
 from PIL import Image, UnidentifiedImageError
 
-from fastapi import FastAPI, UploadFile, File, Query
+from fastapi import FastAPI, UploadFile, File, Query, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
@@ -36,7 +36,6 @@ from database import init_db, save_diagnosis, save_alert, save_farmer, get_conne
 from ai_forecast_service import AIForecastService
 from sms_service import SMSService
 
-# disease_info.py عندك قد يكون dict مباشرة أو دالة
 try:
     from disease_info import DISEASE_INFO
 except Exception:
@@ -63,7 +62,7 @@ def get_db_connection():
 app = FastAPI(
     title="Phytologic AI Platform",
     description="Plant Disease Diagnosis and Smart Agriculture System",
-    version="4.0"
+    version="4.1"
 )
 
 
@@ -126,25 +125,42 @@ PAGE_FILE_MAP = {
     "register": "register.html",
 }
 
-# ملفات إضافية لو كانت موجودة بنفس الاسم
 OPTIONAL_PAGE_CANDIDATES = {
     "layout_shell_pro": "layout_shell_pro.html",
     "layout_shell_ultra": "layout_shell_ultra.html",
 }
 
 
-@app.get("/")
-def root():
+def get_index_file_path():
     index_candidates = [
         os.path.join(BASE_PATH, "index.html"),
         os.path.join(BASE_PATH, "index_home.html"),
     ]
-
     for path in index_candidates:
         if os.path.exists(path):
-            return FileResponse(path)
+            return path
+    return None
+
+
+@app.api_route("/", methods=["GET", "HEAD"])
+def root():
+    index_path = get_index_file_path()
+
+    if index_path:
+        return FileResponse(index_path)
+
+    if "HEAD" in []:
+        return Response(status_code=404)
 
     return JSONResponse({"error": "index.html not found"}, status_code=404)
+
+
+@app.head("/")
+def root_head():
+    index_path = get_index_file_path()
+    if index_path:
+        return Response(status_code=200)
+    return Response(status_code=404)
 
 
 @app.get("/pages/{page_name}")
@@ -215,29 +231,37 @@ transform = transforms.Compose([
 # =========================
 
 def ensure_font_file(local_path: str, download_url: str):
-    if not os.path.exists(local_path):
-        try:
-            urllib.request.urlretrieve(download_url, local_path)
-        except Exception as e:
-            print(f"Failed to download font {local_path}: {e}")
+    if os.path.exists(local_path):
+        return True
+    try:
+        urllib.request.urlretrieve(download_url, local_path)
+        print(f"Downloaded font successfully: {local_path}")
+        return True
+    except Exception as e:
+        print(f"Failed to download font {local_path}: {e}")
+        return False
 
 
-ensure_font_file(
-    os.path.join(FONTS_DIR, "NotoNaskhArabic-Regular.ttf"),
-    "https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf"
-)
+# الأفضل ترفع الخط يدويًا داخل المشروع:
+# fonts/Amiri-Regular.ttf
+# fonts/NotoNaskhArabic-Regular.ttf
+#
+# وإذا لم يوجد، نحاول تنزيل Noto فقط لأن رابطه أكثر استقرارًا.
+NOTO_FONT_PATH = os.path.join(FONTS_DIR, "NotoNaskhArabic-Regular.ttf")
+AMIRI_FONT_PATH = os.path.join(FONTS_DIR, "Amiri-Regular.ttf")
 
-ensure_font_file(
-    os.path.join(FONTS_DIR, "Amiri-Regular.ttf"),
-    "https://github.com/aliftype/amiri/raw/master/fonts/ttf/Amiri-Regular.ttf"
-)
+if not os.path.exists(NOTO_FONT_PATH):
+    ensure_font_file(
+        NOTO_FONT_PATH,
+        "https://github.com/notofonts/arabic/raw/main/fonts/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf"
+    )
 
 AR_FONT_REGISTERED = False
 AR_FONT_PATH_USED = None
 
 for font_path in [
-    os.path.join(FONTS_DIR, "NotoNaskhArabic-Regular.ttf"),
-    os.path.join(FONTS_DIR, "Amiri-Regular.ttf"),
+    AMIRI_FONT_PATH,                       # محلي إن وجد
+    NOTO_FONT_PATH,                        # محلي أو منزّل
     r"C:\Windows\Fonts\arial.ttf",
     r"C:\Windows\Fonts\tahoma.ttf"
 ]:
@@ -246,9 +270,13 @@ for font_path in [
             pdfmetrics.registerFont(TTFont("ARABIC_FONT", font_path))
             AR_FONT_REGISTERED = True
             AR_FONT_PATH_USED = font_path
+            print(f"Arabic font registered: {font_path}")
             break
         except Exception as e:
             print("Font registration failed:", font_path, e)
+
+print("AR_FONT_REGISTERED =", AR_FONT_REGISTERED)
+print("AR_FONT_PATH_USED =", AR_FONT_PATH_USED)
 
 
 # =========================
@@ -502,25 +530,18 @@ def normalize_pesticide_key(best_class: str, cause: str = "") -> str:
 
     if "healthy" in low or "سليم" in cause:
         return "HEALTHY"
-
     if "tomato" in low and "early" in low and "blight" in low:
         return "Tomato_Early_blight"
-
     if "tomato" in low and "late" in low and "blight" in low:
         return "Tomato_Late_blight"
-
     if "leaf" in low and "mold" in low and "tomato" in low:
         return "Tomato_Leaf_Mold"
-
     if "grape" in low and ("black" in low or "rot" in low):
         return "Grape_Black_rot"
-
     if "corn" in low and ("blight" in low or "leaf_blight" in low or "leaf" in low):
         return "Corn_Blight"
-
     if "powdery" in low and "mildew" in low:
         return "Powdery_Mildew"
-
     if "fungal" in cause_low or "فطري" in cause:
         return "Powdery_Mildew"
 
@@ -1392,10 +1413,6 @@ def alerts_send_region_sms(
         return JSONResponse({"error": str(e)}, status_code=400)
 
 
-# =========================
-# OPTIONAL ALERT CREATE
-# =========================
-
 @app.post("/alerts/create")
 def create_alert(
     region: str = Query(...),
@@ -1450,5 +1467,7 @@ def system_health():
         "forecast_model": "loaded" if forecast_ai_service.model is not None else "not_loaded",
         "database": "connected",
         "sms_configured": sms_service.is_configured(),
-        "version": "Phytologic AI v4.0"
+        "arabic_font_registered": AR_FONT_REGISTERED,
+        "arabic_font_path": AR_FONT_PATH_USED,
+        "version": "Phytologic AI v4.1"
     }
