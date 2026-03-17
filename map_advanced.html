@@ -1,775 +1,175 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - الخريطة الزراعية المتقدمة</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>الخريطة التفاعلية</title>
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"/>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    body{
+      margin:0;
+      font-family:Tahoma,Arial,sans-serif;
+      background:#f4f7fb;
+      color:#111827;
+    }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
+    .wrap{
+      max-width:1400px;
+      margin:auto;
+      padding:20px;
+    }
 
-.page{
-max-width:1600px;
-margin:16px auto;
-padding:0 14px 28px;
-}
+    .hero{
+      background:linear-gradient(135deg,#0f172a,#0f766e);
+      color:#fff;
+      padding:24px;
+      border-radius:22px;
+      margin-bottom:18px;
+    }
 
-.hero{
-background:
-linear-gradient(135deg,rgba(8,19,52,.97),rgba(13,110,126,.90)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:26px;
-padding:24px 26px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
+    .hero h1{
+      margin:0 0 10px;
+    }
 
-.hero:before{
-content:"";
-position:absolute;
-left:-40px;
-top:-40px;
-width:180px;
-height:180px;
-background:rgba(255,255,255,.06);
-border-radius:50%;
-}
+    .hero p{
+      margin:0;
+      line-height:1.8;
+      color:rgba(255,255,255,.92);
+    }
 
-.hero:after{
-content:"";
-position:absolute;
-right:-25px;
-bottom:-25px;
-width:230px;
-height:230px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-}
+    .card{
+      background:#fff;
+      border-radius:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.08);
+      padding:18px;
+      margin-bottom:18px;
+    }
 
-.hero-title{
-font-size:34px;
-font-weight:800;
-margin:0 0 8px 0;
-position:relative;
-z-index:1;
-}
+    #map{
+      height:650px;
+      border-radius:16px;
+      overflow:hidden;
+    }
 
-.hero-sub{
-font-size:14px;
-line-height:1.9;
-opacity:.95;
-position:relative;
-z-index:1;
-max-width:980px;
-}
+    .legend{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
 
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:14px;
-margin-bottom:16px;
-}
+    .badge{
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:bold;
+      background:#f1f5f9;
+    }
 
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px 18px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-min-height:110px;
-}
-
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:10px;
-font-weight:700;
-}
-
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
-
-.stat-sub{
-font-size:12px;
-color:#94a3b8;
-margin-top:8px;
-line-height:1.6;
-}
-
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
-
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.section-title{
-font-size:18px;
-font-weight:800;
-color:#0f172a;
-}
-
-.section-note{
-font-size:12px;
-color:#64748b;
-}
-
-.card-body{
-padding:16px;
-}
-
-.grid-2{
-display:grid;
-grid-template-columns:380px 1fr;
-gap:16px;
-}
-
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
-
-.field label{
-display:block;
-font-size:13px;
-color:#64748b;
-margin-bottom:8px;
-font-weight:700;
-}
-
-.field input,
-.field select{
-width:100%;
-padding:12px 14px;
-border-radius:14px;
-border:1px solid #dbe4f2;
-background:#fff;
-font-size:14px;
-outline:none;
-transition:.2s;
-}
-
-.field input:focus,
-.field select:focus{
-border-color:#2563eb;
-box-shadow:0 0 0 4px rgba(37,99,235,.08);
-}
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:14px;
-}
-
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
-
-.btn-primary{
-background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
-color:white;
-box-shadow:0 8px 16px rgba(37,99,235,.22);
-}
-
-.btn-secondary{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
-
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
-
-.btn-success{
-background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
-color:white;
-}
-
-.btn:hover{
-transform:translateY(-1px);
-}
-
-.info-box{
-padding:14px;
-border-radius:16px;
-border:1px solid #ecf2fb;
-background:#fbfdff;
-margin-bottom:12px;
-}
-
-.info-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:8px;
-color:#111827;
-}
-
-.kpi{
-font-size:26px;
-font-weight:800;
-color:#111827;
-}
-
-.small{
-font-size:12px;
-color:#64748b;
-line-height:1.8;
-}
-
-.status-bar{
-margin-top:12px;
-padding:11px 12px;
-border-radius:14px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
-
-.analysis-box{
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-}
-
-.list{
-display:grid;
-gap:8px;
-}
-
-.list-item{
-padding:10px 12px;
-border-radius:14px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-}
-
-.highlight{
-color:#0f172a;
-font-weight:800;
-}
-
-.badge{
-display:inline-block;
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-color:white;
-}
-
-.badge-green{background:#16a34a}
-.badge-orange{background:#d97706}
-.badge-red{background:#dc2626}
-.badge-blue{background:#2563eb}
-.badge-gray{background:#64748b}
-
-.legend{
-display:grid;
-gap:8px;
-margin-top:12px;
-}
-
-.legend-row{
-display:flex;
-align-items:center;
-gap:8px;
-font-size:13px;
-color:#475569;
-}
-
-.dot{
-width:14px;
-height:14px;
-border-radius:50%;
-display:inline-block;
-}
-
-.dot-green{background:#16a34a}
-.dot-orange{background:#d97706}
-.dot-red{background:#dc2626}
-.dot-blue{background:#2563eb}
-
-#map{
-width:100%;
-height:760px;
-border-radius:18px;
-border:1px solid #e7edf8;
-}
-
-.popup-content{
-font-family:Tahoma,Arial,sans-serif;
-line-height:1.9;
-font-size:13px;
-}
-
-.leaflet-popup-content-wrapper{
-border-radius:16px;
-}
-
-@media(max-width:1300px){
-.stats-grid{grid-template-columns:repeat(3,1fr)}
-.grid-2{grid-template-columns:1fr}
-#map{height:620px}
-}
-
-@media(max-width:760px){
-.stats-grid,.grid-3{grid-template-columns:1fr}
-.hero-title{font-size:26px}
-#map{height:500px}
-}
-</style>
+    a{
+      color:#0f766e;
+      text-decoration:none;
+      font-weight:bold;
+    }
+  </style>
 </head>
 <body>
-
-<div class="page">
-
-  <div class="hero">
-    <h1 class="hero-title">الخريطة الزراعية المتقدمة</h1>
-    <div class="hero-sub">
-      خريطة احترافية لعرض الإصابات الزراعية، التوزيع الجغرافي، شدة الحالات، المناطق الأكثر نشاطًا، مع إمكانيات التصفية والبحث والتحديث الفوري.
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">إجمالي النقاط</div>
-      <div class="stat-value" id="totalPoints">0</div>
-      <div class="stat-sub">كل الحالات المحملة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">النقاط المعروضة</div>
-      <div class="stat-value" id="shownPoints">0</div>
-      <div class="stat-sub">بعد التصفية</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أعلى منطقة</div>
-      <div class="stat-value" id="topRegion" style="font-size:20px">-</div>
-      <div class="stat-sub">الأكثر ظهورًا</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أكثر مرض</div>
-      <div class="stat-value" id="topDisease" style="font-size:20px">-</div>
-      <div class="stat-sub">الأكثر تكرارًا</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">متوسط الشدة</div>
-      <div class="stat-value" id="avgSeverity">0%</div>
-      <div class="stat-sub">للنقاط المعروضة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">آخر تحديث</div>
-      <div class="stat-value" id="lastUpdate" style="font-size:20px">-</div>
-      <div class="stat-sub">وقت التحديث الحالي</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">أدوات الخريطة</div>
-      <div class="section-note">متوافقة مع /map/data و /map/summary</div>
-    </div>
-    <div class="card-body">
-      <div class="grid-3">
-        <div class="field">
-          <label>تصفية حسب المنطقة</label>
-          <input id="regionFilter" type="text" placeholder="مثال: الرياض">
-        </div>
-
-        <div class="field">
-          <label>تصفية حسب المرض</label>
-          <input id="diseaseFilter" type="text" placeholder="مثال: Tomato">
-        </div>
-
-        <div class="field">
-          <label>تصفية حسب الشدة</label>
-          <select id="severityFilter">
-            <option value="all">الكل</option>
-            <option value="low">منخفضة</option>
-            <option value="moderate">متوسطة</option>
-            <option value="high">مرتفعة</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="loadMapData()">تحديث البيانات</button>
-        <button class="btn btn-success" onclick="applyFilters()">تطبيق الفلاتر</button>
-        <button class="btn btn-dark" onclick="resetFilters()">إعادة ضبط</button>
-        <button class="btn btn-secondary" onclick="exportVisibleJson()">تصدير JSON</button>
-      </div>
-
-      <div class="status-bar" id="statusBar">جاهز لتحميل الخريطة.</div>
-    </div>
-  </div>
-<div class="grid-2">
-
-    <div>
-      <div class="card">
-        <div class="section-header">
-          <div class="section-title">الملخص الجانبي</div>
-          <div class="section-note">قراءة سريعة للنقاط الحالية</div>
-        </div>
-        <div class="card-body">
-          <div class="info-box">
-            <div class="info-title">حالة العرض</div>
-            <div class="small" id="filterState">لا توجد فلاتر مطبقة.</div>
-          </div>
-
-          <div class="info-box">
-            <div class="info-title">قراءة تنفيذية</div>
-            <div class="analysis-box" id="executiveBox">
-              ستظهر هنا قراءة تنفيذية مباشرة بعد تحميل البيانات.
-            </div>
-          </div>
-
-          <div class="info-box">
-            <div class="info-title">دليل الألوان</div>
-            <div class="legend">
-              <div class="legend-row"><span class="dot dot-green"></span><span>شدة منخفضة</span></div>
-              <div class="legend-row"><span class="dot dot-orange"></span><span>شدة متوسطة</span></div>
-              <div class="legend-row"><span class="dot dot-red"></span><span>شدة مرتفعة</span></div>
-              <div class="legend-row"><span class="dot dot-blue"></span><span>نقطة بدون شدة واضحة</span></div>
-            </div>
-          </div>
-
-          <div class="info-box">
-            <div class="info-title">أعلى 5 مناطق</div>
-            <div class="list" id="topRegionsList">
-              <div class="list-item">بانتظار البيانات...</div>
-            </div>
-          </div>
-
-          <div class="info-box">
-            <div class="info-title">أعلى 5 أمراض</div>
-            <div class="list" id="topDiseasesList">
-              <div class="list-item">بانتظار البيانات...</div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <div class="wrap">
+    <div class="hero">
+      <h1>الخريطة التفاعلية للأمراض النباتية</h1>
+      <p>تعرض توزيع الحالات ومتوسط شدة الإصابة حسب المناطق اعتمادًا على بيانات النظام.</p>
+      <p style="margin-top:10px;"><a href="/">العودة للرئيسية</a></p>
     </div>
 
     <div class="card">
-      <div class="section-header">
-        <div class="section-title">الخريطة التفاعلية</div>
-        <div class="section-note">Marker Clustering + Popups</div>
-      </div>
-      <div class="card-body">
-        <div id="map"></div>
+      <div id="map"></div>
+      <div class="legend">
+        <div class="badge">أخضر = حالات منخفضة</div>
+        <div class="badge">برتقالي = حالات متوسطة</div>
+        <div class="badge">أحمر = حالات مرتفعة</div>
       </div>
     </div>
-
   </div>
 
-</div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script>
+    const REGION_COORDS = {
+      "الرياض": [24.7136, 46.6753],
+      "مكة": [21.3891, 39.8579],
+      "المدينة": [24.5247, 39.5692],
+      "القصيم": [26.3592, 43.9818],
+      "حائل": [27.5114, 41.7208],
+      "تبوك": [28.3998, 36.5715],
+      "الجوف": [29.9697, 40.2064],
+      "الحدود الشمالية": [30.9753, 41.0381],
+      "الشرقية": [26.4207, 50.0888],
+      "الباحة": [20.0129, 41.4677],
+      "عسير": [18.2164, 42.5053],
+      "جازان": [16.8892, 42.5511],
+      "نجران": [17.5650, 44.2289]
+    };
 
-<script>
-const API = "http://127.0.0.1:8000";
+    const map = L.map('map').setView([24.5, 44.5], 6);
 
-let allData = [];
-let visibleData = [];
-let map;
-let clusterGroup;
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
-}
-
-function safeText(v, fallback="-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
-
-function initMap(){
-  map = L.map('map').setView([24.7, 46.7], 6);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 18,
-    attribution: '&copy; OpenStreetMap'
-  }).addTo(map);
-
-  clusterGroup = L.markerClusterGroup();
-  map.addLayer(clusterGroup);
-}
-
-function severityLevelFromValue(sev){
-  const s = Number(sev || 0);
-  if(s < 5) return "low";
-  if(s < 15) return "moderate";
-  return "high";
-}
-
-function severityLabelAr(sev){
-  const level = severityLevelFromValue(sev);
-  if(level === "low") return "منخفضة";
-  if(level === "moderate") return "متوسطة";
-  return "مرتفعة";
-}
-
-function markerColor(sev){
-  const level = severityLevelFromValue(sev);
-  if(level === "low") return "#16a34a";
-  if(level === "moderate") return "#d97706";
-  return "#dc2626";
-}
-
-function avg(arr){
-  if(!arr.length) return 0;
-  return arr.reduce((a,b)=>a+b,0)/arr.length;
-}
-
-function countByKey(data, key){
-  const counts = {};
-  data.forEach(item => {
-    const val = safeText(item[key], "غير محدد");
-    counts[val] = (counts[val] || 0) + 1;
-  });
-  return counts;
-}
-
-function topEntries(countsObj, limit=5){
-  return Object.entries(countsObj)
-    .sort((a,b)=>b[1]-a[1])
-    .slice(0, limit);
-}
-function updateStats(){
-  const regionCounts = countByKey(visibleData, "region");
-  const diseaseCounts = countByKey(visibleData, "disease");
-
-  document.getElementById("totalPoints").textContent = allData.length;
-  document.getElementById("shownPoints").textContent = visibleData.length;
-  document.getElementById("topRegion").textContent =
-    topEntries(regionCounts,1).length ? topEntries(regionCounts,1)[0][0] : "-";
-  document.getElementById("topDisease").textContent =
-    topEntries(diseaseCounts,1).length ? topEntries(diseaseCounts,1)[0][0] : "-";
-
-  const avgSev = avg(visibleData.map(x => Number(x.severity || 0)));
-  document.getElementById("avgSeverity").textContent = avgSev.toFixed(2) + "%";
-  document.getElementById("lastUpdate").textContent = new Date().toLocaleTimeString("ar-SA");
-
-  const topRegions = topEntries(regionCounts, 5);
-  document.getElementById("topRegionsList").innerHTML = topRegions.length
-    ? topRegions.map(r => `<div class="list-item"><span class="highlight">${r[0]}</span> — ${r[1]} حالة</div>`).join("")
-    : `<div class="list-item">لا توجد بيانات.</div>`;
-
-  const topDiseases = topEntries(diseaseCounts, 5);
-  document.getElementById("topDiseasesList").innerHTML = topDiseases.length
-    ? topDiseases.map(r => `<div class="list-item"><span class="highlight">${r[0]}</span> — ${r[1]} حالة</div>`).join("")
-    : `<div class="list-item">لا توجد بيانات.</div>`;
-
-  document.getElementById("executiveBox").innerHTML = `
-    <div class="list">
-      <div class="list-item"><span class="highlight">النقاط المعروضة:</span> ${visibleData.length}</div>
-      <div class="list-item"><span class="highlight">أعلى منطقة:</span> ${document.getElementById("topRegion").textContent}</div>
-      <div class="list-item"><span class="highlight">أكثر مرض:</span> ${document.getElementById("topDisease").textContent}</div>
-      <div class="list-item"><span class="highlight">متوسط الشدة:</span> ${avgSev.toFixed(2)}%</div>
-      <div class="list-item"><span class="highlight">القراءة التشغيلية:</span> ${
-        avgSev >= 15
-        ? "الوضع يميل إلى شدة مرتفعة ويحتاج متابعة عاجلة."
-        : avgSev >= 5
-        ? "الوضع متوسط ويحتاج متابعة مستمرة وتحسين إدارة الوقاية."
-        : "الوضع منخفض نسبيًا حاليًا مع استمرار الرصد."
-      }</div>
-    </div>
-  `;
-}
-
-function renderMap(){
-  clusterGroup.clearLayers();
-
-  visibleData.forEach(d => {
-    if(d.latitude == null || d.longitude == null) return;
-
-    const sev = Number(d.severity || 0);
-    const color = markerColor(sev);
-
-    const marker = L.circleMarker([d.latitude, d.longitude], {
-      radius: 8,
-      color: color,
-      fillColor: color,
-      fillOpacity: 0.85,
-      weight: 2
-    });
-
-    marker.bindPopup(`
-      <div class="popup-content">
-        <b>المزارع:</b> ${safeText(d.farmer_name)}<br>
-        <b>المزرعة:</b> ${safeText(d.farm_name)}<br>
-        <b>المحصول:</b> ${safeText(d.crop)}<br>
-        <b>النبات:</b> ${safeText(d.plant)}<br>
-        <b>المرض:</b> ${safeText(d.disease)}<br>
-        <b>المنطقة:</b> ${safeText(d.region)}<br>
-        <b>المدينة:</b> ${safeText(d.city)}<br>
-        <b>الشدة:</b> ${sev.toFixed(2)}% (${severityLabelAr(sev)})<br>
-        <b>الثقة:</b> ${safeText(d.confidence)}<br>
-        <b>المسبب:</b> ${safeText(d.cause)}<br>
-        <b>التاريخ:</b> ${safeText(d.created_at)}
-      </div>
-    `);
-
-    clusterGroup.addLayer(marker);
-  });
-
-  if(visibleData.length){
-    const validPoints = visibleData.filter(d => d.latitude != null && d.longitude != null);
-    if(validPoints.length){
-      const bounds = L.latLngBounds(validPoints.map(d => [d.latitude, d.longitude]));
-      map.fitBounds(bounds, {padding:[30,30]});
-    }
-  }
-}
-
-function updateFilterState(){
-  const region = document.getElementById("regionFilter").value.trim() || "لا يوجد";
-  const disease = document.getElementById("diseaseFilter").value.trim() || "لا يوجد";
-  const severity = document.getElementById("severityFilter").value;
-
-  let sevText = "الكل";
-  if(severity === "low") sevText = "منخفضة";
-  if(severity === "moderate") sevText = "متوسطة";
-  if(severity === "high") sevText = "مرتفعة";
-
-  document.getElementById("filterState").innerHTML = `
-    <div class="list">
-      <div class="list-item"><span class="highlight">المنطقة:</span> ${region}</div>
-      <div class="list-item"><span class="highlight">المرض:</span> ${disease}</div>
-      <div class="list-item"><span class="highlight">الشدة:</span> ${sevText}</div>
-    </div>
-  `;
-}
-async function loadMapData(){
-  try{
-    setStatus("جاري تحميل بيانات الخريطة...");
-
-    const res = await fetch(`${API}/map/data`);
-    const data = await res.json();
-
-    if(!Array.isArray(data)){
-      throw new Error("الاستجابة ليست قائمة بيانات صحيحة");
+    function getColor(count){
+      if(count >= 20) return 'red';
+      if(count >= 8) return 'orange';
+      return 'green';
     }
 
-    allData = data;
-    visibleData = [...allData];
+    function getRadius(count){
+      if(count >= 20) return 20;
+      if(count >= 8) return 14;
+      return 10;
+    }
 
-    updateFilterState();
-    updateStats();
-    renderMap();
+    async function loadMapData(){
+      try{
+        const res = await fetch('/map/summary');
+        const data = await res.json();
 
-    setStatus("تم تحميل بيانات الخريطة بنجاح.");
-  }catch(err){
-    console.error(err);
-    setStatus("تعذر تحميل بيانات الخريطة.");
-    document.getElementById("executiveBox").innerHTML = `
-      <div class="list-item" style="color:#b91c1c;border-color:#fecaca;background:#fef2f2">
-        فشل تحميل البيانات: ${err.message}
-      </div>
-    `;
-  }
-}
+        if(!Array.isArray(data) || !data.length){
+          alert('لا توجد بيانات خرائط متاحة حاليًا');
+          return;
+        }
 
-function applyFilters(){
-  const region = document.getElementById("regionFilter").value.trim().toLowerCase();
-  const disease = document.getElementById("diseaseFilter").value.trim().toLowerCase();
-  const severity = document.getElementById("severityFilter").value;
+        data.forEach(item => {
+          const coords = REGION_COORDS[item.region];
+          if(!coords) return;
 
-  visibleData = allData.filter(item => {
-    const itemRegion = safeText(item.region, "").toLowerCase();
-    const itemDisease = safeText(item.disease, "").toLowerCase();
-    const itemSeverity = severityLevelFromValue(item.severity);
+          const marker = L.circleMarker(coords, {
+            radius: getRadius(item.count || 0),
+            color: getColor(item.count || 0),
+            fillColor: getColor(item.count || 0),
+            fillOpacity: 0.65,
+            weight: 2
+          }).addTo(map);
 
-    if(region && !itemRegion.includes(region)) return false;
-    if(disease && !itemDisease.includes(disease)) return false;
-    if(severity !== "all" && itemSeverity !== severity) return false;
+          marker.bindPopup(`
+            <div style="text-align:right;min-width:180px;">
+              <strong>المنطقة:</strong> ${item.region}<br>
+              <strong>عدد الحالات:</strong> ${item.count ?? 0}<br>
+              <strong>متوسط الشدة:</strong> ${item.avg_severity ?? 0}%
+            </div>
+          `);
+        });
+      }catch(e){
+        console.error(e);
+        alert('حدث خطأ أثناء تحميل بيانات الخريطة');
+      }
+    }
 
-    return true;
-  });
-
-  updateFilterState();
-  updateStats();
-  renderMap();
-  setStatus("تم تطبيق الفلاتر بنجاح.");
-}
-
-function resetFilters(){
-  document.getElementById("regionFilter").value = "";
-  document.getElementById("diseaseFilter").value = "";
-  document.getElementById("severityFilter").value = "all";
-
-  visibleData = [...allData];
-  updateFilterState();
-  updateStats();
-  renderMap();
-  setStatus("تمت إعادة ضبط الفلاتر.");
-}
-
-function exportVisibleJson(){
-  if(!visibleData.length){
-    setStatus("لا توجد بيانات ظاهرة للتصدير.");
-    return;
-  }
-
-  const blob = new Blob([JSON.stringify(visibleData, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "map_visible_data.json";
-  a.click();
-  URL.revokeObjectURL(url);
-
-  setStatus("تم تصدير البيانات الظاهرة بنجاح.");
-}
-
-initMap();
-loadMapData();
-</script>
-
+    loadMapData();
+  </script>
 </body>
 </html>
