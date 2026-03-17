@@ -16,7 +16,7 @@ from PIL import Image, UnidentifiedImageError
 from fastapi import FastAPI, UploadFile, File, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, JSONResponse, StreamingResponse, Response
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from torchvision import transforms, models
 
@@ -61,7 +61,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app = FastAPI(
     title="Phytologic AI Platform",
     description="Professional Plant Health AI Platform",
-    version="6.0"
+    version="6.1"
 )
 
 app.add_middleware(
@@ -84,7 +84,7 @@ PAGE_FILE_MAP = {
     "index_home": "index_home.html",
     "dashboard": "dashboard.html",
     "alerts": "alerts.html",
-    "report_center": "report_center.html",
+    "report_center": "reports_center.html",
     "reports_center": "reports_center.html",
     "farmers": "farmers.html",
     "admin": "admin.html",
@@ -96,8 +96,8 @@ PAGE_FILE_MAP = {
     "layout_shell_pro": "layout_shell_pro.html",
     "layout_shell_ultra": "layout_shell_ultra.html",
     "login": "login.html",
-    "map_advanced": "map_advanced.html",
     "register": "register.html",
+    "map_advanced": "map_advanced.html",
 }
 
 # =========================
@@ -322,6 +322,30 @@ def get_disease_info_by_class(best_class: str):
             "advice": []
         }
     )
+
+# =========================
+# WEATHER
+# =========================
+
+def get_live_weather(latitude: float, longitude: float) -> dict:
+    query = urllib.parse.urlencode({
+        "latitude": latitude,
+        "longitude": longitude,
+        "current": "temperature_2m,relative_humidity_2m,precipitation",
+        "timezone": "auto"
+    })
+
+    url = f"https://api.open-meteo.com/v1/forecast?{query}"
+    data = fetch_json(url)
+    current = data.get("current", {})
+
+    return {
+        "temperature": float(current.get("temperature_2m", 25)),
+        "humidity": float(current.get("relative_humidity_2m", 70)),
+        "rainfall": float(current.get("precipitation", 0)),
+        "latitude": latitude,
+        "longitude": longitude
+    }
 
 # =========================
 # PESTICIDE
@@ -725,27 +749,6 @@ def send_sms_to_region_farmers(region: str, disease_name: str, risk_score: float
 
     return sent_results
 
-
-def get_live_weather(latitude: float, longitude: float) -> dict:
-    query = urllib.parse.urlencode({
-        "latitude": latitude,
-        "longitude": longitude,
-        "current": "temperature_2m,relative_humidity_2m,precipitation",
-        "timezone": "auto"
-    })
-
-    url = f"https://api.open-meteo.com/v1/forecast?{query}"
-    data = fetch_json(url)
-    current = data.get("current", {})
-
-    return {
-        "temperature": float(current.get("temperature_2m", 25)),
-        "humidity": float(current.get("relative_humidity_2m", 70)),
-        "rainfall": float(current.get("precipitation", 0)),
-        "latitude": latitude,
-        "longitude": longitude
-    }
-
 # =========================
 # PAGE ROUTES
 # =========================
@@ -899,7 +902,6 @@ async def diagnose(
         result["gradcam_image"] = gradcam_b64
         result["image_path"] = image_path
 
-        # حفظ تلقائي
         try:
             save_diagnosis(
                 farmer_name=farmer_name,
@@ -1054,6 +1056,96 @@ def forecast_predict(
                 "rainfall": rainfall,
                 "cases_count": cases_count,
                 "severity_avg": severity_avg
+            }
+        }
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+# =========================
+# WEATHER ROUTES
+# =========================
+
+@app.get("/weather/live")
+def weather_live(
+    region: str = Query(""),
+    city: str = Query(""),
+    latitude: float = Query(None),
+    longitude: float = Query(None)
+):
+    try:
+        lat, lon, source = resolve_region_or_city_coords(
+            region=region,
+            city=city,
+            latitude=latitude,
+            longitude=longitude
+        )
+
+        current = get_live_weather(lat, lon)
+
+        return {
+            "success": True,
+            "source": source,
+            "location": {
+                "region": region,
+                "city": city,
+                "latitude": lat,
+                "longitude": lon
+            },
+            "current": current
+        }
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.get("/weather/forecast")
+def weather_forecast(
+    region: str = Query(""),
+    city: str = Query(""),
+    latitude: float = Query(None),
+    longitude: float = Query(None)
+):
+    try:
+        lat, lon, source = resolve_region_or_city_coords(
+            region=region,
+            city=city,
+            latitude=latitude,
+            longitude=longitude
+        )
+
+        query = urllib.parse.urlencode({
+            "latitude": lat,
+            "longitude": lon,
+            "current": "temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m",
+            "hourly": "temperature_2m,relative_humidity_2m,precipitation",
+            "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum",
+            "forecast_days": 3,
+            "timezone": "auto"
+        })
+
+        url = f"https://api.open-meteo.com/v1/forecast?{query}"
+        data = fetch_json(url)
+
+        return {
+            "success": True,
+            "source": source,
+            "location": {
+                "region": region,
+                "city": city,
+                "latitude": lat,
+                "longitude": lon
+            },
+            "current": data.get("current", {}),
+            "hourly": {
+                "time": data.get("hourly", {}).get("time", [])[:12],
+                "temperature_2m": data.get("hourly", {}).get("temperature_2m", [])[:12],
+                "relative_humidity_2m": data.get("hourly", {}).get("relative_humidity_2m", [])[:12],
+                "precipitation": data.get("hourly", {}).get("precipitation", [])[:12]
+            },
+            "daily": {
+                "time": data.get("daily", {}).get("time", []),
+                "temperature_2m_max": data.get("daily", {}).get("temperature_2m_max", []),
+                "temperature_2m_min": data.get("daily", {}).get("temperature_2m_min", []),
+                "precipitation_sum": data.get("daily", {}).get("precipitation_sum", [])
             }
         }
     except Exception as e:
@@ -1324,7 +1416,7 @@ def auth_status():
 def health():
     return {
         "status": "running",
-        "version": "Phytologic AI v6.0",
+        "version": "Phytologic AI v6.1",
         "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
@@ -1339,5 +1431,5 @@ def system_health():
         "sms_configured": sms_service.is_configured(),
         "arabic_font_registered": AR_FONT_REGISTERED,
         "arabic_font_path": AR_FONT_PATH_USED,
-        "version": "Phytologic AI v6.0"
+        "version": "Phytologic AI v6.1"
     }
