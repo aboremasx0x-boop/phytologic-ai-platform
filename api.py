@@ -1,11 +1,7 @@
-# =========================
-# IMPORTS
-# =========================
-
 import io
 import os
-import uuid
 import json
+import uuid
 import base64
 import urllib.parse
 import urllib.request
@@ -17,10 +13,10 @@ import torch
 import torch.nn.functional as F
 from PIL import Image, UnidentifiedImageError
 
-from fastapi import FastAPI, UploadFile, File, Query, Response
+from fastapi import FastAPI, UploadFile, File, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
+from fastapi.responses import JSONResponse, StreamingResponse, FileResponse, Response
 
 from torchvision import transforms, models
 
@@ -39,77 +35,55 @@ from sms_service import SMSService
 try:
     from disease_info import DISEASE_INFO
 except Exception:
-    DISEASE_INFO = None
-
-try:
-    from disease_info import get_disease_info_by_class as imported_get_disease_info_by_class
-except Exception:
-    imported_get_disease_info_by_class = None
+    DISEASE_INFO = {}
 
 
 # =========================
-# DATABASE CONNECTION
+# PATHS
 # =========================
 
-def get_db_connection():
-    return get_connection()
+BASE_PATH = os.path.dirname(os.path.abspath(__file__))
+TEMPLATES_DIR = os.path.join(BASE_PATH, "templates")
+STATIC_DIR = os.path.join(BASE_PATH, "static")
+FONTS_DIR = os.path.join(BASE_PATH, "fonts")
+DATA_DIR = os.path.join(BASE_PATH, "data")
+UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
+
+os.makedirs(TEMPLATES_DIR, exist_ok=True)
+os.makedirs(STATIC_DIR, exist_ok=True)
+os.makedirs(FONTS_DIR, exist_ok=True)
+os.makedirs(DATA_DIR, exist_ok=True)
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 # =========================
-# FASTAPI APP
+# APP
 # =========================
 
 app = FastAPI(
     title="Phytologic AI Platform",
-    description="Plant Disease Diagnosis and Smart Agriculture System",
-    version="4.1"
+    description="Professional Plant Health AI Platform",
+    version="5.0"
 )
-
-
-# =========================
-# PATHS / STORAGE
-# =========================
-
-BASE_PATH = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.getenv("DATA_DIR", ".")
-STATIC_DIR = os.path.join(BASE_PATH, "static")
-UPLOAD_DIR = os.path.join(DATA_DIR, "uploads")
-FONTS_DIR = os.path.join(BASE_PATH, "fonts")
-
-os.makedirs(DATA_DIR, exist_ok=True)
-os.makedirs(STATIC_DIR, exist_ok=True)
-os.makedirs(UPLOAD_DIR, exist_ok=True)
-os.makedirs(FONTS_DIR, exist_ok=True)
-
-
-# =========================
-# CORS
-# =========================
-
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS if ALLOWED_ORIGINS != [""] else ["*"],
-    allow_credentials=False if ALLOWED_ORIGINS == ["*"] else True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# =========================
-# STATIC FILES
-# =========================
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 # =========================
-# PAGE ROUTING
+# PAGE MAP
 # =========================
 
 PAGE_FILE_MAP = {
-    "index_home": "index_home.html",
+    "index": "index.html",
+    "index_home": "index.html",
     "dashboard": "dashboard.html",
     "alerts": "alerts.html",
     "report_center": "report_center.html",
@@ -119,68 +93,20 @@ PAGE_FILE_MAP = {
     "ops": "ops.html",
     "forecast": "forecast.html",
     "forecast_ai": "forecast_ai.html",
-    "layout_shell": "layout_shell_pro.html",
+    "layout_shell": "layout_shell.html",
     "layout_shell_ultra": "layout_shell_ultra.html",
     "login": "login.html",
     "register": "register.html",
 }
 
-OPTIONAL_PAGE_CANDIDATES = {
-    "layout_shell_pro": "layout_shell_pro.html",
-    "layout_shell_ultra": "layout_shell_ultra.html",
-}
-
-
-def get_index_file_path():
-    index_candidates = [
-        os.path.join(BASE_PATH, "index.html"),
-        os.path.join(BASE_PATH, "index_home.html"),
-    ]
-    for path in index_candidates:
-        if os.path.exists(path):
-            return path
-    return None
-
-
-@app.api_route("/", methods=["GET", "HEAD"])
-def root():
-    index_path = get_index_file_path()
-
-    if index_path:
-        return FileResponse(index_path)
-
-    if "HEAD" in []:
-        return Response(status_code=404)
-
-    return JSONResponse({"error": "index.html not found"}, status_code=404)
-
-
-@app.head("/")
-def root_head():
-    index_path = get_index_file_path()
-    if index_path:
-        return Response(status_code=200)
-    return Response(status_code=404)
-
-
-@app.get("/pages/{page_name}")
-def open_page(page_name: str):
-    safe_page = (page_name or "").strip().lower()
-
-    filename = PAGE_FILE_MAP.get(safe_page) or OPTIONAL_PAGE_CANDIDATES.get(safe_page)
-    if not filename:
-        return JSONResponse({"error": "page not allowed"}, status_code=404)
-
-    file_path = os.path.join(BASE_PATH, filename)
-    if os.path.exists(file_path):
-        return FileResponse(file_path)
-
-    return JSONResponse({"error": "page file not found"}, status_code=404)
-
 
 # =========================
-# INIT DB / SERVICES
+# DB / SERVICES
 # =========================
+
+def get_db_connection():
+    return get_connection()
+
 
 init_db()
 
@@ -193,10 +119,10 @@ sms_service = SMSService(
 
 
 # =========================
-# MODEL FILES
+# MODEL
 # =========================
 
-MODEL_PATH = os.getenv("IMAGE_MODEL_PATH", os.path.join(DATA_DIR, "plant_disease_model_v3.pth"))
+MODEL_PATH = os.path.join(DATA_DIR, "plant_disease_model_v3.pth")
 IMG_SIZE = 160
 
 
@@ -227,61 +153,54 @@ transform = transforms.Compose([
 
 
 # =========================
-# ARABIC FONTS FOR PDF
+# FONTS
 # =========================
+
+AR_FONT_REGISTERED = False
+AR_FONT_PATH_USED = None
+
 
 def ensure_font_file(local_path: str, download_url: str):
     if os.path.exists(local_path):
         return True
     try:
         urllib.request.urlretrieve(download_url, local_path)
-        print(f"Downloaded font successfully: {local_path}")
         return True
-    except Exception as e:
-        print(f"Failed to download font {local_path}: {e}")
+    except Exception:
         return False
 
 
-# الأفضل ترفع الخط يدويًا داخل المشروع:
-# fonts/Amiri-Regular.ttf
-# fonts/NotoNaskhArabic-Regular.ttf
-#
-# وإذا لم يوجد، نحاول تنزيل Noto فقط لأن رابطه أكثر استقرارًا.
-NOTO_FONT_PATH = os.path.join(FONTS_DIR, "NotoNaskhArabic-Regular.ttf")
-AMIRI_FONT_PATH = os.path.join(FONTS_DIR, "Amiri-Regular.ttf")
+amiri_path = os.path.join(FONTS_DIR, "Amiri-Regular.ttf")
+noto_path = os.path.join(FONTS_DIR, "NotoNaskhArabic-Regular.ttf")
 
-if not os.path.exists(NOTO_FONT_PATH):
+if not os.path.exists(noto_path):
     ensure_font_file(
-        NOTO_FONT_PATH,
+        noto_path,
         "https://github.com/notofonts/arabic/raw/main/fonts/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf"
     )
 
-AR_FONT_REGISTERED = False
-AR_FONT_PATH_USED = None
-
-for font_path in [
-    AMIRI_FONT_PATH,                       # محلي إن وجد
-    NOTO_FONT_PATH,                        # محلي أو منزّل
-    r"C:\Windows\Fonts\arial.ttf",
-    r"C:\Windows\Fonts\tahoma.ttf"
-]:
+for font_path in [amiri_path, noto_path]:
     if os.path.exists(font_path):
         try:
             pdfmetrics.registerFont(TTFont("ARABIC_FONT", font_path))
             AR_FONT_REGISTERED = True
             AR_FONT_PATH_USED = font_path
-            print(f"Arabic font registered: {font_path}")
             break
-        except Exception as e:
-            print("Font registration failed:", font_path, e)
-
-print("AR_FONT_REGISTERED =", AR_FONT_REGISTERED)
-print("AR_FONT_PATH_USED =", AR_FONT_PATH_USED)
+        except Exception:
+            pass
 
 
 # =========================
-# COORDINATES
+# HELPERS
 # =========================
+
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+    "image/bmp",
+}
+
 
 REGION_COORDS = {
     "الرياض": {"lat": 24.7136, "lon": 46.6753, "city": "الرياض"},
@@ -318,16 +237,19 @@ CITY_COORDS = {
 }
 
 
-# =========================
-# HELPERS
-# =========================
+def template_path(filename: str) -> str:
+    return os.path.join(TEMPLATES_DIR, filename)
 
-ALLOWED_IMAGE_TYPES = {
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/bmp"
-}
+
+def get_existing_index():
+    candidates = [
+        template_path("index.html"),
+        template_path("index_home.html"),
+    ]
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return None
 
 
 def validate_uploaded_image(file: UploadFile):
@@ -375,7 +297,10 @@ def save_upload_file(image_bytes: bytes, original_filename: str) -> str:
 
 
 def fetch_json(url: str, timeout: int = 20) -> dict:
-    req = urllib.request.Request(url, headers={"User-Agent": "PhytologicAI/1.0"})
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "PhytologicAI/1.0"}
+    )
     with urllib.request.urlopen(req, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
 
@@ -398,33 +323,19 @@ def resolve_region_or_city_coords(region=None, city=None, latitude=None, longitu
 
 
 def get_disease_info_by_class(best_class: str):
-    if callable(imported_get_disease_info_by_class):
-        try:
-            return imported_get_disease_info_by_class(best_class)
-        except Exception:
-            pass
-
-    if isinstance(DISEASE_INFO, dict):
-        return DISEASE_INFO.get(
-            best_class,
-            {
-                "plant": "غير معروف",
-                "disease_ar": "غير معروف",
-                "cause": "غير معروف",
-                "advice": []
-            }
-        )
-
-    return {
-        "plant": "غير معروف",
-        "disease_ar": "غير معروف",
-        "cause": "غير معروف",
-        "advice": []
-    }
+    return DISEASE_INFO.get(
+        best_class,
+        {
+            "plant": "غير معروف",
+            "disease_ar": "غير معروف",
+            "cause": "غير معروف",
+            "advice": []
+        }
+    )
 
 
 # =========================
-# PESTICIDE DATABASE
+# PESTICIDE
 # =========================
 
 PESTICIDE_DATABASE = {
@@ -437,26 +348,6 @@ PESTICIDE_DATABASE = {
             "dose": "2 مل لكل لتر ماء",
             "phi": "7 أيام",
             "severity_fit": ["low", "moderate", "high"],
-            "spray_decision": "spray"
-        },
-        {
-            "title_ar": "الخيار 2",
-            "active_ingredient": "Mancozeb",
-            "trade_name": "Dithane M-45",
-            "type": "fungicide",
-            "dose": "2 جم لكل لتر ماء",
-            "phi": "14 يوم",
-            "severity_fit": ["low", "moderate"],
-            "spray_decision": "spray"
-        },
-        {
-            "title_ar": "الخيار 3",
-            "active_ingredient": "Azoxystrobin",
-            "trade_name": "Amistar",
-            "type": "fungicide",
-            "dose": "1 مل لكل لتر ماء",
-            "phi": "7 أيام",
-            "severity_fit": ["moderate", "high"],
             "spray_decision": "spray"
         }
     ],
@@ -484,30 +375,6 @@ PESTICIDE_DATABASE = {
             "spray_decision": "spray"
         }
     ],
-    "Grape_Black_rot": [
-        {
-            "title_ar": "الخيار 1",
-            "active_ingredient": "Mancozeb",
-            "trade_name": "Dithane M-45",
-            "type": "fungicide",
-            "dose": "2 جم لكل لتر ماء",
-            "phi": "14 يوم",
-            "severity_fit": ["low", "moderate", "high"],
-            "spray_decision": "spray"
-        }
-    ],
-    "Corn_Blight": [
-        {
-            "title_ar": "الخيار 1",
-            "active_ingredient": "Azoxystrobin",
-            "trade_name": "Amistar",
-            "type": "fungicide",
-            "dose": "1 مل لكل لتر ماء",
-            "phi": "7 أيام",
-            "severity_fit": ["moderate", "high"],
-            "spray_decision": "spray"
-        }
-    ],
     "Powdery_Mildew": [
         {
             "title_ar": "الخيار 1",
@@ -526,7 +393,6 @@ PESTICIDE_DATABASE = {
 def normalize_pesticide_key(best_class: str, cause: str = "") -> str:
     name = (best_class or "").replace("-", "_").replace(" ", "_")
     low = name.lower()
-    cause_low = (cause or "").lower()
 
     if "healthy" in low or "سليم" in cause:
         return "HEALTHY"
@@ -536,15 +402,8 @@ def normalize_pesticide_key(best_class: str, cause: str = "") -> str:
         return "Tomato_Late_blight"
     if "leaf" in low and "mold" in low and "tomato" in low:
         return "Tomato_Leaf_Mold"
-    if "grape" in low and ("black" in low or "rot" in low):
-        return "Grape_Black_rot"
-    if "corn" in low and ("blight" in low or "leaf_blight" in low or "leaf" in low):
-        return "Corn_Blight"
     if "powdery" in low and "mildew" in low:
         return "Powdery_Mildew"
-    if "fungal" in cause_low or "فطري" in cause:
-        return "Powdery_Mildew"
-
     return "GENERIC"
 
 
@@ -561,30 +420,6 @@ def get_default_pesticide_program(best_class: str, cause: str = "", severity_lev
             "phi": "-",
             "severity_fit": ["low", "moderate", "high"],
             "spray_decision": "no_spray"
-        }]
-
-    if "virus" in low or "فيروسي" in cause:
-        return [{
-            "title_ar": "إدارة فيروسية",
-            "active_ingredient": "لا يوجد مبيد علاجي مباشر",
-            "trade_name": "-",
-            "type": "إدارة وقائية",
-            "dose": "إزالة الأجزاء المصابة + مكافحة الناقل",
-            "phi": "-",
-            "severity_fit": ["low", "moderate", "high"],
-            "spray_decision": "no_direct_chemical"
-        }]
-
-    if "bacterial" in low or "بكتيري" in cause:
-        return [{
-            "title_ar": "الخيار 1",
-            "active_ingredient": "Fixed copper",
-            "trade_name": "Copper fungicide/bactericide",
-            "type": "bactericide",
-            "dose": "بحسب بطاقة المنتج",
-            "phi": "بحسب المنتج",
-            "severity_fit": ["low", "moderate", "high"],
-            "spray_decision": "spray"
         }]
 
     return [{
@@ -618,20 +453,16 @@ def choose_best_pesticide_option(options: list, severity_level: str = "moderate"
     return options[0]
 
 
-def get_spray_decision_message(spray_decision: str, severity_level: str, best_class: str) -> str:
+def get_spray_decision_message(spray_decision: str, severity_level: str) -> str:
     if spray_decision == "no_spray":
-        return "لا حاجة للرش الكيميائي حاليًا لأن النبات سليم أو لا توجد إصابة واضحة."
-    if spray_decision == "no_direct_chemical":
-        return "لا يوجد مبيد علاجي مباشر لهذه الإصابة، ويُنصح بالإدارة الوقائية ومكافحة الناقل."
-    if spray_decision == "consult":
-        return "يُنصح بمراجعة مختص قبل تطبيق أي برنامج مكافحة."
+        return "لا حاجة للرش الكيميائي حاليًا."
     if severity_level == "low":
-        return "يمكن البدء بخيار وقائي أو مبيد خفيف مناسب مع المتابعة."
+        return "ابدأ بخيار وقائي مناسب مع المتابعة."
     if severity_level == "moderate":
-        return "ينصح بالبدء في برنامج رش مناسب مع تحسين التهوية وتقليل الرطوبة."
+        return "ينصح بالبدء في برنامج رش مناسب وتحسين التهوية."
     if severity_level == "high":
-        return "الإصابة مرتفعة؛ يوصى بالتدخل السريع وإزالة الأجزاء الشديدة الإصابة."
-    return "اتبع توصية المختص وبطاقة المنتج."
+        return "الإصابة مرتفعة؛ يوصى بالتدخل السريع."
+    return "اتبع توصية المختص."
 
 
 def get_pesticide_program(best_class: str, cause: str = "", severity_level: str = "moderate") -> dict:
@@ -658,8 +489,7 @@ def get_pesticide_program(best_class: str, cause: str = "", severity_level: str 
             "spray_decision": best_option.get("spray_decision", "consult"),
             "spray_message_ar": get_spray_decision_message(
                 best_option.get("spray_decision", "consult"),
-                severity_level,
-                best_class
+                severity_level
             )
         },
         "options": options
@@ -667,71 +497,7 @@ def get_pesticide_program(best_class: str, cause: str = "", severity_level: str 
 
 
 # =========================
-# WEATHER / FARMERS / SMS
-# =========================
-
-def get_farmers_by_region(region: str):
-    conn = get_db_connection()
-    cur = conn.cursor()
-
-    rows = cur.execute("""
-        SELECT *
-        FROM farmers
-        WHERE region = ?
-        ORDER BY id DESC
-    """, (region,)).fetchall()
-
-    conn.close()
-    return rows
-
-
-def send_sms_to_region_farmers(region: str, disease_name: str, risk_score: float):
-    farmers = get_farmers_by_region(region)
-    sent_results = []
-
-    for farmer in farmers:
-        message = (
-            f"تنبيه زراعي: تم رصد خطر انتشار {disease_name} "
-            f"في منطقة {region} بدرجة {round(risk_score, 2)}%."
-        )
-
-        try:
-            res = sms_service.send_sms(farmer["phone"], message)
-        except Exception as e:
-            res = {"success": False, "error": str(e)}
-
-        sent_results.append({
-            "farmer": farmer["name"],
-            "phone": farmer["phone"],
-            "result": res
-        })
-
-    return sent_results
-
-
-def get_live_weather(latitude: float, longitude: float) -> dict:
-    query = urllib.parse.urlencode({
-        "latitude": latitude,
-        "longitude": longitude,
-        "current": "temperature_2m,relative_humidity_2m,precipitation",
-        "timezone": "auto"
-    })
-
-    url = f"https://api.open-meteo.com/v1/forecast?{query}"
-    data = fetch_json(url)
-    current = data.get("current", {})
-
-    return {
-        "temperature": float(current.get("temperature_2m", 25)),
-        "humidity": float(current.get("relative_humidity_2m", 70)),
-        "rainfall": float(current.get("precipitation", 0)),
-        "latitude": latitude,
-        "longitude": longitude
-    }
-
-
-# =========================
-# IMAGE ANALYSIS
+# ANALYSIS
 # =========================
 
 def compute_real_severity(img_bgr: np.ndarray, cam_gray=None) -> dict:
@@ -739,7 +505,6 @@ def compute_real_severity(img_bgr: np.ndarray, cam_gray=None) -> dict:
     gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
 
     _, leaf_mask = cv2.threshold(gray, 245, 255, cv2.THRESH_BINARY_INV)
-
     leaf_mask = cv2.morphologyEx(leaf_mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
     leaf_mask = cv2.morphologyEx(leaf_mask, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
 
@@ -749,7 +514,6 @@ def compute_real_severity(img_bgr: np.ndarray, cam_gray=None) -> dict:
 
     lesion_mask = cv2.bitwise_or(yellow_mask, brown_mask)
     lesion_mask = cv2.bitwise_or(lesion_mask, dark_mask)
-
     lesion_mask = cv2.morphologyEx(lesion_mask, cv2.MORPH_OPEN, np.ones((3, 3), np.uint8))
     lesion_mask = cv2.morphologyEx(lesion_mask, cv2.MORPH_CLOSE, np.ones((5, 5), np.uint8))
     lesion_mask = cv2.bitwise_and(lesion_mask, leaf_mask)
@@ -830,10 +594,6 @@ def gradcam_overlay(img_pil: Image.Image, class_idx: int):
     return pil_to_base64(np_to_pil(overlay)), cam_resized
 
 
-# =========================
-# QUESTIONS / RESULT BUILDERS
-# =========================
-
 def generate_diagnostic_questions(best_class: str, second_class: str):
     questions = []
 
@@ -842,30 +602,14 @@ def generate_diagnostic_questions(best_class: str, second_class: str):
 
     if "early" in best and "blight" in best:
         questions.append({
-            "question": "هل تظهر بقع دائرية بها حلقات متداخلة (Bullseye)؟",
+            "question": "هل تظهر بقع دائرية بها حلقات متداخلة؟",
             "symptom": "bullseye"
-        })
-        questions.append({
-            "question": "هل الأوراق السفلية هي الأكثر إصابة؟",
-            "symptom": "lower_leaves"
         })
 
     if "septoria" in second:
         questions.append({
             "question": "هل البقع صغيرة ولها مركز رمادي؟",
             "symptom": "septoria_spots"
-        })
-
-    if "powdery" in best:
-        questions.append({
-            "question": "هل يوجد مسحوق أبيض على سطح الورقة؟",
-            "symptom": "white_powder"
-        })
-
-    if "mildew" in best:
-        questions.append({
-            "question": "هل توجد طبقة بيضاء أو رمادية على الأوراق؟",
-            "symptom": "mildew_layer"
         })
 
     return questions
@@ -911,10 +655,6 @@ def build_diagnosis_result(
     }
 
 
-# =========================
-# PDF
-# =========================
-
 def build_pdf_bytes(result: dict):
     buffer = io.BytesIO()
     c = canvas.Canvas(buffer, pagesize=A4)
@@ -928,26 +668,18 @@ def build_pdf_bytes(result: dict):
     lines = [
         "تقرير تشخيص أمراض النبات",
         f"التاريخ: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-        "",
         f"أفضل تشخيص: {result['best_prediction']['class_name']}",
         f"نسبة الثقة: {result['best_prediction']['confidence']}%",
         f"النبات: {result['disease_info']['plant']}",
         f"المرض: {result['disease_info']['disease_ar']}",
         f"المسبب: {result['disease_info']['cause']}",
         f"شدة الإصابة: {result['severity']['label']['ar']} ({result['severity']['severity_percent_est']}%)",
-        "",
-        "التوصيات:"
     ]
 
     for line in lines:
         text_to_draw = fix_arabic(line) if AR_FONT_REGISTERED else line
         c.drawRightString(w - 40, y, text_to_draw)
-        y -= 20
-
-    for item in result["disease_info"]["advice"]:
-        text_to_draw = fix_arabic("- " + item) if AR_FONT_REGISTERED else "- " + item
-        c.drawRightString(w - 40, y, text_to_draw)
-        y -= 18
+        y -= 22
 
     c.showPage()
     c.save()
@@ -956,8 +688,124 @@ def build_pdf_bytes(result: dict):
     return buffer.read()
 
 
+def get_farmers_by_region(region: str):
+    conn = get_db_connection()
+    cur = conn.cursor()
+    rows = cur.execute("""
+        SELECT *
+        FROM farmers
+        WHERE region = ?
+        ORDER BY id DESC
+    """, (region,)).fetchall()
+    conn.close()
+    return rows
+
+
+def send_sms_to_region_farmers(region: str, disease_name: str, risk_score: float):
+    farmers = get_farmers_by_region(region)
+    sent_results = []
+
+    for farmer in farmers:
+        message = (
+            f"تنبيه زراعي: تم رصد خطر انتشار {disease_name} "
+            f"في منطقة {region} بدرجة {round(risk_score, 2)}%."
+        )
+
+        try:
+            res = sms_service.send_sms(farmer["phone"], message)
+        except Exception as e:
+            res = {"success": False, "error": str(e)}
+
+        sent_results.append({
+            "farmer": farmer["name"],
+            "phone": farmer["phone"],
+            "result": res
+        })
+
+    return sent_results
+
+
+def get_live_weather(latitude: float, longitude: float) -> dict:
+    query = urllib.parse.urlencode({
+        "latitude": latitude,
+        "longitude": longitude,
+        "current": "temperature_2m,relative_humidity_2m,precipitation",
+        "timezone": "auto"
+    })
+
+    url = f"https://api.open-meteo.com/v1/forecast?{query}"
+    data = fetch_json(url)
+    current = data.get("current", {})
+
+    return {
+        "temperature": float(current.get("temperature_2m", 25)),
+        "humidity": float(current.get("relative_humidity_2m", 70)),
+        "rainfall": float(current.get("precipitation", 0)),
+        "latitude": latitude,
+        "longitude": longitude
+    }
+
+
 # =========================
-# DIAGNOSE ENDPOINTS
+# ROUTES - PAGES
+# =========================
+
+@app.api_route("/", methods=["GET", "HEAD"])
+def root():
+    index_file = get_existing_index()
+    if not index_file:
+        return JSONResponse({"error": "index file not found"}, status_code=404)
+    return FileResponse(index_file)
+
+
+@app.get("/pages/{page_name}")
+def open_page(page_name: str):
+    page_name = page_name.strip().lower()
+    filename = PAGE_FILE_MAP.get(page_name)
+
+    if not filename:
+        candidate = f"{page_name}.html"
+        candidate_path = template_path(candidate)
+        if os.path.exists(candidate_path):
+            return FileResponse(candidate_path)
+        return JSONResponse({"error": f"{page_name} not allowed"}, status_code=404)
+
+    file_path = template_path(filename)
+
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+
+    return JSONResponse({
+        "error": f"{filename} not found",
+        "templates_dir": TEMPLATES_DIR
+    }, status_code=404)
+
+
+@app.get("/{page_file}.html")
+def open_direct_html(page_file: str):
+    filename = f"{page_file}.html"
+    file_path = template_path(filename)
+
+    if os.path.exists(file_path):
+        return FileResponse(file_path)
+
+    return JSONResponse({"error": f"{filename} not found"}, status_code=404)
+
+
+@app.get("/debug/files")
+def debug_files():
+    files = []
+    if os.path.exists(TEMPLATES_DIR):
+        files = sorted(os.listdir(TEMPLATES_DIR))
+    return {
+        "templates_dir": TEMPLATES_DIR,
+        "templates_exists": os.path.exists(TEMPLATES_DIR),
+        "files": files
+    }
+
+
+# =========================
+# ROUTES - DIAGNOSIS
 # =========================
 
 @app.post("/diagnose")
@@ -1115,7 +963,7 @@ async def diagnose_and_pdf(
 
 
 # =========================
-# FARMERS ENDPOINT
+# ROUTES - FARMERS
 # =========================
 
 @app.post("/farmers/register")
@@ -1129,16 +977,13 @@ def register_farmer(
 ):
     try:
         save_farmer(name, phone, farm_name, region, city, crop)
-        return {
-            "success": True,
-            "message": "تم تسجيل المزارع بنجاح"
-        }
+        return {"success": True, "message": "تم تسجيل المزارع بنجاح"}
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
 
 
 # =========================
-# FORECAST ENDPOINT
+# ROUTES - FORECAST
 # =========================
 
 @app.get("/forecast/predict")
@@ -1186,7 +1031,7 @@ def forecast_predict(
 
 
 # =========================
-# STATS ENDPOINTS
+# ROUTES - STATS
 # =========================
 
 @app.get("/stats/summary")
@@ -1277,10 +1122,6 @@ def stats_severity():
     ]
 
 
-# =========================
-# MAP SUMMARY
-# =========================
-
 @app.get("/map/summary")
 def map_summary():
     conn = get_db_connection()
@@ -1303,7 +1144,7 @@ def map_summary():
 
 
 # =========================
-# ALERTS ENDPOINTS
+# ROUTES - ALERTS
 # =========================
 
 @app.get("/alerts/all")
@@ -1435,29 +1276,22 @@ def create_alert(
             alert_message=alert_message,
             recommendation=recommendation
         )
-        return {
-            "success": True,
-            "message": "تم حفظ التنبيه بنجاح"
-        }
+        return {"success": True, "message": "تم حفظ التنبيه بنجاح"}
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
 
 
 # =========================
-# AUTH PLACEHOLDER
+# AUTH / HEALTH
 # =========================
 
 @app.get("/auth/status")
 def auth_status():
     return {
         "auth_enabled": False,
-        "message": "صفحات login/register حالياً واجهات Frontend فقط ولم يتم ربط نظام مصادقة فعلي بعد."
+        "message": "صفحات login/register حالياً Frontend فقط ولم يتم ربط مصادقة فعلية بعد."
     }
 
-
-# =========================
-# SYSTEM HEALTH
-# =========================
 
 @app.get("/system/health")
 def system_health():
@@ -1469,5 +1303,5 @@ def system_health():
         "sms_configured": sms_service.is_configured(),
         "arabic_font_registered": AR_FONT_REGISTERED,
         "arabic_font_path": AR_FONT_PATH_USED,
-        "version": "Phytologic AI v4.1"
+        "version": "Phytologic AI v5.0"
     }
