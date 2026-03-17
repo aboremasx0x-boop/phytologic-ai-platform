@@ -1,836 +1,803 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - تنبؤ الذكاء الاصطناعي</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | Forecast AI</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * { box-sizing: border-box; }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --success:#15803d;
+      --dark:#0b1220;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+      --radius:22px;
+    }
 
-.page{
-max-width:1450px;
-margin:16px auto;
-padding:0 14px 28px;
-}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
+      color:var(--text);
+    }
 
-.hero{
-background:
-linear-gradient(135deg,rgba(14,23,62,.97),rgba(27,73,101,.92)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:24px;
-padding:24px 26px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
+    .page{
+      max-width:1450px;
+      margin:0 auto;
+      padding:18px;
+    }
 
-.hero:before{
-content:"";
-position:absolute;
-left:-40px;
-top:-40px;
-width:180px;
-height:180px;
-background:rgba(255,255,255,.06);
-border-radius:50%;
-}
+    .navbar{
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:18px;
+      position:sticky;
+      top:12px;
+      z-index:20;
+    }
 
-.hero:after{
-content:"";
-position:absolute;
-right:-20px;
-bottom:-20px;
-width:220px;
-height:220px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-}
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
 
-.hero-title{
-font-size:32px;
-font-weight:800;
-margin:0 0 8px 0;
-position:relative;
-z-index:1;
-}
+    .brand-title{
+      font-size:22px;
+      font-weight:800;
+      color:#0b5b55;
+    }
 
-.hero-sub{
-font-size:14px;
-line-height:1.9;
-opacity:.95;
-position:relative;
-z-index:1;
-max-width:980px;
-}
+    .brand-sub{
+      font-size:13px;
+      color:var(--muted);
+    }
 
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:14px;
-margin-bottom:16px;
-}
+    .nav-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px 18px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-min-height:110px;
-}
+    .nav-links a{
+      text-decoration:none;
+      color:#0f172a;
+      background:#fff;
+      border:1px solid #dbe5ef;
+      border-radius:14px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:700;
+      transition:.2s ease;
+    }
 
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:10px;
-font-weight:700;
-}
+    .nav-links a:hover{
+      background:#f8fbff;
+      transform:translateY(-1px);
+    }
 
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(11,18,32,.98), rgba(29,78,216,.88)),
+        radial-gradient(circle at top left, rgba(255,255,255,.15), transparent 35%);
+      color:white;
+      border-radius:30px;
+      padding:32px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
 
-.stat-sub{
-font-size:12px;
-color:#94a3b8;
-margin-top:8px;
-line-height:1.6;
-}
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
 
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
+    .hero h1{
+      margin:0 0 12px;
+      font-size:38px;
+      line-height:1.2;
+    }
 
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
+    .hero p{
+      margin:0;
+      line-height:1.95;
+      max-width:920px;
+      color:rgba(255,255,255,.92);
+      font-size:16px;
+    }
 
-.section-title{
-font-size:18px;
-font-weight:800;
-color:#0f172a;
-}
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-.section-note{
-font-size:12px;
-color:#64748b;
-}
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:22px;
+    }
 
-.card-body{
-padding:16px;
-}
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 18px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.grid-2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
+    .btn:hover{ transform:translateY(-1px); }
 
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
+    .btn-white{
+      background:white;
+      color:#0b5b55;
+    }
 
-.grid-5{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:14px;
-}
+    .btn-white:hover{ background:#f4f7ff; }
 
-.field label{
-display:block;
-font-size:13px;
-color:#64748b;
-margin-bottom:8px;
-font-weight:700;
-}
+    .btn-glass{
+      background:rgba(255,255,255,.12);
+      color:white;
+      border:1px solid rgba(255,255,255,.18);
+    }
 
-.field input{
-width:100%;
-padding:12px 14px;
-border-radius:14px;
-border:1px solid #dbe4f2;
-background:#fff;
-font-size:14px;
-outline:none;
-transition:.2s;
-}
+    .btn-glass:hover{ background:rgba(255,255,255,.18); }
 
-.field input:focus{
-border-color:#4f46e5;
-box-shadow:0 0 0 4px rgba(79,70,229,.08);
-}
+    .btn-primary{
+      background:var(--primary);
+      color:white;
+    }
 
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:14px;
-}
+    .btn-primary:hover{
+      background:var(--primary-dark);
+    }
 
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
+    .btn-outline{
+      background:white;
+      color:var(--secondary);
+      border:1px solid #cbd5e1;
+    }
 
-.btn-primary{
-background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);
-color:white;
-box-shadow:0 8px 16px rgba(37,99,235,.22);
-}
+    .btn-outline:hover{
+      background:#f8fbff;
+    }
 
-.btn-secondary{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
+    .grid{
+      display:grid;
+      gap:18px;
+    }
 
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
+    .grid-2{ grid-template-columns:1.1fr .9fr; }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
 
-.btn-success{
-background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
-color:white;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-.btn:hover{
-transform:translateY(-1px);
-}
+    .card-header{
+      padding:18px 20px 12px;
+      border-bottom:1px solid #edf2f7;
+    }
 
-.info-box{
-padding:14px;
-border-radius:16px;
-border:1px solid #ecf2fb;
-background:#fbfdff;
-}
+    .card-header h2,
+    .card-header h3{
+      margin:0;
+      font-size:20px;
+    }
 
-.info-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:10px;
-color:#111827;
-}
+    .card-header p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-.kpi{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .card-body{
+      padding:20px;
+    }
 
-.small{
-font-size:12px;
-color:#64748b;
-line-height:1.8;
-}
+    .kpi{
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      min-height:118px;
+    }
 
-.status-bar{
-margin-top:12px;
-padding:11px 12px;
-border-radius:14px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
+    .kpi-label{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
 
-.analysis-box{
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-}
+    .kpi-value{
+      font-size:28px;
+      font-weight:800;
+      color:var(--text);
+    }
 
-.list{
-display:grid;
-gap:8px;
-}
+    .kpi-sub{
+      margin-top:8px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.8;
+    }
 
-.list-item{
-padding:10px 12px;
-border-radius:14px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-}
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
 
-.highlight{
-color:#0f172a;
-font-weight:800;
-}
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
 
-.error-box{
-background:#fef2f2;
-border:1px solid #fecaca;
-color:#b91c1c;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .field.full{
+      grid-column:1 / -1;
+    }
 
-.ok-box{
-background:#ecfdf5;
-border:1px solid #a7f3d0;
-color:#047857;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    label{
+      font-size:14px;
+      font-weight:700;
+      color:#1f2937;
+    }
 
-.table-wrap{
-overflow:auto;
-}
+    input[type="number"]{
+      width:100%;
+      border:1px solid #dbe2ea;
+      border-radius:14px;
+      padding:13px 14px;
+      background:#fff;
+      font-size:15px;
+      outline:none;
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-min-width:700px;
-}
+    input:focus{
+      border-color:#0f766e;
+      box-shadow:0 0 0 4px rgba(15,118,110,.08);
+    }
 
-th,td{
-padding:11px 10px;
-text-align:right;
-border-bottom:1px solid #edf2fb;
-font-size:13px;
-}
+    .submit-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
 
-th{
-background:#f8fbff;
-color:#334155;
-font-weight:800;
-}
+    .loading{
+      display:none;
+      margin-top:14px;
+      color:var(--secondary);
+      font-size:14px;
+      font-weight:700;
+    }
 
-canvas{
-max-height:340px;
-}
+    .error-box, .success-box{
+      display:none;
+      margin-top:16px;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      line-height:1.9;
+    }
 
-@media(max-width:1350px){
-.stats-grid{grid-template-columns:repeat(3,1fr)}
-.grid-5{grid-template-columns:repeat(2,1fr)}
-.grid-3{grid-template-columns:1fr 1fr}
-.grid-2{grid-template-columns:1fr}
-}
+    .error-box{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
 
-@media(max-width:780px){
-.stats-grid,.grid-5,.grid-3{grid-template-columns:1fr}
-.hero-title{font-size:26px}
-}
-</style>
+    .success-box{
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .info-box{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:#fcfdff;
+      margin-bottom:14px;
+    }
+
+    .info-box:last-child{
+      margin-bottom:0;
+    }
+
+    .info-box h4{
+      margin:0 0 12px;
+      font-size:17px;
+    }
+
+    .info-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .info-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding-bottom:10px;
+      border-bottom:1px dashed #e5e7eb;
+    }
+
+    .info-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
+
+    .key{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      text-align:left;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .pill-low{
+      background:#ecfdf5;
+      color:#166534;
+    }
+
+    .pill-moderate{
+      background:#fff7ed;
+      color:#9a3412;
+    }
+
+    .pill-high{
+      background:#fef2f2;
+      color:#991b1b;
+    }
+
+    .pill-neutral{
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .list-box{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .list-box li{
+      border:1px solid #edf2f7;
+      background:#fafcff;
+      border-radius:14px;
+      padding:12px 14px;
+      line-height:1.9;
+      font-size:14px;
+    }
+
+    .footer-note{
+      text-align:center;
+      color:#64748b;
+      padding:18px 10px 8px;
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    @media (max-width:1200px){
+      .grid-4, .grid-2, .form-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
 
-<div class="page">
-
-  <div class="hero">
-    <h1 class="hero-title">تنبؤ الذكاء الاصطناعي - Phytologic AI</h1>
-    <div class="hero-sub">
-      لوحة تحليل متقدمة لتقدير الحالات المتوقعة اعتمادًا على الحرارة، الرطوبة، الأمطار، عدد الحالات السابقة، ومتوسط شدة الإصابة باستخدام نموذج الذكاء الاصطناعي المتصل مباشرة بالـ API.
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">الحالات المتوقعة</div>
-      <div class="stat-value" id="heroPredictedCases">-</div>
-      <div class="stat-sub">المخرج الأساسي للنموذج</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">مستوى الخطر</div>
-      <div class="stat-value" id="heroRiskLevel" style="font-size:20px">-</div>
-      <div class="stat-sub">منخفض / متوسط / مرتفع</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">الحرارة المدخلة</div>
-      <div class="stat-value" id="heroTemp">-</div>
-      <div class="stat-sub">قيمة الإدخال الحالية</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">الرطوبة المدخلة</div>
-      <div class="stat-value" id="heroHumidity">-</div>
-      <div class="stat-sub">نسبة الرطوبة المستخدمة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">متوسط الشدة</div>
-      <div class="stat-value" id="heroSeverity">-</div>
-      <div class="stat-sub">شدة الإصابة المُدخلة</div>
-    </div>
-  </div>
-<div class="card">
-    <div class="section-header">
-      <div class="section-title">مدخلات نموذج AI</div>
-      <div class="section-note">متوافق مع المسار /forecast/ai</div>
-    </div>
-    <div class="card-body">
-
-      <div class="grid-5">
-        <div class="field">
-          <label>درجة الحرارة</label>
-          <input id="temperature" type="number" value="25">
-        </div>
-
-        <div class="field">
-          <label>الرطوبة</label>
-          <input id="humidity" type="number" value="70">
-        </div>
-
-        <div class="field">
-          <label>الأمطار</label>
-          <input id="rainfall" type="number" value="0">
-        </div>
-
-        <div class="field">
-          <label>عدد الحالات السابقة</label>
-          <input id="cases_count" type="number" value="5">
-        </div>
-
-        <div class="field">
-          <label>متوسط الشدة</label>
-          <input id="severity_avg" type="number" value="10">
-        </div>
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-title">Phytologic AI Forecast AI</div>
+        <div class="brand-sub">واجهة تنبؤ ذكية بالحالات ومستوى الخطر</div>
       </div>
 
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="runAIForecast()">تشغيل التنبؤ</button>
-        <button class="btn btn-secondary" onclick="fillLowScenario()">سيناريو منخفض</button>
-        <button class="btn btn-dark" onclick="fillMediumScenario()">سيناريو متوسط</button>
-        <button class="btn btn-success" onclick="fillHighScenario()">سيناريو مرتفع</button>
-        <button class="btn btn-dark" onclick="exportHistory()">تصدير السجل JSON</button>
-        <button class="btn btn-dark" onclick="clearHistory()">مسح السجل</button>
+      <div class="nav-links">
+        <a href="/">الرئيسية</a>
+        <a href="/pages/dashboard">لوحة التحكم</a>
+        <a href="/pages/report_center">مركز التقارير</a>
+        <a href="/pages/alerts">التنبيهات</a>
+        <a href="/pages/farmers">المزارعون</a>
       </div>
+    </nav>
 
-      <div class="status-bar" id="statusBar">جاهز لتشغيل تنبؤ AI.</div>
-
-    </div>
-  </div>
-
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">مخرجات التنبؤ</div>
-        <div class="section-note">النتيجة المباشرة من النموذج</div>
-      </div>
-      <div class="card-body">
-
-        <div class="grid-3">
-          <div class="info-box">
-            <div class="info-title">الحالات المتوقعة</div>
-            <div class="kpi" id="predictedCases">-</div>
-            <div class="small">القيمة الأساسية من النموذج</div>
-          </div>
-
-          <div class="info-box">
-            <div class="info-title">مستوى الخطر</div>
-            <div class="kpi" id="riskLevel" style="font-size:20px">-</div>
-            <div class="small">تصنيف الخطر النهائي</div>
-          </div>
-
-          <div class="info-box">
-            <div class="info-title">حالة التشغيل</div>
-            <div class="kpi" id="runStatus" style="font-size:18px">-</div>
-            <div class="small">نجاح / خطأ / انتظار</div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="forecastText">
-          ستظهر هنا القراءة التفسيرية لنتيجة النموذج.
-        </div>
-
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">تحليل المدخلات والمخرجات</div>
-        <div class="section-note">رؤية سريعة لعوامل التنبؤ</div>
-      </div>
-      <div class="card-body">
-
-        <div style="margin-bottom:16px">
-          <canvas id="inputsChart"></canvas>
-        </div>
-
+    <section class="hero">
+      <div class="hero-top">
         <div>
-          <canvas id="forecastGaugeChart"></canvas>
+          <h1>Forecast AI</h1>
+          <p>
+            واجهة تشغيل مخصصة لنموذج التنبؤ، تساعد على تقدير عدد الحالات المتوقع ومستوى الخطر
+            باستخدام مدخلات مناخية وتشغيلية مثل الحرارة والرطوبة والأمطار وعدد الحالات الحالية
+            ومتوسط شدة الإصابة.
+          </p>
         </div>
 
+        <div class="status-chip" id="heroForecastChip">
+          <span>●</span>
+          <span>جاري تهيئة Forecast AI...</span>
+        </div>
       </div>
-    </div>
 
-  </div>
-<div class="grid-2">
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="checkHealth()">فحص النظام</button>
+        <button class="btn btn-glass" onclick="fillDemoData()">تعبئة تجريبية</button>
+        <button class="btn btn-glass" onclick="resetForecastForm()">إعادة تعيين</button>
+      </div>
+    </section>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">القراءة التنفيذية</div>
-        <div class="section-note">تفسير إداري وتشغيلي للمخرجات</div>
+    <section class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <h2>ملخص الخدمة</h2>
+        <p>عرض سريع لحالة النظام ونموذج التنبؤ.</p>
       </div>
       <div class="card-body">
-        <div class="analysis-box" id="executiveAnalysis">
-          بعد تشغيل التنبؤ سيظهر هنا تحليل تنفيذي مباشر.
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">حالة النظام</div>
+            <div class="kpi-value" id="kpiSystemStatus" style="font-size:22px;">--</div>
+            <div class="kpi-sub">الحالة العامة للخدمة</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">نموذج التنبؤ</div>
+            <div class="kpi-value" id="kpiForecastModel" style="font-size:22px;">--</div>
+            <div class="kpi-sub">فحص Forecast Model</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">نموذج الصور</div>
+            <div class="kpi-value" id="kpiAiModel" style="font-size:22px;">--</div>
+            <div class="kpi-sub">فحص AI Model</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">الإصدار</div>
+            <div class="kpi-value" id="kpiVersion" style="font-size:20px;">--</div>
+            <div class="kpi-sub">نسخة النظام الحالية</div>
+          </div>
         </div>
       </div>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="card-header">
+          <h2>بيانات التنبؤ</h2>
+          <p>أدخل القيم المطلوبة لتشغيل نموذج Forecast AI.</p>
+        </div>
+        <div class="card-body">
+          <form id="forecastForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="temperature">درجة الحرارة</label>
+                <input type="number" step="any" id="temperature" placeholder="مثال: 28" required />
+              </div>
+
+              <div class="field">
+                <label for="humidity">الرطوبة</label>
+                <input type="number" step="any" id="humidity" placeholder="مثال: 70" required />
+              </div>
+
+              <div class="field">
+                <label for="rainfall">الأمطار</label>
+                <input type="number" step="any" id="rainfall" placeholder="مثال: 0" required />
+              </div>
+
+              <div class="field">
+                <label for="cases_count">عدد الحالات الحالية</label>
+                <input type="number" step="any" id="cases_count" placeholder="مثال: 5" required />
+              </div>
+
+              <div class="field full">
+                <label for="severity_avg">متوسط شدة الإصابة</label>
+                <input type="number" step="any" id="severity_avg" placeholder="مثال: 8" required />
+              </div>
+            </div>
+
+            <div class="submit-row">
+              <button type="submit" class="btn btn-primary">تنفيذ Forecast AI</button>
+              <button type="button" class="btn btn-outline" onclick="fillDemoData()">تعبئة تجريبية</button>
+              <button type="button" class="btn btn-outline" onclick="resetForecastForm()">مسح الحقول</button>
+            </div>
+
+            <div class="loading" id="loadingText">جاري تنفيذ Forecast AI...</div>
+            <div class="error-box" id="errorBox"></div>
+            <div class="success-box" id="successBox"></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>نتيجة Forecast AI</h2>
+          <p>عرض المخرجات الأساسية والخصائص المستخدمة.</p>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <h4>النتيجة الأساسية</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">الحالات المتوقعة</div>
+                <div class="value" id="predictedCases">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">مستوى الخطر</div>
+                <div class="value" id="riskLevelAr">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">كود الخطر</div>
+                <div class="value" id="riskLevelCode">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>المدخلات المستخدمة</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">الحرارة</div>
+                <div class="value" id="usedTemperature">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الرطوبة</div>
+                <div class="value" id="usedHumidity">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الأمطار</div>
+                <div class="value" id="usedRainfall">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">عدد الحالات</div>
+                <div class="value" id="usedCasesCount">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">متوسط الشدة</div>
+                <div class="value" id="usedSeverityAvg">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">آخر تشغيل</div>
-        <div class="section-note">آخر نتيجة تم تسجيلها داخل الصفحة</div>
+    <section class="card" style="margin-top:18px;">
+      <div class="card-header">
+        <h2>إرشادات الاستخدام</h2>
+        <p>ملاحظات مهمة لتحسين جودة نتائج التنبؤ.</p>
       </div>
       <div class="card-body">
-        <div class="analysis-box" id="lastRunBox">
-          لا يوجد تشغيل سابق حتى الآن.
-        </div>
+        <ul class="list-box">
+          <li>أدخل الرطوبة ضمن مدى منطقي من 0 إلى 100.</li>
+          <li>تأكد من أن عدد الحالات الحالية ومتوسط الشدة مبنيان على بيانات ميدانية أو سجل حقيقي.</li>
+          <li>الأمطار لا يجب أن تكون قيمة سالبة.</li>
+          <li>استخدم هذه الصفحة كأداة دعم قرار وليست كبديل عن التقييم الحقلي المباشر.</li>
+          <li>يمكن لاحقًا ربط هذه الصفحة تلقائيًا بنتائج التشخيص والطقس لتعبئة الحقول آليًا.</li>
+        </ul>
       </div>
-    </div>
+    </section>
 
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">سجل التنبؤات</div>
-      <div class="section-note">آخر النتائج المنفذة داخل الصفحة</div>
-    </div>
-    <div class="card-body">
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>الحرارة</th>
-              <th>الرطوبة</th>
-              <th>الأمطار</th>
-              <th>الحالات السابقة</th>
-              <th>متوسط الشدة</th>
-              <th>الحالات المتوقعة</th>
-              <th>الخطر</th>
-              <th>وقت التشغيل</th>
-            </tr>
-          </thead>
-          <tbody id="historyTable">
-            <tr><td colspan="9">لا يوجد سجل بعد.</td></tr>
-          </tbody>
-        </table>
-      </div>
-
+    <div class="footer-note">
+      Phytologic AI Forecast AI — واجهة تشغيل نموذج التنبؤ الذكي بالحالات ومستوى الخطر.
     </div>
   </div>
 
-</div>
+  <script>
+    const forecastForm = document.getElementById("forecastForm");
+    const loadingText = document.getElementById("loadingText");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
 
-<script>
-const API = "http://127.0.0.1:8000";
-let forecastHistory = [];
-let inputsChart = null;
-let forecastGaugeChart = null;
-
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
-}
-
-function safeText(v, fallback="-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
-
-function destroyChart(chartObj){
-  if(chartObj){
-    chartObj.destroy();
-  }
-}
-
-function currentInputs(){
-  return {
-    temperature: Number(document.getElementById("temperature").value || 0),
-    humidity: Number(document.getElementById("humidity").value || 0),
-    rainfall: Number(document.getElementById("rainfall").value || 0),
-    cases_count: Number(document.getElementById("cases_count").value || 0),
-    severity_avg: Number(document.getElementById("severity_avg").value || 0)
-  };
-}
-
-function updateHero(predictedCases, riskLevel, inputs){
-  document.getElementById("heroPredictedCases").textContent = safeText(predictedCases);
-  document.getElementById("heroRiskLevel").textContent = safeText(riskLevel);
-  document.getElementById("heroTemp").textContent = `${safeText(inputs.temperature)}°`;
-  document.getElementById("heroHumidity").textContent = `${safeText(inputs.humidity)}%`;
-  document.getElementById("heroSeverity").textContent = `${safeText(inputs.severity_avg)}%`;
-}
-
-function fillLowScenario(){
-  document.getElementById("temperature").value = 20;
-  document.getElementById("humidity").value = 45;
-  document.getElementById("rainfall").value = 0;
-  document.getElementById("cases_count").value = 1;
-  document.getElementById("severity_avg").value = 3;
-  setStatus("تم تحميل سيناريو منخفض.");
-}
-
-function fillMediumScenario(){
-  document.getElementById("temperature").value = 27;
-  document.getElementById("humidity").value = 68;
-  document.getElementById("rainfall").value = 2;
-  document.getElementById("cases_count").value = 6;
-  document.getElementById("severity_avg").value = 12;
-  setStatus("تم تحميل سيناريو متوسط.");
-}
-
-function fillHighScenario(){
-  document.getElementById("temperature").value = 29;
-  document.getElementById("humidity").value = 88;
-  document.getElementById("rainfall").value = 12;
-  document.getElementById("cases_count").value = 18;
-  document.getElementById("severity_avg").value = 28;
-  setStatus("تم تحميل سيناريو مرتفع.");
-}
-
-function clearHistory(){
-  forecastHistory = [];
-  renderHistory();
-  document.getElementById("lastRunBox").innerHTML = "تم مسح السجل.";
-  setStatus("تم مسح سجل التنبؤات.");
-}
-
-function exportHistory(){
-  const blob = new Blob([JSON.stringify(forecastHistory, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "forecast_ai_history.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function guessRiskLevelFromPrediction(predicted){
-  const p = Number(predicted || 0);
-  if(p < 5) return "منخفض";
-  if(p < 15) return "متوسط";
-  return "مرتفع";
-}
-
-function buildNarrative(predicted, riskLevel){
-  if(riskLevel === "مرتفع"){
-    return `
-      <div class="list">
-        <div class="list-item">التوقع يشير إلى <span class="highlight">خطر مرتفع</span> مع عدد حالات متوقعة يساوي <span class="highlight">${predicted}</span>.</div>
-        <div class="list-item">الرطوبة المرتفعة وارتفاع عدد الحالات السابقة أو شدة الإصابة قد تكون من أهم العوامل المؤثرة.</div>
-        <div class="list-item">يوصى بزيادة وتيرة المراقبة الحقلية والاستعداد لتدخل سريع عند ظهور أعراض فعلية.</div>
-      </div>
-    `;
-  }
-
-  if(riskLevel === "متوسط"){
-    return `
-      <div class="list">
-        <div class="list-item">التوقع يشير إلى <span class="highlight">خطر متوسط</span> مع عدد حالات متوقعة يساوي <span class="highlight">${predicted}</span>.</div>
-        <div class="list-item">الوضع يحتاج متابعة منتظمة وتحسين الإدارة الزراعية خاصة الرطوبة والري.</div>
-        <div class="list-item">يفضل تجهيز خطة وقائية إذا بدأت المؤشرات بالارتفاع.</div>
-      </div>
-    `;
-  }
-
-  return `
-    <div class="list">
-      <div class="list-item">التوقع يشير إلى <span class="highlight">خطر منخفض</span> مع عدد حالات متوقعة يساوي <span class="highlight">${predicted}</span>.</div>
-      <div class="list-item">الوضع الحالي مطمئن نسبيًا مع الاستمرار في المراقبة الدورية.</div>
-      <div class="list-item">الحفاظ على النظافة الزراعية والإدارة الجيدة يكفي غالبًا في هذه المرحلة.</div>
-    </div>
-  `;
-}
-function renderCharts(inputs, predictedCases){
-  destroyChart(inputsChart);
-  inputsChart = new Chart(document.getElementById("inputsChart"),{
-    type:"bar",
-    data:{
-      labels:["الحرارة","الرطوبة","الأمطار","الحالات السابقة","متوسط الشدة"],
-      datasets:[{
-        label:"المدخلات",
-        data:[
-          Number(inputs.temperature || 0),
-          Number(inputs.humidity || 0),
-          Number(inputs.rainfall || 0),
-          Number(inputs.cases_count || 0),
-          Number(inputs.severity_avg || 0)
-        ],
-        borderWidth:1
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false
-    }
-  });
-
-  const maxRef = Math.max(30, Number(predictedCases || 0) + 5);
-  const remaining = Math.max(0, maxRef - Number(predictedCases || 0));
-
-  destroyChart(forecastGaugeChart);
-  forecastGaugeChart = new Chart(document.getElementById("forecastGaugeChart"),{
-    type:"doughnut",
-    data:{
-      labels:["الحالات المتوقعة","المجال المرجعي"],
-      datasets:[{
-        data:[Number(predictedCases || 0), remaining]
-      }]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      cutout:"72%"
-    }
-  });
-}
-
-function renderHistory(){
-  const tbody = document.getElementById("historyTable");
-  tbody.innerHTML = "";
-
-  if(!forecastHistory.length){
-    tbody.innerHTML = `<tr><td colspan="9">لا يوجد سجل بعد.</td></tr>`;
-    return;
-  }
-
-  forecastHistory.forEach((row, index) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${row.inputs.temperature}</td>
-        <td>${row.inputs.humidity}</td>
-        <td>${row.inputs.rainfall}</td>
-        <td>${row.inputs.cases_count}</td>
-        <td>${row.inputs.severity_avg}</td>
-        <td>${row.predictedCases}</td>
-        <td>${row.riskLevel}</td>
-        <td>${row.runTime}</td>
-      </tr>
-    `;
-  });
-}
-
-async function runAIForecast(){
-  try{
-    setStatus("جاري تشغيل تنبؤ AI...");
-    document.getElementById("runStatus").textContent = "جاري التشغيل";
-
-    const inputs = currentInputs();
-
-    const url = `${API}/forecast/ai?temperature=${encodeURIComponent(inputs.temperature)}&humidity=${encodeURIComponent(inputs.humidity)}&rainfall=${encodeURIComponent(inputs.rainfall)}&cases_count=${encodeURIComponent(inputs.cases_count)}&severity_avg=${encodeURIComponent(inputs.severity_avg)}`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if(data.success === false){
-      throw new Error(data.error || "تعذر تشغيل النموذج");
+    function safeText(v, fallback = "--") {
+      if (v === null || v === undefined || v === "") return fallback;
+      return v;
     }
 
-    const forecast = data.forecast || {};
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.textContent = message || "حدث خطأ غير متوقع";
+    }
 
-    let predictedCases =
-      forecast.predicted_cases ??
-      forecast.prediction ??
-      forecast.expected_cases ??
-      forecast.value ??
-      forecast.predicted_value ??
-      "-";
+    function hideError() {
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
 
-    let riskLevel =
-      forecast.risk_level_ar ??
-      forecast.risk_level ??
-      guessRiskLevelFromPrediction(predictedCases);
+    function showSuccess(message) {
+      successBox.style.display = "block";
+      successBox.textContent = message || "";
+    }
 
-    document.getElementById("predictedCases").textContent = safeText(predictedCases);
-    document.getElementById("riskLevel").textContent = safeText(riskLevel);
-    document.getElementById("runStatus").textContent = "نجاح";
+    function hideSuccess() {
+      successBox.style.display = "none";
+      successBox.textContent = "";
+    }
 
-    document.getElementById("forecastText").innerHTML = buildNarrative(predictedCases, riskLevel);
+    function setLoading(state) {
+      loadingText.style.display = state ? "block" : "none";
+    }
 
-    document.getElementById("executiveAnalysis").innerHTML = `
-      <div class="list">
-        <div class="list-item"><span class="highlight">ملخص النتيجة:</span> النموذج يتوقع <span class="highlight">${predictedCases}</span> حالة تقريبًا.</div>
-        <div class="list-item"><span class="highlight">مستوى الخطر:</span> ${riskLevel}</div>
-        <div class="list-item"><span class="highlight">العوامل الأكثر تأثيرًا عادة:</span> الرطوبة، عدد الحالات السابقة، ومتوسط الشدة.</div>
-        <div class="list-item"><span class="highlight">التوصية التنفيذية:</span> ${
-          riskLevel === "مرتفع"
-          ? "رفع الجاهزية الميدانية فورًا."
-          : riskLevel === "متوسط"
-          ? "المتابعة المتكررة والاستعداد الوقائي."
-          : "المراقبة الروتينية مع استمرار الإجراءات الجيدة."
-        }</div>
-      </div>
-    `;
+    function riskPill(level, label) {
+      const val = String(level || "").toLowerCase();
 
-    const runTime = new Date().toLocaleString("ar-SA");
-    document.getElementById("lastRunBox").innerHTML = `
-      <div class="ok-box">
-        آخر تشغيل تم بنجاح في <b>${runTime}</b><br>
-        الحالات المتوقعة: <b>${predictedCases}</b><br>
-        مستوى الخطر: <b>${riskLevel}</b>
-      </div>
-    `;
+      if (val === "high") {
+        return `<span class="pill pill-high">${safeText(label)}</span>`;
+      }
+      if (val === "moderate") {
+        return `<span class="pill pill-moderate">${safeText(label)}</span>`;
+      }
+      if (val === "low") {
+        return `<span class="pill pill-low">${safeText(label)}</span>`;
+      }
+      return `<span class="pill pill-neutral">${safeText(label)}</span>`;
+    }
 
-    forecastHistory.unshift({
-      inputs,
-      predictedCases,
-      riskLevel,
-      runTime
+    function resetForecastForm() {
+      forecastForm.reset();
+      hideError();
+      hideSuccess();
+      setLoading(false);
+
+      document.getElementById("predictedCases").textContent = "--";
+      document.getElementById("riskLevelAr").textContent = "--";
+      document.getElementById("riskLevelCode").textContent = "--";
+      document.getElementById("usedTemperature").textContent = "--";
+      document.getElementById("usedHumidity").textContent = "--";
+      document.getElementById("usedRainfall").textContent = "--";
+      document.getElementById("usedCasesCount").textContent = "--";
+      document.getElementById("usedSeverityAvg").textContent = "--";
+    }
+
+    function fillDemoData() {
+      document.getElementById("temperature").value = 28;
+      document.getElementById("humidity").value = 70;
+      document.getElementById("rainfall").value = 0;
+      document.getElementById("cases_count").value = 5;
+      document.getElementById("severity_avg").value = 8;
+      hideError();
+      showSuccess("تمت تعبئة بيانات تجريبية.");
+    }
+
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed: ${url}`);
+      }
+
+      return data;
+    }
+
+    async function checkHealth() {
+      try {
+        const data = await fetchJson("/system/health");
+
+        document.getElementById("kpiSystemStatus").textContent = safeText(data.status);
+        document.getElementById("kpiForecastModel").textContent = safeText(data.forecast_model);
+        document.getElementById("kpiAiModel").textContent = safeText(data.ai_model);
+        document.getElementById("kpiVersion").textContent = safeText(data.version);
+
+        document.getElementById("heroForecastChip").innerHTML =
+          `<span>●</span><span>Forecast AI: ${safeText(data.forecast_model)} | ${safeText(data.version)}</span>`;
+      } catch (err) {
+        document.getElementById("heroForecastChip").innerHTML =
+          `<span>●</span><span>تعذر فحص Forecast AI</span>`;
+      }
+    }
+
+    forecastForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      hideError();
+      hideSuccess();
+      setLoading(true);
+
+      try {
+        const temperature = document.getElementById("temperature").value.trim();
+        const humidity = document.getElementById("humidity").value.trim();
+        const rainfall = document.getElementById("rainfall").value.trim();
+        const cases_count = document.getElementById("cases_count").value.trim();
+        const severity_avg = document.getElementById("severity_avg").value.trim();
+
+        if (!temperature || !humidity || !rainfall || !cases_count || !severity_avg) {
+          throw new Error("يرجى تعبئة جميع الحقول المطلوبة");
+        }
+
+        const params = new URLSearchParams({
+          temperature,
+          humidity,
+          rainfall,
+          cases_count,
+          severity_avg
+        });
+
+        const data = await fetchJson(`/forecast/predict?${params.toString()}`);
+
+        document.getElementById("predictedCases").textContent = safeText(data.predicted_cases);
+        document.getElementById("riskLevelAr").innerHTML =
+          riskPill(data.risk_level_code, data.risk_level_ar);
+        document.getElementById("riskLevelCode").textContent = safeText(data.risk_level_code);
+
+        const f = data.features_used || {};
+        document.getElementById("usedTemperature").textContent = safeText(f.temperature);
+        document.getElementById("usedHumidity").textContent = safeText(f.humidity);
+        document.getElementById("usedRainfall").textContent = safeText(f.rainfall);
+        document.getElementById("usedCasesCount").textContent = safeText(f.cases_count);
+        document.getElementById("usedSeverityAvg").textContent = safeText(f.severity_avg);
+
+        showSuccess("تم تنفيذ Forecast AI بنجاح.");
+      } catch (err) {
+        showError(err.message || "فشل تنفيذ Forecast AI");
+      } finally {
+        setLoading(false);
+      }
     });
 
-    if(forecastHistory.length > 10){
-      forecastHistory = forecastHistory.slice(0, 10);
-    }
-
-    renderHistory();
-    renderCharts(inputs, predictedCases);
-    updateHero(predictedCases, riskLevel, inputs);
-
-    setStatus("تم تشغيل تنبؤ AI بنجاح.");
-  }catch(err){
-    console.error(err);
-    document.getElementById("runStatus").textContent = "خطأ";
-    document.getElementById("forecastText").innerHTML = `<div class="error-box">تعذر تشغيل النموذج: ${err.message}</div>`;
-    document.getElementById("executiveAnalysis").innerHTML = `<div class="error-box">فشل إنشاء التحليل التنفيذي بسبب خطأ في النموذج أو في الاتصال بالـ API.</div>`;
-    setStatus("تعذر تشغيل تنبؤ AI.");
-  }
-}
-
-renderHistory();
-</script>
-
+    window.addEventListener("DOMContentLoaded", checkHealth);
+  </script>
 </body>
 </html>
