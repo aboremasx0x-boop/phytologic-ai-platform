@@ -3,40 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phytologic AI | مركز التقارير</title>
+  <title>Phytologic AI | Reports Center</title>
+
   <style>
     *{box-sizing:border-box}
+
     body{
       margin:0;
-      font-family:Tahoma,Arial,sans-serif;
+      font-family:Tahoma, Arial, sans-serif;
       background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
       color:#0f172a;
     }
+
     .page{
-      max-width:1400px;
+      max-width:1450px;
       margin:0 auto;
       padding:18px;
     }
+
     .hero{
       background:linear-gradient(135deg,#0b1220,#0f766e);
       color:#fff;
       border-radius:28px;
       padding:28px;
-      box-shadow:0 14px 32px rgba(15,23,42,.12);
+      box-shadow:0 16px 34px rgba(15,23,42,.12);
       margin-bottom:18px;
     }
+
     .hero h1{
       margin:0 0 10px;
       font-size:34px;
     }
+
     .hero p{
       margin:0;
       line-height:1.9;
-      color:rgba(255,255,255,.9);
+      color:rgba(255,255,255,.92);
+      max-width:1000px;
     }
+
     .hero a{
       display:inline-block;
-      margin-top:14px;
+      margin-top:16px;
       text-decoration:none;
       color:#fff;
       background:rgba(255,255,255,.12);
@@ -45,54 +53,68 @@
       border-radius:12px;
       font-weight:700;
     }
+
     .grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:18px;
     }
+
     .card{
       background:#fff;
       border:1px solid #e2e8f0;
       border-radius:22px;
-      box-shadow:0 12px 26px rgba(15,23,42,.08);
+      box-shadow:0 10px 24px rgba(15,23,42,.08);
       overflow:hidden;
     }
+
     .card-header{
-      padding:18px 20px 10px;
+      padding:18px 20px 12px;
       border-bottom:1px solid #edf2f7;
     }
-    .card-header h2,.card-header h3{
+
+    .card-header h2,
+    .card-header h3{
       margin:0;
       font-size:22px;
     }
+
     .card-header p{
       margin:8px 0 0;
       color:#64748b;
       font-size:14px;
       line-height:1.8;
     }
+
     .card-body{
       padding:20px;
     }
+
     .form-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:14px;
     }
+
     .field{
       display:flex;
       flex-direction:column;
       gap:8px;
     }
+
     .field.full{
       grid-column:1 / -1;
     }
+
     label{
       font-size:14px;
       font-weight:700;
       color:#334155;
     }
-    input[type="text"], input[type="file"]{
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"]{
       width:100%;
       border:1px solid #dbe2ea;
       border-radius:14px;
@@ -100,17 +122,21 @@
       background:#fff;
       font-size:14px;
       outline:none;
+      transition:.2s ease;
     }
+
     input:focus{
       border-color:#0f766e;
       box-shadow:0 0 0 4px rgba(15,118,110,.08);
     }
+
     .btn-row{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
       margin-top:14px;
     }
+
     button{
       border:none;
       border-radius:14px;
@@ -120,20 +146,27 @@
       cursor:pointer;
       transition:.2s ease;
     }
-    button:hover{transform:translateY(-1px)}
+
+    button:hover{
+      transform:translateY(-1px);
+    }
+
     .btn-primary{
       background:#0f766e;
       color:#fff;
     }
+
     .btn-secondary{
       background:#1d4ed8;
       color:#fff;
     }
+
     .btn-light{
       background:#fff;
       color:#1d4ed8;
       border:1px solid #dbe2ea;
     }
+
     .status{
       display:none;
       margin-top:14px;
@@ -142,55 +175,66 @@
       font-size:14px;
       line-height:1.8;
     }
+
     .status.info{
       display:block;
       background:#eff6ff;
       color:#1d4ed8;
       border:1px solid #bfdbfe;
     }
+
     .status.success{
       display:block;
       background:#ecfdf5;
       color:#166534;
       border:1px solid #bbf7d0;
     }
+
     .status.error{
       display:block;
       background:#fef2f2;
       color:#991b1b;
       border:1px solid #fecaca;
     }
+
     .summary-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:12px;
     }
+
     .summary-item{
       background:#f8fbff;
       border:1px solid #e2e8f0;
       border-radius:16px;
       padding:14px;
     }
+
     .summary-item .label{
       color:#64748b;
       font-size:13px;
       margin-bottom:6px;
     }
+
     .summary-item .value{
       color:#0f172a;
       font-size:16px;
       font-weight:800;
       line-height:1.7;
+      word-break:break-word;
     }
+
     .section-title{
       margin:18px 0 12px;
       font-size:18px;
       font-weight:800;
     }
+
     .list-box{
       display:grid;
       gap:10px;
     }
+
     .list-item{
       background:#fff;
       border:1px solid #e2e8f0;
@@ -199,22 +243,26 @@
       line-height:1.8;
       font-size:14px;
     }
+
     .question-card{
       background:#fafcff;
       border:1px solid #dbeafe;
       border-radius:14px;
       padding:14px;
     }
+
     .question-text{
       font-weight:700;
       margin-bottom:10px;
       line-height:1.8;
     }
+
     .answer-row{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
     }
+
     .answer-chip{
       padding:8px 12px;
       border-radius:999px;
@@ -223,41 +271,49 @@
       cursor:pointer;
       font-size:13px;
       font-weight:700;
+      user-select:none;
     }
+
     .answer-chip.active-yes{
       background:#ecfdf5;
       border-color:#86efac;
       color:#166534;
     }
+
     .answer-chip.active-no{
       background:#fef2f2;
       border-color:#fca5a5;
       color:#991b1b;
     }
+
     .img-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
       gap:16px;
       margin-top:12px;
     }
+
     .img-box{
       background:#fff;
       border:1px solid #e2e8f0;
       border-radius:16px;
       padding:14px;
     }
+
     .img-box h4{
       margin:0 0 12px;
       font-size:17px;
     }
+
     .img-box img{
       width:100%;
-      max-height:420px;
+      max-height:430px;
       object-fit:contain;
       border-radius:12px;
       background:#f8fafc;
       display:none;
     }
+
     pre{
       margin:0;
       background:#0f172a;
@@ -269,8 +325,19 @@
       line-height:1.7;
       font-size:12px;
     }
-    @media (max-width: 1000px){
-      .grid,.form-grid,.summary-grid,.img-grid{
+
+    .footer-note{
+      text-align:center;
+      color:#64748b;
+      font-size:13px;
+      margin-top:18px;
+    }
+
+    @media (max-width:1000px){
+      .grid,
+      .form-grid,
+      .summary-grid,
+      .img-grid{
         grid-template-columns:1fr;
       }
     }
@@ -280,7 +347,10 @@
   <div class="page">
     <section class="hero">
       <h1>مركز التقارير والتشخيص</h1>
-      <p>ارفع صورة النبات لتشغيل نموذج الذكاء الاصطناعي الكامل، عرض التشخيص، الأسئلة التشخيصية، الشدة، الصور التوضيحية، ثم حفظ التقرير داخل النظام.</p>
+      <p>
+        ارفع صورة النبات وشغّل نموذج الذكاء الاصطناعي الكامل، ثم راجع النتيجة،
+        الأسئلة التشخيصية، الشدة، صور التفسير، واحفظ التقرير داخل النظام.
+      </p>
       <a href="/">العودة للرئيسية</a>
     </section>
 
@@ -288,7 +358,7 @@
       <section class="card">
         <div class="card-header">
           <h2>بيانات الإدخال</h2>
-          <p>أدخل بيانات الحالة ثم شغّل التشخيص من خلال API الأساسي.</p>
+          <p>أدخل بيانات الحالة، ثم نفّذ التشخيص من خلال API الأساسي.</p>
         </div>
         <div class="card-body">
           <div class="form-grid">
@@ -324,18 +394,18 @@
 
             <div class="field">
               <label for="latitude">خط العرض</label>
-              <input type="text" id="latitude" placeholder="اختياري" />
+              <input type="number" step="any" id="latitude" placeholder="اختياري" />
             </div>
 
             <div class="field">
               <label for="longitude">خط الطول</label>
-              <input type="text" id="longitude" placeholder="اختياري" />
+              <input type="number" step="any" id="longitude" placeholder="اختياري" />
             </div>
           </div>
 
           <div class="btn-row">
             <button class="btn-primary" onclick="runDiagnosis()">تشغيل التشخيص</button>
-            <button class="btn-secondary" onclick="saveCurrentDiagnosis()">حفظ التقرير في النظام</button>
+            <button class="btn-secondary" onclick="saveCurrentDiagnosis()">حفظ التقرير</button>
             <button class="btn-light" onclick="clearAllData()">مسح</button>
           </div>
 
@@ -378,7 +448,7 @@
     <section class="card" style="margin-top:18px;">
       <div class="card-header">
         <h3>الأسئلة التشخيصية</h3>
-        <p>هذه الأسئلة تأتي من API التشخيص نفسه، ويمكن استخدامها لدعم قرار المستخدم.</p>
+        <p>هذه الأسئلة تأتي مباشرة من API التشخيص.</p>
       </div>
       <div class="card-body">
         <div id="questionsWrap" class="list-box">
@@ -409,23 +479,21 @@
     <section class="card" style="margin-top:18px;">
       <div class="card-header">
         <h3>النتيجة الخام</h3>
-        <p>نسخة كاملة من JSON القادم من <code>/diagnose</code>.</p>
+        <p>الـ JSON الكامل القادم من <code>/diagnose</code>.</p>
       </div>
       <div class="card-body">
         <pre id="rawResult">لا توجد نتيجة بعد.</pre>
       </div>
     </section>
+
+    <div class="footer-note">
+      Phytologic AI Reports Center
+    </div>
   </div>
 
   <script>
     let lastDiagnosisResult = null;
     let questionAnswers = {};
-
-    function setStatus(type, message){
-      const box = document.getElementById('statusBox');
-      box.className = 'status ' + type;
-      box.textContent = message;
-    }
 
     function safe(v, fallback='--'){
       return (v === null || v === undefined || v === '') ? fallback : v;
@@ -435,41 +503,14 @@
       document.getElementById(id).textContent = safe(value);
     }
 
-    function clearList(id, emptyText){
-      document.getElementById(id).innerHTML = `<div class="list-item">${emptyText}</div>`;
+    function setStatus(type, message){
+      const box = document.getElementById('statusBox');
+      box.className = 'status ' + type;
+      box.textContent = message;
     }
 
-    function clearAllData(){
-      document.getElementById('file').value = '';
-      ['farmer_name','farm_name','crop','city','region','latitude','longitude'].forEach(id => {
-        document.getElementById(id).value = '';
-      });
-
-      lastDiagnosisResult = null;
-      questionAnswers = {};
-
-      setText('bestClass','--');
-      setText('bestConfidence','--');
-      setText('secondClass','--');
-      setText('secondConfidence','--');
-      setText('confidenceLevel','--');
-      setText('decisionStatus','--');
-      setText('plantName','--');
-      setText('diseaseAr','--');
-      setText('causeName','--');
-      setText('severityInfo','--');
-
-      clearList('adviceList','لا توجد توصيات بعد.');
-      clearList('pesticideList','لا توجد بيانات بعد.');
-      clearList('questionsWrap','لا توجد أسئلة تشخيصية بعد.');
-
-      document.getElementById('gradcamImage').style.display = 'none';
-      document.getElementById('severityImage').style.display = 'none';
-      document.getElementById('gradcamImage').src = '';
-      document.getElementById('severityImage').src = '';
-      document.getElementById('rawResult').textContent = 'لا توجد نتيجة بعد.';
-
-      setStatus('info', 'تم مسح البيانات.');
+    function clearList(id, text){
+      document.getElementById(id).innerHTML = `<div class="list-item">${text}</div>`;
     }
 
     function renderAdvice(advice){
@@ -483,6 +524,7 @@
 
     function renderPesticide(program){
       const wrap = document.getElementById('pesticideList');
+
       if(!program){
         wrap.innerHTML = '<div class="list-item">لا يوجد برنامج مكافحة.</div>';
         return;
@@ -577,9 +619,8 @@
       setText('diseaseAr', data.disease_info?.disease_ar);
       setText('causeName', data.disease_info?.cause);
 
-      const sev = data.severity;
-      if(sev){
-        setText('severityInfo', `${safe(sev.label?.ar)} (${safe(sev.severity_percent_est)}%)`);
+      if(data.severity){
+        setText('severityInfo', `${safe(data.severity.label?.ar)} (${safe(data.severity.severity_percent_est)}%)`);
       } else {
         setText('severityInfo', '--');
       }
@@ -631,7 +672,7 @@
         questionAnswers = {};
         renderSummary(data);
 
-        setStatus('success', 'تم التشخيص بنجاح. يمكنك الآن مراجعة الأسئلة أو حفظ التقرير.');
+        setStatus('success', 'تم التشخيص بنجاح. يمكنك الآن حفظ التقرير.');
       }catch(err){
         setStatus('error', 'حدث خطأ أثناء تنفيذ التشخيص.');
         document.getElementById('rawResult').textContent = String(err);
@@ -655,13 +696,13 @@
           region: document.getElementById('region').value,
           latitude: document.getElementById('latitude').value || null,
           longitude: document.getElementById('longitude').value || null,
-
           plant: lastDiagnosisResult.disease_info?.plant,
           disease_class: lastDiagnosisResult.best_prediction?.class_name,
           disease_ar: lastDiagnosisResult.disease_info?.disease_ar,
           confidence: lastDiagnosisResult.best_prediction?.confidence,
           severity_percent: lastDiagnosisResult.severity?.severity_percent_est,
           cause: lastDiagnosisResult.disease_info?.cause,
+          image_path: lastDiagnosisResult.image_path || "",
           question_answers: questionAnswers
         };
 
@@ -682,6 +723,39 @@
       }catch(err){
         setStatus('error', 'حدث خطأ أثناء حفظ التقرير.');
       }
+    }
+
+    function clearAllData(){
+      document.getElementById('file').value = '';
+      ['farmer_name','farm_name','crop','city','region','latitude','longitude'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+
+      lastDiagnosisResult = null;
+      questionAnswers = {};
+
+      setText('bestClass','--');
+      setText('bestConfidence','--');
+      setText('secondClass','--');
+      setText('secondConfidence','--');
+      setText('confidenceLevel','--');
+      setText('decisionStatus','--');
+      setText('plantName','--');
+      setText('diseaseAr','--');
+      setText('causeName','--');
+      setText('severityInfo','--');
+
+      clearList('adviceList','لا توجد توصيات بعد.');
+      clearList('pesticideList','لا توجد بيانات بعد.');
+      clearList('questionsWrap','لا توجد أسئلة تشخيصية بعد.');
+
+      document.getElementById('gradcamImage').style.display = 'none';
+      document.getElementById('severityImage').style.display = 'none';
+      document.getElementById('gradcamImage').src = '';
+      document.getElementById('severityImage').src = '';
+      document.getElementById('rawResult').textContent = 'لا توجد نتيجة بعد.';
+
+      setStatus('info', 'تم مسح البيانات.');
     }
   </script>
 </body>
