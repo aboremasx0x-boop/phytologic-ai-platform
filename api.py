@@ -96,6 +96,7 @@ PAGE_FILE_MAP = {
     "layout_shell_pro": "layout_shell_pro.html",
     "layout_shell_ultra": "layout_shell_ultra.html",
     "login": "login.html",
+    "map_advanced": "map_advanced.html",
     "register": "register.html",
 }
 
