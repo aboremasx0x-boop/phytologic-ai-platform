@@ -1,570 +1,693 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - المركز الوطني</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | National Center</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
 
-<style>
-*{box-sizing:border-box}
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --success:#15803d;
+      --dark:#0b1220;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+      --radius:22px;
+    }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
+      color:var(--text);
+    }
 
-.page{
-max-width:1600px;
-margin:16px auto;
-padding:0 14px 28px;
-}
+    .page{
+      max-width:1600px;
+      margin:0 auto;
+      padding:18px;
+    }
 
-.hero{
-background:
-linear-gradient(135deg,rgba(9,18,48,.97),rgba(8,83,120,.90)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:28px;
-padding:26px 28px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
+    .navbar{
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:18px;
+      position:sticky;
+      top:12px;
+      z-index:20;
+    }
 
-.hero:before{
-content:"";
-position:absolute;
-left:-40px;
-top:-40px;
-width:200px;
-height:200px;
-background:rgba(255,255,255,.06);
-border-radius:50%;
-}
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
 
-.hero:after{
-content:"";
-position:absolute;
-right:-30px;
-bottom:-30px;
-width:250px;
-height:250px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-}
+    .brand-title{
+      font-size:22px;
+      font-weight:800;
+      color:#0b5b55;
+    }
 
-.hero-title{
-font-size:36px;
-font-weight:800;
-margin:0 0 8px 0;
-position:relative;
-z-index:1;
-}
+    .brand-sub{
+      font-size:13px;
+      color:var(--muted);
+    }
 
-.hero-sub{
-font-size:14px;
-line-height:1.95;
-opacity:.95;
-position:relative;
-z-index:1;
-max-width:1080px;
-}
+    .nav-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:14px;
-margin-bottom:16px;
-}
+    .nav-links a{
+      text-decoration:none;
+      color:#0f172a;
+      background:#fff;
+      border:1px solid #dbe5ef;
+      border-radius:14px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:700;
+      transition:.2s ease;
+    }
 
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px 18px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-min-height:114px;
-}
+    .nav-links a:hover{
+      background:#f8fbff;
+      transform:translateY(-1px);
+    }
 
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:10px;
-font-weight:700;
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(11,18,32,.98), rgba(15,118,110,.90)),
+        radial-gradient(circle at top left, rgba(255,255,255,.15), transparent 35%);
+      color:white;
+      border-radius:30px;
+      padding:32px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
 
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
 
-.stat-sub{
-font-size:12px;
-color:#94a3b8;
-margin-top:8px;
-line-height:1.6;
-}
+    .hero h1{
+      margin:0 0 12px;
+      font-size:38px;
+      line-height:1.2;
+    }
 
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
+    .hero p{
+      margin:0;
+      line-height:1.95;
+      max-width:980px;
+      color:rgba(255,255,255,.92);
+      font-size:16px;
+    }
 
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-.section-title{
-font-size:18px;
-font-weight:800;
-color:#0f172a;
-}
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:22px;
+    }
 
-.section-note{
-font-size:12px;
-color:#64748b;
-}
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 18px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.card-body{
-padding:16px;
-}
+    .btn:hover{ transform:translateY(-1px); }
 
-.grid-2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
+    .btn-white{
+      background:white;
+      color:#0b5b55;
+    }
 
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
+    .btn-white:hover{ background:#f4f7ff; }
 
-.grid-4{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:14px;
-}
+    .btn-glass{
+      background:rgba(255,255,255,.12);
+      color:white;
+      border:1px solid rgba(255,255,255,.18);
+    }
 
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:8px;
-}
+    .btn-glass:hover{ background:rgba(255,255,255,.18); }
 
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
+    .btn-outline{
+      background:white;
+      color:var(--secondary);
+      border:1px solid #cbd5e1;
+    }
 
-.btn-primary{
-background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
-color:white;
-box-shadow:0 8px 16px rgba(37,99,235,.22);
-}
+    .btn-outline:hover{
+      background:#f8fbff;
+    }
 
-.btn-secondary{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
+    .grid{
+      display:grid;
+      gap:18px;
+    }
 
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
+    .grid-2{ grid-template-columns:1fr 1fr; }
+    .grid-3{ grid-template-columns:repeat(3,1fr); }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
 
-.btn-success{
-background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
-color:white;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-.btn:hover{
-transform:translateY(-1px);
-}
+    .card-header{
+      padding:18px 20px 12px;
+      border-bottom:1px solid #edf2f7;
+    }
 
-.info-box{
-padding:14px;
-border-radius:16px;
-border:1px solid #ecf2fb;
-background:#fbfdff;
-}
+    .card-header h2,
+    .card-header h3{
+      margin:0;
+      font-size:20px;
+    }
 
-.info-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:10px;
-color:#111827;
-}
+    .card-header p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-.kpi{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .card-body{
+      padding:20px;
+    }
 
-.small{
-font-size:12px;
-color:#64748b;
-line-height:1.8;
-}
+    .kpi{
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      min-height:118px;
+    }
 
-.status-bar{
-margin-top:12px;
-padding:11px 12px;
-border-radius:14px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
+    .kpi-label{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
 
-.analysis-box{
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-}
+    .kpi-value{
+      font-size:28px;
+      font-weight:800;
+      color:var(--text);
+    }
 
-.list{
-display:grid;
-gap:8px;
-}
+    .kpi-sub{
+      margin-top:8px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.8;
+    }
 
-.list-item{
-padding:10px 12px;
-border-radius:14px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-}
+    .info-box{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:#fcfdff;
+      margin-bottom:14px;
+    }
 
-.highlight{
-color:#0f172a;
-font-weight:800;
-}
+    .info-box:last-child{
+      margin-bottom:0;
+    }
 
-.table-wrap{
-overflow:auto;
-}
+    .info-box h4{
+      margin:0 0 12px;
+      font-size:17px;
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-min-width:980px;
-}
+    .info-list{
+      display:grid;
+      gap:10px;
+    }
 
-th,td{
-padding:11px 10px;
-text-align:right;
-border-bottom:1px solid #edf2fb;
-font-size:13px;
-}
+    .info-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding-bottom:10px;
+      border-bottom:1px dashed #e5e7eb;
+    }
 
-th{
-background:#f8fbff;
-color:#334155;
-font-weight:800;
-}
+    .info-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
 
-.badge{
-display:inline-block;
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-color:white;
-}
+    .key{
+      color:var(--muted);
+      font-size:14px;
+    }
 
-.badge-green{background:#16a34a}
-.badge-orange{background:#d97706}
-.badge-red{background:#dc2626}
-.badge-gray{background:#64748b}
+    .value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      text-align:left;
+    }
 
-.error-box{
-background:#fef2f2;
-border:1px solid #fecaca;
-color:#b91c1c;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
 
-.ok-box{
-background:#ecfdf5;
-border:1px solid #a7f3d0;
-color:#047857;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .toolbar-left,
+    .toolbar-right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
-canvas{
-max-height:340px;
-}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
 
-@media(max-width:1500px){
-.stats-grid{grid-template-columns:repeat(4,1fr)}
-.grid-4{grid-template-columns:repeat(2,1fr)}
-.grid-3{grid-template-columns:1fr 1fr}
-.grid-2{grid-template-columns:1fr}
-}
+    .pill-low{
+      background:#ecfdf5;
+      color:#166534;
+    }
 
-@media(max-width:780px){
-.stats-grid,.grid-4,.grid-3{grid-template-columns:1fr}
-.hero-title{font-size:26px}
-}
-</style>
+    .pill-moderate{
+      background:#fff7ed;
+      color:#9a3412;
+    }
+
+    .pill-high{
+      background:#fef2f2;
+      color:#991b1b;
+    }
+
+    .pill-neutral{
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .table-wrap{
+      overflow-x:auto;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:white;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:840px;
+    }
+
+    thead{ background:#f8fbff; }
+
+    th,td{
+      text-align:right;
+      padding:14px 16px;
+      border-bottom:1px solid #edf2f7;
+      font-size:14px;
+      vertical-align:top;
+    }
+
+    th{
+      color:#334155;
+      font-weight:800;
+    }
+
+    tr:hover td{ background:#fbfdff; }
+
+    .empty{
+      color:var(--muted);
+      text-align:center;
+      padding:24px 10px;
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    .region-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+
+    .region-card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);
+    }
+
+    .region-card h4{
+      margin:0 0 12px;
+      font-size:18px;
+    }
+
+    .region-meta{
+      display:grid;
+      gap:8px;
+      font-size:14px;
+      color:#334155;
+      line-height:1.8;
+    }
+
+    .footer-note{
+      text-align:center;
+      color:#64748b;
+      padding:18px 10px 8px;
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    @media (max-width:1200px){
+      .grid-4, .grid-3, .grid-2, .region-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
 
-<div class="page">
-
-  <div class="hero">
-    <h1 class="hero-title">المركز الوطني - Phytologic AI</h1>
-    <div class="hero-sub">
-      لوحة وطنية عليا لعرض الوضع الزراعي العام على مستوى المملكة، تشمل إجمالي الحالات، التنبيهات، أكثر الأمراض والمناطق، متوسطات الشدة، مقارنة المناطق الوطنية، ومؤشرات الخطر الحي لدعم القرار على المستوى الوطني.
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">إجمالي الحالات</div>
-      <div class="stat-value" id="totalCases">0</div>
-      <div class="stat-sub">كل التشخيصات المسجلة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">متوسط الشدة</div>
-      <div class="stat-value" id="avgSeverity">0%</div>
-      <div class="stat-sub">المتوسط الوطني</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أكثر مرض</div>
-      <div class="stat-value" id="topDisease" style="font-size:20px">-</div>
-      <div class="stat-sub">الأعلى تكرارًا</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أكثر منطقة</div>
-      <div class="stat-value" id="topRegion" style="font-size:20px">-</div>
-      <div class="stat-sub">الأعلى تسجيلًا</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">إجمالي التنبيهات</div>
-      <div class="stat-value" id="totalAlerts">0</div>
-      <div class="stat-sub">السجل الوطني للتنبيهات</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">تنبيهات مرتفعة</div>
-      <div class="stat-value" id="highAlerts">0</div>
-      <div class="stat-sub">الحالات الحرجة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أعلى منطقة خطرًا</div>
-      <div class="stat-value" id="topLiveRiskRegion" style="font-size:20px">-</div>
-      <div class="stat-sub">من التوقع الحي</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">أدوات المركز الوطني</div>
-      <div class="section-note">تحديث وتحليل وتصدير</div>
-    </div>
-    <div class="card-body">
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="loadNationalDashboard()">تحديث شامل</button>
-        <button class="btn btn-secondary" onclick="exportNationalJson()">تصدير JSON</button>
-        <button class="btn btn-dark" onclick="buildExecutiveAnalysis()">إعادة بناء التحليل الوطني</button>
-        <button class="btn btn-success" onclick="toggleAutoRefresh()">تشغيل/إيقاف التحديث التلقائي</button>
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-title">Phytologic AI National Center</div>
+        <div class="brand-sub">مركز وطني لمتابعة الصحة النباتية والإنذار المبكر</div>
       </div>
-      <div class="status-bar" id="statusBar">جاهز لتحميل لوحة المركز الوطني.</div>
-    </div>
-  </div>
-<div class="grid-2">
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">الملخص الوطني</div>
-        <div class="section-note">من summary + alerts + live regions</div>
+      <div class="nav-links">
+        <a href="/">الرئيسية</a>
+        <a href="/pages/dashboard">لوحة التحكم</a>
+        <a href="/pages/alerts">التنبيهات</a>
+        <a href="/pages/report_center">مركز التقارير</a>
+        <a href="/pages/farmers">المزارعون</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>المركز الوطني للصحة النباتية</h1>
+          <p>
+            واجهة وطنية موحدة لمتابعة الحالات المرضية النباتية، توزيع الإصابات حسب المناطق،
+            تحليل التنبيهات، دعم القرار المبكر، ومراجعة المؤشرات العامة على مستوى المملكة
+            أو أي نطاق تشغيلي واسع داخل المنصة.
+          </p>
+        </div>
+
+        <div class="status-chip" id="heroNationalChip">
+          <span>●</span>
+          <span>جاري تهيئة المركز الوطني...</span>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="refreshNationalCenter()">تحديث كامل</button>
+        <button class="btn btn-glass" onclick="checkHealth()">فحص النظام</button>
+        <button class="btn btn-glass" onclick="downloadAlertsJson()">تصدير التنبيهات JSON</button>
+        <a class="btn btn-glass" href="/pages/report_center">مركز التقارير</a>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <h2>المؤشرات الوطنية</h2>
+        <p>ملخص سريع للحالات والتنبيهات والحالة التشغيلية العامة.</p>
       </div>
       <div class="card-body">
-        <div class="grid-4">
-          <div class="info-box">
-            <div class="info-title">إجمالي الحالات</div>
-            <div class="kpi" id="sumCases">0</div>
-            <div class="small">عدد الحالات الوطنية</div>
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">إجمالي الحالات</div>
+            <div class="kpi-value" id="kpiTotalCases">--</div>
+            <div class="kpi-sub">عدد التشخيصات المسجلة في النظام</div>
           </div>
-          <div class="info-box">
-            <div class="info-title">آخر منطقة بتنبيه</div>
-            <div class="kpi" id="latestAlertRegion" style="font-size:18px">-</div>
-            <div class="small">آخر تنبيه وطني</div>
+
+          <div class="kpi">
+            <div class="kpi-label">متوسط الشدة</div>
+            <div class="kpi-value" id="kpiAvgSeverity">--</div>
+            <div class="kpi-sub">متوسط شدة الإصابة عبر الحالات</div>
           </div>
-          <div class="info-box">
-            <div class="info-title">أعلى خطر حي</div>
-            <div class="kpi" id="highestLiveRisk" style="font-size:18px">-</div>
-            <div class="small">نتيجة forecast/live-regions</div>
+
+          <div class="kpi">
+            <div class="kpi-label">إجمالي التنبيهات</div>
+            <div class="kpi-value" id="kpiTotalAlerts">--</div>
+            <div class="kpi-sub">عدد التنبيهات الوطنية المسجلة</div>
           </div>
-          <div class="info-box">
-            <div class="info-title">أعلى متوسط شدة</div>
-            <div class="kpi" id="highestSeverityDisease" style="font-size:18px">-</div>
-            <div class="small">من /stats/severity</div>
+
+          <div class="kpi">
+            <div class="kpi-label">التنبيهات العالية</div>
+            <div class="kpi-value" id="kpiHighAlerts">--</div>
+            <div class="kpi-sub">عدد التنبيهات ذات الخطر المرتفع</div>
           </div>
         </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="summaryNarrative">
-          ستظهر هنا قراءة وطنية مختصرة.
-        </div>
       </div>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="card-header">
+          <h2>الملخص الاستراتيجي</h2>
+          <p>أكثر الأمراض والمناطق نشاطًا، وآخر تنبيه مسجل.</p>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <h4>مؤشرات رئيسية</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">أكثر مرض شيوعًا</div>
+                <div class="value" id="topDiseaseName">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">عدد حالاته</div>
+                <div class="value" id="topDiseaseCount">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">أكثر منطقة تسجيلًا</div>
+                <div class="value" id="topRegionName">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">عدد الحالات فيها</div>
+                <div class="value" id="topRegionCount">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>آخر تنبيه وطني</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">المنطقة</div>
+                <div class="value" id="latestAlertRegion">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">المرض</div>
+                <div class="value" id="latestAlertDisease">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">درجة الخطر</div>
+                <div class="value" id="latestAlertScore">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">المستوى</div>
+                <div class="value" id="latestAlertLevel">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>الحالة التشغيلية</h2>
+          <p>فحص صحة المنصة وخدماتها الأساسية.</p>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <h4>صحة النظام</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">الحالة</div>
+                <div class="value" id="healthStatus">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">نموذج الصور</div>
+                <div class="value" id="healthAi">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">نموذج التنبؤ</div>
+                <div class="value" id="healthForecast">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">قاعدة البيانات</div>
+                <div class="value" id="healthDatabase">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">SMS</div>
+                <div class="value" id="healthSms">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الإصدار</div>
+                <div class="value" id="healthVersion">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">التنبيهات الوطنية</div>
-        <div class="section-note">من /alerts/summary و /alerts/regions</div>
+    <section class="card" style="margin-top:18px;">
+      <div class="card-header">
+        <h2>ملخص المناطق</h2>
+        <p>عرض وطني لتوزيع الحالات ومتوسطات الشدة حسب المنطقة من `/map/summary`.</p>
       </div>
       <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="alertsChart"></canvas>
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <span class="pill pill-neutral">/map/summary</span>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-outline" onclick="loadMapSummary()">تحديث ملخص المناطق</button>
+          </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المنطقة</th>
-                <th>عدد التنبيهات</th>
-              </tr>
-            </thead>
-            <tbody id="alertsRegionsTable">
-              <tr><td colspan="3">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
+
+        <div class="region-grid" id="regionCardsWrap">
+          <div class="region-card">
+            <h4>جاري تحميل البيانات...</h4>
+            <div class="region-meta">يرجى الانتظار</div>
+          </div>
         </div>
       </div>
+    </section>
+
+    <div class="grid grid-2" style="margin-top:18px;">
+      <section class="card">
+        <div class="card-header">
+          <h2>جدول الأمراض</h2>
+          <p>عرض عدد الحالات لكل مرض.</p>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>المرض</th>
+                  <th>عدد الحالات</th>
+                </tr>
+              </thead>
+              <tbody id="diseasesTableBody">
+                <tr><td colspan="3" class="empty">جاري تحميل البيانات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>جدول المناطق</h2>
+          <p>عرض عدد الحالات حسب المنطقة.</p>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>المنطقة</th>
+                  <th>عدد الحالات</th>
+                </tr>
+              </thead>
+              <tbody id="regionsTableBody">
+                <tr><td colspan="3" class="empty">جاري تحميل البيانات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
 
-  </div>
-
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">أكثر الأمراض انتشارًا</div>
-        <div class="section-note">المسار: /stats/diseases</div>
+    <section class="card" style="margin-top:18px;">
+      <div class="card-header">
+        <h2>جدول التنبيهات الوطنية</h2>
+        <p>أحدث التنبيهات من `/alerts/all` مع عرض المستوى ودرجة الخطر.</p>
       </div>
       <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="diseasesChart"></canvas>
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <span class="pill pill-high">High</span>
+            <span class="pill pill-moderate">Moderate</span>
+            <span class="pill pill-neutral">/alerts/all</span>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-outline" onclick="loadAlerts()">تحديث التنبيهات</button>
+          </div>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المرض</th>
-                <th>العدد</th>
-              </tr>
-            </thead>
-            <tbody id="diseasesTable">
-              <tr><td colspan="3">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">المناطق الأعلى تسجيلًا</div>
-        <div class="section-note">المسار: /stats/regions</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="regionsChart"></canvas>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المنطقة</th>
-                <th>العدد</th>
-              </tr>
-            </thead>
-            <tbody id="regionsTable">
-              <tr><td colspan="3">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div>
-<div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">متوسط الشدة حسب المرض</div>
-        <div class="section-note">المسار: /stats/severity</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="severityChart"></canvas>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المرض</th>
-                <th>متوسط الشدة</th>
-              </tr>
-            </thead>
-            <tbody id="severityTable">
-              <tr><td colspan="3">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">المقارنة الوطنية الحية للمناطق</div>
-        <div class="section-note">المسار: /forecast/live-regions</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="liveRegionsChart"></canvas>
-        </div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -572,408 +695,228 @@ max-height:340px;
                 <th>#</th>
                 <th>المنطقة</th>
                 <th>المدينة</th>
-                <th>الخطر</th>
-                <th>الدرجة</th>
-                <th>الحرارة</th>
-                <th>الرطوبة</th>
-                <th>الأمطار</th>
+                <th>المرض</th>
+                <th>المحصول</th>
+                <th>درجة الخطر</th>
+                <th>المستوى</th>
+                <th>التاريخ</th>
               </tr>
             </thead>
-            <tbody id="liveRegionsTable">
-              <tr><td colspan="8">بانتظار البيانات...</td></tr>
+            <tbody id="alertsTableBody">
+              <tr><td colspan="8" class="empty">جاري تحميل التنبيهات...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
+    </section>
 
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">التحليل الوطني التنفيذي</div>
-      <div class="section-note">قراءة عليا للوضع على مستوى المملكة</div>
-    </div>
-    <div class="card-body">
-      <div class="analysis-box" id="executiveAnalysis">
-        بعد تحميل البيانات ستظهر هنا القراءة الوطنية التنفيذية.
-      </div>
+    <div class="footer-note">
+      Phytologic AI National Center — مركز وطني لمراقبة الصحة النباتية والإنذار المبكر.
     </div>
   </div>
 
-</div>
+  <script>
+    function safeText(v, fallback = "--") {
+      if (v === null || v === undefined || v === "") return fallback;
+      return v;
+    }
 
-<script>
-const API = "http://127.0.0.1:8000";
+    function fmtNum(v, fallback = "--") {
+      if (v === null || v === undefined || isNaN(v)) return fallback;
+      return Number(v).toFixed(2);
+    }
 
-let nationalCache = {
-  summary:null,
-  diseases:[],
-  regions:[],
-  severity:[],
-  statsAll:null,
-  alertsSummary:null,
-  alertsRegions:[],
-  alerts:[],
-  mapSummary:[],
-  liveRegions:[]
-};
+    function riskPill(level) {
+      const val = String(level || "").toLowerCase();
 
-let autoRefresh = false;
-let autoRefreshTimer = null;
+      if (val === "high" || val === "مرتفع") {
+        return `<span class="pill pill-high">${safeText(level)}</span>`;
+      }
+      if (val === "moderate" || val === "متوسط") {
+        return `<span class="pill pill-moderate">${safeText(level)}</span>`;
+      }
+      if (val === "low" || val === "منخفض") {
+        return `<span class="pill pill-low">${safeText(level)}</span>`;
+      }
+      return `<span class="pill pill-neutral">${safeText(level)}</span>`;
+    }
 
-let diseasesChart = null;
-let regionsChart = null;
-let severityChart = null;
-let alertsChart = null;
-let liveRegionsChart = null;
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
 
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
-}
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed: ${url}`);
+      }
 
-function safeText(v, fallback="-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
+      return data;
+    }
 
-function destroyChart(chartObj){
-  if(chartObj){
-    chartObj.destroy();
-  }
-}
+    async function checkHealth() {
+      try {
+        const data = await fetchJson("/system/health");
 
-function badgeHTML(level){
-  if(level === "مرتفع") return '<span class="badge badge-red">مرتفع</span>';
-  if(level === "متوسط") return '<span class="badge badge-orange">متوسط</span>';
-  if(level === "منخفض") return '<span class="badge badge-green">منخفض</span>';
-  return '<span class="badge badge-gray">غير متاح</span>';
-}
+        document.getElementById("healthStatus").textContent = safeText(data.status);
+        document.getElementById("healthAi").textContent = safeText(data.ai_model);
+        document.getElementById("healthForecast").textContent = safeText(data.forecast_model);
+        document.getElementById("healthDatabase").textContent = safeText(data.database);
+        document.getElementById("healthSms").textContent = data.sms_configured ? "configured" : "not configured";
+        document.getElementById("healthVersion").textContent = safeText(data.version);
 
-async function fetchJson(url){
-  const res = await fetch(url);
-  return await res.json();
-}
+        document.getElementById("heroNationalChip").innerHTML =
+          `<span>●</span><span>الحالة الوطنية: ${safeText(data.status)} | ${safeText(data.version)}</span>`;
+      } catch (err) {
+        document.getElementById("heroNationalChip").innerHTML =
+          `<span>●</span><span>تعذر فحص حالة المركز الوطني</span>`;
+      }
+    }
 
-function exportNationalJson(){
-  const blob = new Blob([JSON.stringify(nationalCache, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "national_center_data.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
+    async function loadSummary() {
+      const stats = await fetchJson("/stats/summary");
+      const alerts = await fetchJson("/alerts/summary");
 
-function toggleAutoRefresh(){
-  autoRefresh = !autoRefresh;
+      document.getElementById("kpiTotalCases").textContent = safeText(stats.total_cases, 0);
+      document.getElementById("kpiAvgSeverity").textContent = `${fmtNum(stats.avg_severity, 0)}%`;
+      document.getElementById("kpiTotalAlerts").textContent = safeText(alerts.total_alerts, 0);
+      document.getElementById("kpiHighAlerts").textContent = safeText(alerts.high_alerts, 0);
 
-  if(autoRefresh){
-    autoRefreshTimer = setInterval(loadNationalDashboard, 180000);
-    setStatus("تم تشغيل التحديث التلقائي كل 3 دقائق.");
-  }else{
-    clearInterval(autoRefreshTimer);
-    setStatus("تم إيقاف التحديث التلقائي.");
-  }
-}
+      document.getElementById("topDiseaseName").textContent = safeText(stats?.top_disease?.name);
+      document.getElementById("topDiseaseCount").textContent = safeText(stats?.top_disease?.count, 0);
+      document.getElementById("topRegionName").textContent = safeText(stats?.top_region?.name);
+      document.getElementById("topRegionCount").textContent = safeText(stats?.top_region?.count, 0);
 
-function renderSummary(){
-  const s = nationalCache.summary || {};
-  const a = nationalCache.alertsSummary || {};
-  const live = nationalCache.liveRegions || [];
-  const sev = nationalCache.severity || [];
+      const latest = alerts.latest_alert || {};
+      document.getElementById("latestAlertRegion").textContent = safeText(latest.region);
+      document.getElementById("latestAlertDisease").textContent = safeText(latest.disease_name);
+      document.getElementById("latestAlertScore").textContent = latest.risk_score != null ? `${fmtNum(latest.risk_score)}%` : "--";
+      document.getElementById("latestAlertLevel").innerHTML = riskPill(latest.risk_level);
+    }
 
-  const topLive = live.length ? live[0] : null;
-  const topSev = sev.length ? sev[0] : null;
+    async function loadMapSummary() {
+      const data = await fetchJson("/map/summary");
+      const wrap = document.getElementById("regionCardsWrap");
 
-  document.getElementById("totalCases").textContent = safeText(s.total_cases,0);
-  document.getElementById("avgSeverity").textContent = `${safeText(s.avg_severity,0)}%`;
-  document.getElementById("topDisease").textContent = safeText(s.top_disease?.name,"-");
-  document.getElementById("topRegion").textContent = safeText(s.top_region?.name,"-");
-  document.getElementById("totalAlerts").textContent = safeText(a.total_alerts,0);
-  document.getElementById("highAlerts").textContent = safeText(a.high_alerts,0);
-  document.getElementById("topLiveRiskRegion").textContent = safeText(topLive?.region,"-");
+      if (!Array.isArray(data) || data.length === 0) {
+        wrap.innerHTML = `
+          <div class="region-card">
+            <h4>لا توجد بيانات</h4>
+            <div class="region-meta">لا توجد بيانات مناطق حاليًا.</div>
+          </div>
+        `;
+        return;
+      }
 
-  document.getElementById("sumCases").textContent = safeText(s.total_cases,0);
-  document.getElementById("latestAlertRegion").textContent = safeText(a.latest_alert?.region,"-");
-  document.getElementById("highestLiveRisk").textContent = topLive ? `${topLive.final_score}%` : "-";
-  document.getElementById("highestSeverityDisease").textContent = topSev ? `${topSev.disease}` : "-";
+      wrap.innerHTML = data.map(row => `
+        <div class="region-card">
+          <h4>${safeText(row.region)}</h4>
+          <div class="region-meta">
+            <div>عدد الحالات: <strong>${safeText(row.count, 0)}</strong></div>
+            <div>متوسط الشدة: <strong>${fmtNum(row.avg_severity, 0)}%</strong></div>
+          </div>
+        </div>
+      `).join("");
+    }
 
-  document.getElementById("summaryNarrative").innerHTML = `
-    <div class="list">
-      <div class="list-item">إجمالي الحالات على مستوى المملكة هو <span class="highlight">${safeText(s.total_cases,0)}</span>.</div>
-      <div class="list-item">متوسط شدة الإصابة الوطني يبلغ <span class="highlight">${safeText(s.avg_severity,0)}%</span>.</div>
-      <div class="list-item">المرض الأكثر ظهورًا هو <span class="highlight">${safeText(s.top_disease?.name,"-")}</span>.</div>
-      <div class="list-item">أعلى منطقة خطرًا حاليًا هي <span class="highlight">${safeText(topLive?.region,"-")}</span>.</div>
-    </div>
-  `;
-}
-function renderDiseases(){
-  const rows = nationalCache.diseases || [];
-  const tbody = document.getElementById("diseasesTable");
-  tbody.innerHTML = "";
+    async function loadDiseases() {
+      const data = await fetchJson("/stats/diseases");
+      const body = document.getElementById("diseasesTableBody");
 
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
-    return;
-  }
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="3" class="empty">لا توجد بيانات أمراض.</td></tr>`;
+        return;
+      }
 
-  rows.forEach((r,i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${safeText(r.disease)}</td>
-        <td>${safeText(r.count,0)}</td>
-      </tr>
-    `;
-  });
-
-  destroyChart(diseasesChart);
-  diseasesChart = new Chart(document.getElementById("diseasesChart"),{
-    type:"bar",
-    data:{
-      labels:rows.map(r => r.disease),
-      datasets:[{
-        label:"عدد الحالات",
-        data:rows.map(r => Number(r.count || 0)),
-        borderWidth:1
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
-
-function renderRegions(){
-  const rows = nationalCache.regions || [];
-  const tbody = document.getElementById("regionsTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
-    return;
-  }
-
-  rows.forEach((r,i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${safeText(r.region)}</td>
-        <td>${safeText(r.count,0)}</td>
-      </tr>
-    `;
-  });
-
-  destroyChart(regionsChart);
-  regionsChart = new Chart(document.getElementById("regionsChart"),{
-    type:"bar",
-    data:{
-      labels:rows.map(r => r.region),
-      datasets:[{
-        label:"عدد الحالات",
-        data:rows.map(r => Number(r.count || 0)),
-        borderWidth:1
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
-
-function renderSeverity(){
-  const rows = nationalCache.severity || [];
-  const tbody = document.getElementById("severityTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
-    return;
-  }
-
-  rows.forEach((r,i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${safeText(r.disease)}</td>
-        <td>${safeText(r.avg_severity,0)}%</td>
-      </tr>
-    `;
-  });
-
-  destroyChart(severityChart);
-  severityChart = new Chart(document.getElementById("severityChart"),{
-    type:"line",
-    data:{
-      labels:rows.map(r => r.disease),
-      datasets:[{
-        label:"متوسط الشدة",
-        data:rows.map(r => Number(r.avg_severity || 0)),
-        fill:false,
-        tension:.25
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
-
-function renderAlertsRegions(){
-  const rows = nationalCache.alertsRegions || [];
-  const tbody = document.getElementById("alertsRegionsTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
-  }else{
-    rows.forEach((r,i) => {
-      tbody.innerHTML += `
+      body.innerHTML = data.map((row, i) => `
         <tr>
-          <td>${i+1}</td>
-          <td>${safeText(r.region)}</td>
-          <td>${safeText(r.count,0)}</td>
+          <td>${i + 1}</td>
+          <td>${safeText(row.disease)}</td>
+          <td>${safeText(row.count, 0)}</td>
         </tr>
-      `;
-    });
-  }
+      `).join("");
+    }
 
-  const a = nationalCache.alertsSummary || {};
-  destroyChart(alertsChart);
-  alertsChart = new Chart(document.getElementById("alertsChart"),{
-    type:"doughnut",
-    data:{
-      labels:["مرتفعة","متوسطة","باقي"],
-      datasets:[{
-        data:[
-          Number(a.high_alerts || 0),
-          Number(a.moderate_alerts || 0),
-          Math.max(0, Number(a.total_alerts || 0) - Number(a.high_alerts || 0) - Number(a.moderate_alerts || 0))
-        ]
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,cutout:"70%"}
-  });
-}
+    async function loadRegions() {
+      const data = await fetchJson("/stats/regions");
+      const body = document.getElementById("regionsTableBody");
 
-function renderLiveRegions(){
-  const rows = nationalCache.liveRegions || [];
-  const tbody = document.getElementById("liveRegionsTable");
-  tbody.innerHTML = "";
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="3" class="empty">لا توجد بيانات مناطق.</td></tr>`;
+        return;
+      }
 
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="8">لا توجد بيانات.</td></tr>`;
-    return;
-  }
+      body.innerHTML = data.map((row, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.count, 0)}</td>
+        </tr>
+      `).join("");
+    }
 
-  rows.forEach((r,i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${safeText(r.region)}</td>
-        <td>${safeText(r.city)}</td>
-        <td>${badgeHTML(r.risk_level_ar)}</td>
-        <td>${safeText(r.final_score,0)}%</td>
-        <td>${safeText(r.weather?.temperature)}</td>
-        <td>${safeText(r.weather?.humidity)}</td>
-        <td>${safeText(r.weather?.rainfall)}</td>
-      </tr>
-    `;
-  });
+    async function loadAlerts() {
+      const data = await fetchJson("/alerts/all");
+      const body = document.getElementById("alertsTableBody");
 
-  destroyChart(liveRegionsChart);
-  liveRegionsChart = new Chart(document.getElementById("liveRegionsChart"),{
-    type:"bar",
-    data:{
-      labels:rows.map(r => r.region),
-      datasets:[{
-        label:"درجة الخطر الحي",
-        data:rows.map(r => Number(r.final_score || 0)),
-        borderWidth:1
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="8" class="empty">لا توجد تنبيهات.</td></tr>`;
+        return;
+      }
 
-function buildExecutiveAnalysis(){
-  const s = nationalCache.summary || {};
-  const a = nationalCache.alertsSummary || {};
-  const live = nationalCache.liveRegions || [];
-  const sev = nationalCache.severity || [];
-  const topLive = live.length ? live[0] : null;
-  const topSev = sev.length ? sev[0] : null;
+      body.innerHTML = data.slice(0, 15).map((row, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.city)}</td>
+          <td>${safeText(row.disease_name)}</td>
+          <td>${safeText(row.crop)}</td>
+          <td>${row.risk_score != null ? `${fmtNum(row.risk_score)}%` : "--"}</td>
+          <td>${riskPill(row.risk_level)}</td>
+          <td>${safeText(row.created_at)}</td>
+        </tr>
+      `).join("");
+    }
 
-  document.getElementById("executiveAnalysis").innerHTML = `
-    <div class="list">
-      <div class="list-item"><span class="highlight">الوضع الوطني العام:</span> توجد ${safeText(s.total_cases,0)} حالة مسجلة بمتوسط شدة ${safeText(s.avg_severity,0)}%.</div>
-      <div class="list-item"><span class="highlight">المرض المسيطر:</span> ${safeText(s.top_disease?.name,"-")}.</div>
-      <div class="list-item"><span class="highlight">المنطقة الأكثر تسجيلًا:</span> ${safeText(s.top_region?.name,"-")}.</div>
-      <div class="list-item"><span class="highlight">أعلى منطقة خطرًا الآن:</span> ${topLive ? `${topLive.region} بدرجة ${topLive.final_score}% ومستوى ${topLive.risk_level_ar}` : "غير متاح"}.</div>
-      <div class="list-item"><span class="highlight">أعلى متوسط شدة:</span> ${topSev ? `${topSev.disease} بمتوسط ${topSev.avg_severity}%` : "غير متاح"}.</div>
-      <div class="list-item"><span class="highlight">التنبيهات الوطنية:</span> إجمالي ${safeText(a.total_alerts,0)} تنبيه، منها ${safeText(a.high_alerts,0)} مرتفع و ${safeText(a.moderate_alerts,0)} متوسط.</div>
-      <div class="list-item"><span class="highlight">التوصية العليا:</span> ${
-        Number(a.high_alerts || 0) > 0
-        ? "يوصى برفع مستوى المتابعة الوطنية والتركيز على المناطق الأعلى خطرًا مع تسريع الإنذار الميداني."
-        : Number(a.moderate_alerts || 0) > 0
-        ? "الوضع يحتاج متابعة استباقية منظمة على مستوى المناطق المتوسطة الخطر."
-        : "الوضع الوطني مستقر نسبيًا حاليًا مع استمرار الرصد الروتيني."
-      }</div>
-    </div>
-  `;
-}
+    async function downloadAlertsJson() {
+      try {
+        const res = await fetch("/export/alerts/json");
+        const data = await res.json();
 
-async function loadNationalDashboard(){
-  try{
-    setStatus("جاري تحميل لوحة المركز الوطني...");
+        if (!res.ok) {
+          throw new Error(data.error || "تعذر تصدير البيانات");
+        }
 
-    const [
-      summary,
-      diseases,
-      regions,
-      severity,
-      statsAll,
-      alertsSummary,
-      alertsRegions,
-      alertsRows,
-      mapSummary,
-      liveRegions
-    ] = await Promise.all([
-      fetchJson(`${API}/stats/summary`),
-      fetchJson(`${API}/stats/diseases`),
-      fetchJson(`${API}/stats/regions`),
-      fetchJson(`${API}/stats/severity`),
-      fetchJson(`${API}/stats/all`),
-      fetchJson(`${API}/alerts/summary`),
-      fetchJson(`${API}/alerts/regions`),
-      fetchJson(`${API}/alerts?limit=100`),
-      fetchJson(`${API}/map/summary`),
-      fetchJson(`${API}/forecast/live-regions?disease=${encodeURIComponent("الكل")}&crop=${encodeURIComponent("غير محدد")}&save_if_high=false`)
-    ]);
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "national_alerts_export.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        alert(err.message || "فشل تصدير JSON");
+      }
+    }
 
-    nationalCache.summary = summary;
-    nationalCache.diseases = Array.isArray(diseases) ? diseases : [];
-    nationalCache.regions = Array.isArray(regions) ? regions : [];
-    nationalCache.severity = Array.isArray(severity) ? severity : [];
-    nationalCache.statsAll = statsAll;
-    nationalCache.alertsSummary = alertsSummary;
-    nationalCache.alertsRegions = Array.isArray(alertsRegions) ? alertsRegions : [];
-    nationalCache.alerts = Array.isArray(alertsRows) ? alertsRows : [];
-    nationalCache.mapSummary = Array.isArray(mapSummary) ? mapSummary : [];
-    nationalCache.liveRegions = Array.isArray(liveRegions) ? liveRegions : [];
+    async function refreshNationalCenter() {
+      try {
+        await Promise.all([
+          checkHealth(),
+          loadSummary(),
+          loadMapSummary(),
+          loadDiseases(),
+          loadRegions(),
+          loadAlerts()
+        ]);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("heroNationalChip").innerHTML =
+          `<span>●</span><span>حدث خطأ أثناء تحديث المركز الوطني</span>`;
+      }
+    }
 
-    renderSummary();
-    renderDiseases();
-    renderRegions();
-    renderSeverity();
-    renderAlertsRegions();
-    renderLiveRegions();
-    buildExecutiveAnalysis();
-
-    setStatus("تم تحميل لوحة المركز الوطني بنجاح.");
-  }catch(err){
-    console.error(err);
-    document.getElementById("executiveAnalysis").innerHTML = `<div class="error-box">تعذر تحميل لوحة المركز الوطني: ${err.message}</div>`;
-    setStatus("تعذر تحميل لوحة المركز الوطني.");
-  }
-}
-
-loadNationalDashboard();
-</script>
-
+    window.addEventListener("DOMContentLoaded", refreshNationalCenter);
+  </script>
 </body>
 </html>
