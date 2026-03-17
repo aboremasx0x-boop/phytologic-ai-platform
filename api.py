@@ -238,17 +238,29 @@ CITY_COORDS = {
 
 
 def template_path(filename: str) -> str:
-    return os.path.join(TEMPLATES_DIR, filename)
+    path_in_templates = os.path.join(TEMPLATES_DIR, filename)
+    path_in_root = os.path.join(BASE_PATH, filename)
+
+    if os.path.exists(path_in_templates):
+        return path_in_templates
+
+    if os.path.exists(path_in_root):
+        return path_in_root
+
+    return path_in_templates  # fallback
 
 
 def get_existing_index():
     candidates = [
-        template_path("index.html"),
-        template_path("index_home.html"),
+        "index.html",
+        "index_home.html",
     ]
-    for c in candidates:
-        if os.path.exists(c):
-            return c
+
+    for name in candidates:
+        path = template_path(name)
+        if os.path.exists(path):
+            return path
+
     return None
 
 
@@ -794,13 +806,23 @@ def open_direct_html(page_file: str):
 
 @app.get("/debug/files")
 def debug_files():
-    files = []
+    template_files = []
+    root_files = []
+
     if os.path.exists(TEMPLATES_DIR):
-        files = sorted(os.listdir(TEMPLATES_DIR))
+        template_files = sorted(os.listdir(TEMPLATES_DIR))
+
+    if os.path.exists(BASE_PATH):
+        root_files = sorted([
+            f for f in os.listdir(BASE_PATH)
+            if f.endswith(".html")
+        ])
+
     return {
         "templates_dir": TEMPLATES_DIR,
         "templates_exists": os.path.exists(TEMPLATES_DIR),
-        "files": files
+        "template_files": template_files,
+        "root_html_files": root_files
     }
 
 
