@@ -13,10 +13,10 @@ import torch
 import torch.nn.functional as F
 from PIL import Image, UnidentifiedImageError
 
-from fastapi import FastAPI, UploadFile, File, Query
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, UploadFile, File, Query, Body
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse, FileResponse, Response
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse, Response
 
 from torchvision import transforms, models
 
@@ -37,7 +37,6 @@ try:
 except Exception:
     DISEASE_INFO = {}
 
-
 # =========================
 # PATHS
 # =========================
@@ -55,7 +54,6 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-
 # =========================
 # APP
 # =========================
@@ -63,7 +61,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app = FastAPI(
     title="Phytologic AI Platform",
     description="Professional Plant Health AI Platform",
-    version="5.0"
+    version="6.0"
 )
 
 app.add_middleware(
@@ -74,8 +72,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
-
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # =========================
 # PAGE MAP
@@ -83,7 +81,7 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 PAGE_FILE_MAP = {
     "index": "index.html",
-    "index_home": "index.html",
+    "index_home": "index_home.html",
     "dashboard": "dashboard.html",
     "alerts": "alerts.html",
     "report_center": "report_center.html",
@@ -94,29 +92,22 @@ PAGE_FILE_MAP = {
     "forecast": "forecast.html",
     "forecast_ai": "forecast_ai.html",
     "layout_shell": "layout_shell.html",
+    "layout_shell_pro": "layout_shell_pro.html",
     "layout_shell_ultra": "layout_shell_ultra.html",
     "login": "login.html",
     "register": "register.html",
 }
 
-
 # =========================
-# DB / SERVICES
+# INIT SERVICES
 # =========================
-
-def get_db_connection():
-    return get_connection()
-
 
 init_db()
-
 forecast_ai_service = AIForecastService()
-
 sms_service = SMSService(
     app_sid=os.getenv("UNIFONIC_APP_SID", ""),
     sender=os.getenv("SMS_SENDER", "Phytologic")
 )
-
 
 # =========================
 # MODEL
@@ -124,6 +115,7 @@ sms_service = SMSService(
 
 MODEL_PATH = os.path.join(DATA_DIR, "plant_disease_model_v3.pth")
 IMG_SIZE = 160
+ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp", "image/bmp"}
 
 
 def download_file_if_missing(local_path: str, url: str):
@@ -150,7 +142,6 @@ transform = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
     transforms.ToTensor()
 ])
-
 
 # =========================
 # FONTS
@@ -189,18 +180,9 @@ for font_path in [amiri_path, noto_path]:
         except Exception:
             pass
 
-
 # =========================
 # HELPERS
 # =========================
-
-ALLOWED_IMAGE_TYPES = {
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/bmp",
-}
-
 
 REGION_COORDS = {
     "الرياض": {"lat": 24.7136, "lon": 46.6753, "city": "الرياض"},
@@ -237,30 +219,27 @@ CITY_COORDS = {
 }
 
 
+def get_db_connection():
+    return get_connection()
+
+
 def template_path(filename: str) -> str:
     path_in_templates = os.path.join(TEMPLATES_DIR, filename)
     path_in_root = os.path.join(BASE_PATH, filename)
 
     if os.path.exists(path_in_templates):
         return path_in_templates
-
     if os.path.exists(path_in_root):
         return path_in_root
 
-    return path_in_templates  # fallback
+    return path_in_templates
 
 
 def get_existing_index():
-    candidates = [
-        "index.html",
-        "index_home.html",
-    ]
-
-    for name in candidates:
+    for name in ["index.html", "index_home.html"]:
         path = template_path(name)
         if os.path.exists(path):
             return path
-
     return None
 
 
@@ -309,10 +288,7 @@ def save_upload_file(image_bytes: bytes, original_filename: str) -> str:
 
 
 def fetch_json(url: str, timeout: int = 20) -> dict:
-    req = urllib.request.Request(
-        url,
-        headers={"User-Agent": "PhytologicAI/1.0"}
-    )
+    req = urllib.request.Request(url, headers={"User-Agent": "PhytologicAI/1.0"})
     with urllib.request.urlopen(req, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
 
@@ -344,7 +320,6 @@ def get_disease_info_by_class(best_class: str):
             "advice": []
         }
     )
-
 
 # =========================
 # PESTICIDE
@@ -507,7 +482,6 @@ def get_pesticide_program(best_class: str, cause: str = "", severity_level: str 
         "options": options
     }
 
-
 # =========================
 # ANALYSIS
 # =========================
@@ -614,14 +588,30 @@ def generate_diagnostic_questions(best_class: str, second_class: str):
 
     if "early" in best and "blight" in best:
         questions.append({
-            "question": "هل تظهر بقع دائرية بها حلقات متداخلة؟",
+            "question": "هل تظهر بقع دائرية بها حلقات متداخلة (Bullseye)؟",
             "symptom": "bullseye"
+        })
+        questions.append({
+            "question": "هل الأوراق السفلية هي الأكثر إصابة؟",
+            "symptom": "lower_leaves"
         })
 
     if "septoria" in second:
         questions.append({
             "question": "هل البقع صغيرة ولها مركز رمادي؟",
             "symptom": "septoria_spots"
+        })
+
+    if "powdery" in best:
+        questions.append({
+            "question": "هل يوجد مسحوق أبيض على سطح الورقة؟",
+            "symptom": "white_powder"
+        })
+
+    if "mildew" in best:
+        questions.append({
+            "question": "هل توجد طبقة بيضاء أو رمادية على الأوراق؟",
+            "symptom": "mildew_layer"
         })
 
     return questions
@@ -676,7 +666,6 @@ def build_pdf_bytes(result: dict):
     c.setFont(font_name, 14)
 
     y = h - 50
-
     lines = [
         "تقرير تشخيص أمراض النبات",
         f"التاريخ: {datetime.now().strftime('%Y-%m-%d %H:%M')}",
@@ -695,7 +684,6 @@ def build_pdf_bytes(result: dict):
 
     c.showPage()
     c.save()
-
     buffer.seek(0)
     return buffer.read()
 
@@ -722,7 +710,6 @@ def send_sms_to_region_farmers(region: str, disease_name: str, risk_score: float
             f"تنبيه زراعي: تم رصد خطر انتشار {disease_name} "
             f"في منطقة {region} بدرجة {round(risk_score, 2)}%."
         )
-
         try:
             res = sms_service.send_sms(farmer["phone"], message)
         except Exception as e:
@@ -757,30 +744,25 @@ def get_live_weather(latitude: float, longitude: float) -> dict:
         "longitude": longitude
     }
 
-
 # =========================
-# ROUTES - PAGES
+# PAGE ROUTES
 # =========================
 
 @app.api_route("/", methods=["GET", "HEAD"])
 def root():
     index_file = get_existing_index()
     if not index_file:
-        return JSONResponse({"error": "index file not found"}, status_code=404)
+        return JSONResponse({"error": "index not found"}, status_code=404)
     return FileResponse(index_file)
 
 
 @app.get("/pages/{page_name}")
 def open_page(page_name: str):
-    page_name = page_name.strip().lower()
-    filename = PAGE_FILE_MAP.get(page_name)
+    page_name = (page_name or "").strip().lower()
 
+    filename = PAGE_FILE_MAP.get(page_name)
     if not filename:
-        candidate = f"{page_name}.html"
-        candidate_path = template_path(candidate)
-        if os.path.exists(candidate_path):
-            return FileResponse(candidate_path)
-        return JSONResponse({"error": f"{page_name} not allowed"}, status_code=404)
+        filename = f"{page_name}.html"
 
     file_path = template_path(filename)
 
@@ -789,7 +771,7 @@ def open_page(page_name: str):
 
     return JSONResponse({
         "error": f"{filename} not found",
-        "templates_dir": TEMPLATES_DIR
+        "hint": "ضع الملف في templates أو بجانب api.py"
     }, status_code=404)
 
 
@@ -810,13 +792,10 @@ def debug_files():
     root_files = []
 
     if os.path.exists(TEMPLATES_DIR):
-        template_files = sorted(os.listdir(TEMPLATES_DIR))
+        template_files = sorted([f for f in os.listdir(TEMPLATES_DIR) if f.endswith(".html")])
 
     if os.path.exists(BASE_PATH):
-        root_files = sorted([
-            f for f in os.listdir(BASE_PATH)
-            if f.endswith(".html")
-        ])
+        root_files = sorted([f for f in os.listdir(BASE_PATH) if f.endswith(".html")])
 
     return {
         "templates_dir": TEMPLATES_DIR,
@@ -825,9 +804,8 @@ def debug_files():
         "root_html_files": root_files
     }
 
-
 # =========================
-# ROUTES - DIAGNOSIS
+# DIAGNOSIS ROUTES
 # =========================
 
 @app.post("/diagnose")
@@ -872,12 +850,10 @@ async def diagnose(
         second_conf = float(probs_np[second_idx] * 100)
 
         gradcam_b64, cam_gray = gradcam_overlay(img_pil, best_idx)
-
         severity = compute_real_severity(img_bgr, cam_gray)
         severity_level = severity["severity_level"]
 
         disease_info = get_disease_info_by_class(best_class)
-
         pesticide_program = get_pesticide_program(
             best_class,
             disease_info.get("cause", ""),
@@ -921,6 +897,7 @@ async def diagnose(
         result["gradcam_image"] = gradcam_b64
         result["image_path"] = image_path
 
+        # حفظ تلقائي
         try:
             save_diagnosis(
                 farmer_name=farmer_name,
@@ -983,9 +960,39 @@ async def diagnose_and_pdf(
         headers={"Content-Disposition": "attachment; filename=diagnosis_report.pdf"}
     )
 
+# =========================
+# SAVE DIAGNOSIS API
+# =========================
+
+@app.post("/api/diagnosis")
+def api_diagnosis(data: dict = Body(...)):
+    try:
+        save_diagnosis(
+            data.get("farmer_name", ""),
+            data.get("farm_name", ""),
+            data.get("crop", ""),
+            data.get("plant", ""),
+            data.get("disease_class", ""),
+            data.get("disease_ar", ""),
+            data.get("confidence", 0),
+            data.get("severity_percent", 0),
+            data.get("cause", ""),
+            data.get("city", ""),
+            data.get("region", ""),
+            data.get("latitude", None),
+            data.get("longitude", None),
+            data.get("image_path", "")
+        )
+
+        return {
+            "success": True,
+            "message": "تم حفظ التشخيص بنجاح"
+        }
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
 
 # =========================
-# ROUTES - FARMERS
+# FARMERS
 # =========================
 
 @app.post("/farmers/register")
@@ -1003,9 +1010,8 @@ def register_farmer(
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
 
-
 # =========================
-# ROUTES - FORECAST
+# FORECAST
 # =========================
 
 @app.get("/forecast/predict")
@@ -1051,9 +1057,8 @@ def forecast_predict(
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
 
-
 # =========================
-# ROUTES - STATS
+# STATS
 # =========================
 
 @app.get("/stats/summary")
@@ -1164,9 +1169,8 @@ def map_summary():
         for r in rows
     ]
 
-
 # =========================
-# ROUTES - ALERTS
+# ALERTS
 # =========================
 
 @app.get("/alerts/all")
@@ -1258,24 +1262,6 @@ def export_alerts_json():
     return [dict(r) for r in rows]
 
 
-@app.post("/alerts/send-region-sms")
-def alerts_send_region_sms(
-    region: str = Query(...),
-    disease_name: str = Query(...),
-    risk_score: float = Query(...)
-):
-    try:
-        results = send_sms_to_region_farmers(region, disease_name, risk_score)
-        return {
-            "success": True,
-            "region": region,
-            "count": len(results),
-            "results": results
-        }
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=400)
-
-
 @app.post("/alerts/create")
 def create_alert(
     region: str = Query(...),
@@ -1303,15 +1289,41 @@ def create_alert(
         return JSONResponse({"error": str(e)}, status_code=400)
 
 
+@app.post("/alerts/send-region-sms")
+def alerts_send_region_sms(
+    region: str = Query(...),
+    disease_name: str = Query(...),
+    risk_score: float = Query(...)
+):
+    try:
+        results = send_sms_to_region_farmers(region, disease_name, risk_score)
+        return {
+            "success": True,
+            "region": region,
+            "count": len(results),
+            "results": results
+        }
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
 # =========================
-# AUTH / HEALTH
+# HEALTH
 # =========================
 
 @app.get("/auth/status")
 def auth_status():
     return {
         "auth_enabled": False,
-        "message": "صفحات login/register حالياً Frontend فقط ولم يتم ربط مصادقة فعلية بعد."
+        "message": "صفحات login/register حالياً Frontend فقط."
+    }
+
+
+@app.get("/health")
+def health():
+    return {
+        "status": "running",
+        "version": "Phytologic AI v6.0",
+        "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
 
@@ -1325,5 +1337,5 @@ def system_health():
         "sms_configured": sms_service.is_configured(),
         "arabic_font_registered": AR_FONT_REGISTERED,
         "arabic_font_path": AR_FONT_PATH_USED,
-        "version": "Phytologic AI v5.0"
+        "version": "Phytologic AI v6.0"
     }
