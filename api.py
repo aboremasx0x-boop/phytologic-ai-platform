@@ -31,11 +31,13 @@ from bidi.algorithm import get_display
 from database import init_db, save_diagnosis, save_alert, save_farmer, get_connection
 from ai_forecast_service import AIForecastService
 from sms_service import SMSService
+from ai_spread_engine import DiseaseSpreadEngine
 
 try:
     from disease_info import DISEASE_INFO
 except Exception:
     DISEASE_INFO = {}
+
 
 # =========================
 # PATHS
@@ -54,6 +56,7 @@ os.makedirs(FONTS_DIR, exist_ok=True)
 os.makedirs(DATA_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+
 # =========================
 # APP
 # =========================
@@ -61,7 +64,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 app = FastAPI(
     title="Phytologic AI Platform",
     description="Professional Plant Health AI Platform",
-    version="6.1"
+    version="7.1"
 )
 
 app.add_middleware(
@@ -74,6 +77,7 @@ app.add_middleware(
 
 if os.path.exists(STATIC_DIR):
     app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+
 
 # =========================
 # PAGE MAP
@@ -100,16 +104,21 @@ PAGE_FILE_MAP = {
     "map_advanced": "map_advanced.html",
 }
 
+
 # =========================
 # INIT SERVICES
 # =========================
 
 init_db()
+
 forecast_ai_service = AIForecastService()
+spread_engine = DiseaseSpreadEngine()
+
 sms_service = SMSService(
     app_sid=os.getenv("UNIFONIC_APP_SID", ""),
     sender=os.getenv("SMS_SENDER", "Phytologic")
 )
+
 
 # =========================
 # MODEL
@@ -144,6 +153,7 @@ transform = transforms.Compose([
     transforms.Resize((IMG_SIZE, IMG_SIZE)),
     transforms.ToTensor()
 ])
+
 
 # =========================
 # FONTS
@@ -181,6 +191,7 @@ for font_path in [amiri_path, noto_path]:
             break
         except Exception:
             pass
+
 
 # =========================
 # HELPERS
@@ -290,7 +301,10 @@ def save_upload_file(image_bytes: bytes, original_filename: str) -> str:
 
 
 def fetch_json(url: str, timeout: int = 20) -> dict:
-    req = urllib.request.Request(url, headers={"User-Agent": "PhytologicAI/1.0"})
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "PhytologicAI/1.0"}
+    )
     with urllib.request.urlopen(req, timeout=timeout) as response:
         return json.loads(response.read().decode("utf-8"))
 
@@ -323,6 +337,18 @@ def get_disease_info_by_class(best_class: str):
         }
     )
 
+
+def try_parse_json_text(value):
+    if value is None:
+        return None
+    if isinstance(value, (dict, list)):
+        return value
+    try:
+        return json.loads(value)
+    except Exception:
+        return value
+
+
 # =========================
 # WEATHER
 # =========================
@@ -346,6 +372,7 @@ def get_live_weather(latitude: float, longitude: float) -> dict:
         "latitude": latitude,
         "longitude": longitude
     }
+
 
 # =========================
 # PESTICIDE
@@ -507,6 +534,7 @@ def get_pesticide_program(best_class: str, cause: str = "", severity_level: str 
         },
         "options": options
     }
+
 
 # =========================
 # ANALYSIS
@@ -749,6 +777,28 @@ def send_sms_to_region_farmers(region: str, disease_name: str, risk_score: float
 
     return sent_results
 
+
+def enrich_diagnoses_with_weather_defaults(rows):
+    enriched = []
+
+    for row in rows:
+        item = dict(row)
+
+        weather_snapshot = try_parse_json_text(item.get("weather_snapshot"))
+        if isinstance(weather_snapshot, dict):
+            item["temperature"] = weather_snapshot.get("temperature", 30)
+            item["humidity"] = weather_snapshot.get("humidity", 60)
+            item["rainfall"] = weather_snapshot.get("rainfall", 0)
+        else:
+            item["temperature"] = 30
+            item["humidity"] = 60
+            item["rainfall"] = 0
+
+        enriched.append(item)
+
+    return enriched
+
+
 # =========================
 # PAGE ROUTES
 # =========================
@@ -808,6 +858,7 @@ def debug_files():
         "template_files": template_files,
         "root_html_files": root_files
     }
+
 
 # =========================
 # DIAGNOSIS ROUTES
@@ -917,7 +968,8 @@ async def diagnose(
                 region=region,
                 latitude=lat,
                 longitude=lon,
-                image_path=image_path
+                image_path=image_path,
+                weather_snapshot=weather_data
             )
         except Exception as db_error:
             print("DB save error:", db_error)
@@ -964,6 +1016,7 @@ async def diagnose_and_pdf(
         headers={"Content-Disposition": "attachment; filename=diagnosis_report.pdf"}
     )
 
+
 # =========================
 # SAVE DIAGNOSIS API
 # =========================
@@ -985,7 +1038,11 @@ def api_diagnosis(data: dict = Body(...)):
             data.get("region", ""),
             data.get("latitude", None),
             data.get("longitude", None),
-            data.get("image_path", "")
+            data.get("image_path", ""),
+            question_answers=data.get("question_answers"),
+            notes=data.get("notes"),
+            weather_snapshot=data.get("weather_snapshot"),
+            forecast_snapshot=data.get("forecast_snapshot")
         )
 
         return {
@@ -994,6 +1051,19 @@ def api_diagnosis(data: dict = Body(...)):
         }
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
+
+
+@app.get("/api/diagnoses")
+def get_diagnoses():
+    conn = get_db_connection()
+    rows = conn.execute("""
+        SELECT *
+        FROM diagnoses
+        ORDER BY id DESC
+    """).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
 
 # =========================
 # FARMERS
@@ -1013,6 +1083,7 @@ def register_farmer(
         return {"success": True, "message": "تم تسجيل المزارع بنجاح"}
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
+
 
 # =========================
 # FORECAST
@@ -1060,6 +1131,36 @@ def forecast_predict(
         }
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
+
+
+# =========================
+# SPREAD ENGINE
+# =========================
+
+@app.get("/spread/analysis")
+def spread_analysis():
+    try:
+        conn = get_db_connection()
+        rows = conn.execute("""
+            SELECT *
+            FROM diagnoses
+            ORDER BY id DESC
+        """).fetchall()
+        conn.close()
+
+        data = enrich_diagnoses_with_weather_defaults(rows)
+        heatmap = spread_engine.generate_heatmap_points(data)
+        regions = spread_engine.regional_analysis(data)
+
+        return {
+            "success": True,
+            "heatmap": heatmap,
+            "regions": regions,
+            "count": len(data)
+        }
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+
 
 # =========================
 # WEATHER ROUTES
@@ -1150,6 +1251,7 @@ def weather_forecast(
         }
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
+
 
 # =========================
 # STATS
@@ -1262,6 +1364,7 @@ def map_summary():
         }
         for r in rows
     ]
+
 
 # =========================
 # ALERTS
@@ -1400,6 +1503,7 @@ def alerts_send_region_sms(
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
 
+
 # =========================
 # HEALTH
 # =========================
@@ -1416,7 +1520,7 @@ def auth_status():
 def health():
     return {
         "status": "running",
-        "version": "Phytologic AI v6.1",
+        "version": "Phytologic AI v7.1",
         "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     }
 
@@ -1427,9 +1531,10 @@ def system_health():
         "status": "running",
         "ai_model": "loaded",
         "forecast_model": "loaded" if forecast_ai_service.model is not None else "not_loaded",
+        "spread_engine": "loaded",
         "database": "connected",
         "sms_configured": sms_service.is_configured(),
         "arabic_font_registered": AR_FONT_REGISTERED,
         "arabic_font_path": AR_FONT_PATH_USED,
-        "version": "Phytologic AI v6.1"
+        "version": "Phytologic AI v7.1"
     }
