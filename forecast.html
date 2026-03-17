@@ -1,1107 +1,802 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - التوقع الزراعي المتقدم</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | Forecast Center</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * { box-sizing: border-box; }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --success:#15803d;
+      --dark:#0b1220;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+      --radius:22px;
+    }
 
-.page{
-max-width:1550px;
-margin:16px auto;
-padding:0 14px 28px;
-}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
+      color:var(--text);
+    }
 
-.hero{
-background:
-linear-gradient(135deg,rgba(11,24,68,.97),rgba(22,78,99,.92)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:26px;
-padding:24px 26px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
+    .page{
+      max-width:1400px;
+      margin:0 auto;
+      padding:18px;
+    }
 
-.hero:before{
-content:"";
-position:absolute;
-left:-40px;
-top:-40px;
-width:180px;
-height:180px;
-background:rgba(255,255,255,.06);
-border-radius:50%;
-}
+    .navbar{
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:18px;
+      position:sticky;
+      top:12px;
+      z-index:20;
+    }
 
-.hero:after{
-content:"";
-position:absolute;
-right:-30px;
-bottom:-30px;
-width:240px;
-height:240px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-}
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
 
-.hero-title{
-font-size:34px;
-font-weight:800;
-margin:0 0 8px 0;
-position:relative;
-z-index:1;
-}
+    .brand-title{
+      font-size:22px;
+      font-weight:800;
+      color:#0b5b55;
+    }
 
-.hero-sub{
-font-size:14px;
-line-height:1.9;
-opacity:.95;
-position:relative;
-z-index:1;
-max-width:980px;
-}
+    .brand-sub{
+      font-size:13px;
+      color:var(--muted);
+    }
 
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:14px;
-margin-bottom:16px;
-}
+    .nav-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px 18px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-min-height:112px;
-}
+    .nav-links a{
+      text-decoration:none;
+      color:#0f172a;
+      background:#fff;
+      border:1px solid #dbe5ef;
+      border-radius:14px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:700;
+      transition:.2s ease;
+    }
 
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:10px;
-font-weight:700;
-}
+    .nav-links a:hover{
+      background:#f8fbff;
+      transform:translateY(-1px);
+    }
 
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(11,18,32,.98), rgba(29,78,216,.88)),
+        radial-gradient(circle at top left, rgba(255,255,255,.15), transparent 35%);
+      color:white;
+      border-radius:30px;
+      padding:32px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
 
-.stat-sub{
-font-size:12px;
-color:#94a3b8;
-margin-top:8px;
-line-height:1.6;
-}
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
 
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
+    .hero h1{
+      margin:0 0 12px;
+      font-size:38px;
+      line-height:1.2;
+    }
 
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
+    .hero p{
+      margin:0;
+      line-height:1.95;
+      max-width:930px;
+      color:rgba(255,255,255,.92);
+      font-size:16px;
+    }
 
-.section-title{
-font-size:18px;
-font-weight:800;
-color:#0f172a;
-}
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-.section-note{
-font-size:12px;
-color:#64748b;
-}
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:22px;
+    }
 
-.card-body{
-padding:16px;
-}
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 18px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.grid-2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
+    .btn:hover{ transform:translateY(-1px); }
 
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
+    .btn-white{
+      background:white;
+      color:#0b5b55;
+    }
 
-.grid-4{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:14px;
-}
+    .btn-white:hover{ background:#f4f7ff; }
 
-.grid-6{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:12px;
-}
+    .btn-glass{
+      background:rgba(255,255,255,.12);
+      color:white;
+      border:1px solid rgba(255,255,255,.18);
+    }
 
-.field label{
-display:block;
-font-size:13px;
-color:#64748b;
-margin-bottom:8px;
-font-weight:700;
-}
+    .btn-glass:hover{ background:rgba(255,255,255,.18); }
 
-.field input,
-.field select{
-width:100%;
-padding:12px 14px;
-border-radius:14px;
-border:1px solid #dbe4f2;
-background:#fff;
-font-size:14px;
-outline:none;
-transition:.2s;
-}
+    .btn-primary{
+      background:var(--primary);
+      color:white;
+    }
 
-.field input:focus,
-.field select:focus{
-border-color:#4f46e5;
-box-shadow:0 0 0 4px rgba(79,70,229,.08);
-}
+    .btn-primary:hover{
+      background:var(--primary-dark);
+    }
 
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:14px;
-}
+    .btn-outline{
+      background:white;
+      color:var(--secondary);
+      border:1px solid #cbd5e1;
+    }
 
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
+    .btn-outline:hover{
+      background:#f8fbff;
+    }
 
-.btn-primary{
-background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);
-color:white;
-box-shadow:0 8px 16px rgba(37,99,235,.22);
-}
+    .grid{
+      display:grid;
+      gap:18px;
+    }
 
-.btn-secondary{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
+    .grid-2{ grid-template-columns:1.1fr .9fr; }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
 
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-.btn-success{
-background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
-color:white;
-}
+    .card-header{
+      padding:18px 20px 12px;
+      border-bottom:1px solid #edf2f7;
+    }
 
-.btn:hover{
-transform:translateY(-1px);
-}
+    .card-header h2,
+    .card-header h3{
+      margin:0;
+      font-size:20px;
+    }
 
-.info-box{
-padding:14px;
-border-radius:16px;
-border:1px solid #ecf2fb;
-background:#fbfdff;
-}
+    .card-header p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-.info-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:10px;
-color:#111827;
-}
+    .card-body{
+      padding:20px;
+    }
 
-.kpi{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .kpi{
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      min-height:118px;
+    }
 
-.small{
-font-size:12px;
-color:#64748b;
-line-height:1.8;
-}
+    .kpi-label{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
 
-.badge{
-display:inline-block;
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-color:white;
-}
+    .kpi-value{
+      font-size:28px;
+      font-weight:800;
+      color:var(--text);
+    }
 
-.badge-green{background:#16a34a}
-.badge-orange{background:#d97706}
-.badge-red{background:#dc2626}
-.badge-gray{background:#64748b}
+    .kpi-sub{
+      margin-top:8px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.8;
+    }
 
-.status-bar{
-margin-top:12px;
-padding:11px 12px;
-border-radius:14px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
 
-.table-wrap{
-overflow:auto;
-}
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-min-width:980px;
-}
+    .field.full{
+      grid-column:1 / -1;
+    }
 
-th,td{
-padding:11px 10px;
-text-align:right;
-border-bottom:1px solid #edf2fb;
-font-size:13px;
-}
+    label{
+      font-size:14px;
+      font-weight:700;
+      color:#1f2937;
+    }
 
-th{
-background:#f8fbff;
-color:#334155;
-font-weight:800;
-position:sticky;
-top:0;
-}
+    input[type="number"]{
+      width:100%;
+      border:1px solid #dbe2ea;
+      border-radius:14px;
+      padding:13px 14px;
+      background:#fff;
+      font-size:15px;
+      outline:none;
+    }
 
-.analysis-box{
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-}
+    input:focus{
+      border-color:#0f766e;
+      box-shadow:0 0 0 4px rgba(15,118,110,.08);
+    }
 
-.list{
-display:grid;
-gap:8px;
-}
+    .submit-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
 
-.list-item{
-padding:10px 12px;
-border-radius:14px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-}
+    .loading{
+      display:none;
+      margin-top:14px;
+      color:var(--secondary);
+      font-size:14px;
+      font-weight:700;
+    }
 
-.highlight{
-color:#0f172a;
-font-weight:800;
-}
+    .error-box, .success-box{
+      display:none;
+      margin-top:16px;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      line-height:1.9;
+    }
 
-.muted{
-color:#64748b;
-font-size:12px;
-}
+    .error-box{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
 
-.error-box{
-background:#fef2f2;
-border:1px solid #fecaca;
-color:#b91c1c;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .success-box{
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
 
-.ok-box{
-background:#ecfdf5;
-border:1px solid #a7f3d0;
-color:#047857;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .info-box{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:#fcfdff;
+      margin-bottom:14px;
+    }
 
-canvas{
-max-height:340px;
-}
+    .info-box:last-child{
+      margin-bottom:0;
+    }
 
-@media(max-width:1450px){
-.stats-grid{grid-template-columns:repeat(3,1fr)}
-.grid-6{grid-template-columns:repeat(3,1fr)}
-.grid-4{grid-template-columns:repeat(2,1fr)}
-.grid-3{grid-template-columns:1fr 1fr}
-.grid-2{grid-template-columns:1fr}
-}
+    .info-box h4{
+      margin:0 0 12px;
+      font-size:17px;
+    }
 
-@media(max-width:780px){
-.stats-grid,.grid-6,.grid-4,.grid-3{grid-template-columns:1fr}
-.hero-title{font-size:26px}
-}
-</style>
+    .info-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .info-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding-bottom:10px;
+      border-bottom:1px dashed #e5e7eb;
+    }
+
+    .info-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
+
+    .key{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      text-align:left;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .pill-low{
+      background:#ecfdf5;
+      color:#166534;
+    }
+
+    .pill-moderate{
+      background:#fff7ed;
+      color:#9a3412;
+    }
+
+    .pill-high{
+      background:#fef2f2;
+      color:#991b1b;
+    }
+
+    .pill-neutral{
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .list-box{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .list-box li{
+      border:1px solid #edf2f7;
+      background:#fafcff;
+      border-radius:14px;
+      padding:12px 14px;
+      line-height:1.9;
+      font-size:14px;
+    }
+
+    .footer-note{
+      text-align:center;
+      color:#64748b;
+      padding:18px 10px 8px;
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    @media (max-width:1200px){
+      .grid-4, .grid-2, .form-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
 
-<div class="page">
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-title">Phytologic AI Forecast</div>
+        <div class="brand-sub">واجهة التنبؤ بالحالات ومستوى الخطر</div>
+      </div>
 
-  <div class="hero">
-    <h1 class="hero-title">التوقع الزراعي المتقدم - Phytologic AI</h1>
-    <div class="hero-sub">
-      لوحة تشغيل احترافية لتحليل الطقس الحقيقي، توقع المخاطر الحي، مقارنة مناطق المملكة، الحساب اليدوي، تشغيل نموذج AI، وإصدار قراءة تنفيذية فورية لدعم القرار الزراعي.
-    </div>
-  </div>
+      <div class="nav-links">
+        <a href="/">الرئيسية</a>
+        <a href="/pages/dashboard">لوحة التحكم</a>
+        <a href="/pages/report_center">مركز التقارير</a>
+        <a href="/pages/alerts">التنبيهات</a>
+        <a href="/pages/farmers">المزارعون</a>
+      </div>
+    </nav>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">المنطقة الحالية</div>
-      <div class="stat-value" id="heroRegion" style="font-size:22px">-</div>
-      <div class="stat-sub">المنطقة التي تعمل عليها الآن</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">درجة الخطر الحي</div>
-      <div class="stat-value" id="heroRisk">0%</div>
-      <div class="stat-sub">القيمة النهائية الحالية</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">مستوى الخطر</div>
-      <div class="stat-value" id="heroLevel" style="font-size:20px">-</div>
-      <div class="stat-sub">منخفض / متوسط / مرتفع</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">الحرارة الحالية</div>
-      <div class="stat-value" id="heroTemp">-</div>
-      <div class="stat-sub">من الطقس المباشر</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">الرطوبة الحالية</div>
-      <div class="stat-value" id="heroHumidity">-</div>
-      <div class="stat-sub">رطوبة المنطقة المختارة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أفضل منطقة حاليًا</div>
-      <div class="stat-value" id="heroTopRegion" style="font-size:20px">-</div>
-      <div class="stat-sub">أعلى خطر في المملكة</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">إعدادات التحليل المركزي</div>
-      <div class="section-note">جميع الأقسام تعتمد على هذه المدخلات</div>
-    </div>
-    <div class="card-body">
-      <div class="grid-4">
-        <div class="field">
-          <label>المنطقة</label>
-          <select id="region">
-            <option value="الرياض">الرياض</option>
-            <option value="مكة">مكة</option>
-            <option value="المدينة">المدينة</option>
-            <option value="القصيم">القصيم</option>
-            <option value="حائل">حائل</option>
-            <option value="تبوك">تبوك</option>
-            <option value="الجوف">الجوف</option>
-            <option value="الحدود الشمالية">الحدود الشمالية</option>
-            <option value="الشرقية">الشرقية</option>
-            <option value="الباحة">الباحة</option>
-            <option value="عسير">عسير</option>
-            <option value="جازان">جازان</option>
-            <option value="نجران">نجران</option>
-          </select>
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>مركز التنبؤ</h1>
+          <p>
+            صفحة مخصصة للتنبؤ بعدد الحالات المتوقع ومستوى الخطر اعتمادًا على درجة الحرارة
+            والرطوبة والأمطار وعدد الحالات الحالية ومتوسط شدة الإصابة.
+          </p>
         </div>
 
-        <div class="field">
-          <label>المدينة</label>
-          <input id="city" type="text" value="الرياض" placeholder="اكتب المدينة">
-        </div>
-
-        <div class="field">
-          <label>المرض</label>
-          <input id="disease" type="text" value="الكل" placeholder="مثال: لفحة أوراق الذرة">
-        </div>
-
-        <div class="field">
-          <label>المحصول</label>
-          <input id="crop" type="text" value="غير محدد" placeholder="مثال: الذرة">
+        <div class="status-chip" id="heroForecastChip">
+          <span>●</span>
+          <span>جاري تهيئة خدمة التنبؤ...</span>
         </div>
       </div>
 
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="runAllAnalysis()">تحليل شامل</button>
-        <button class="btn btn-secondary" onclick="loadLiveWeather()">الطقس الحقيقي</button>
-        <button class="btn btn-dark" onclick="loadLiveRisk()">التوقع الحي</button>
-        <button class="btn btn-dark" onclick="loadManualRisk()">الحساب اليدوي</button>
-        <button class="btn btn-dark" onclick="loadRegionsComparison()">مقارنة المناطق</button>
-        <button class="btn btn-success" onclick="loadAIForecast()">تشغيل AI</button>
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="checkHealth()">فحص النظام</button>
+        <button class="btn btn-glass" onclick="fillDemoData()">تعبئة تجريبية</button>
+        <button class="btn btn-glass" onclick="resetForecastForm()">إعادة تعيين</button>
       </div>
+    </section>
 
-      <div class="status-bar" id="statusBar">جاهز للعمل.</div>
-    </div>
-  </div>
-<div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">الطقس الحقيقي</div>
-        <div class="section-note">المسار: /weather/current</div>
+    <section class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <h2>مؤشرات سريعة</h2>
+        <p>معلومات سريعة مرتبطة بخدمة التنبؤ والحالة التشغيلية.</p>
       </div>
       <div class="card-body">
-        <div class="grid-4">
-          <div class="info-box">
-            <div class="info-title">درجة الحرارة</div>
-            <div class="kpi" id="weatherTemp">-</div>
-            <div class="small">درجة مئوية مباشرة</div>
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">حالة النظام</div>
+            <div class="kpi-value" id="kpiSystemStatus" style="font-size:22px;">--</div>
+            <div class="kpi-sub">حالة التشغيل العامة</div>
           </div>
-          <div class="info-box">
-            <div class="info-title">الرطوبة</div>
-            <div class="kpi" id="weatherHumidity">-</div>
-            <div class="small">نسبة الرطوبة الحالية</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">الأمطار</div>
-            <div class="kpi" id="weatherRain">-</div>
-            <div class="small">الهطول المباشر</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">مصدر الإحداثيات</div>
-            <div class="kpi" id="weatherSource" style="font-size:18px">-</div>
-            <div class="small">مباشر / مدينة / منطقة / بديل</div>
-          </div>
-        </div>
 
-        <div style="margin-top:12px" id="weatherBox" class="muted">بانتظار تحميل الطقس الحقيقي.</div>
+          <div class="kpi">
+            <div class="kpi-label">نموذج التنبؤ</div>
+            <div class="kpi-value" id="kpiForecastModel" style="font-size:22px;">--</div>
+            <div class="kpi-sub">حالة نموذج Forecast</div>
+          </div>
 
-        <div style="margin-top:14px">
-          <canvas id="weatherChart"></canvas>
+          <div class="kpi">
+            <div class="kpi-label">نموذج الصور</div>
+            <div class="kpi-value" id="kpiAiModel" style="font-size:22px;">--</div>
+            <div class="kpi-sub">فحص نموذج التشخيص</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">الإصدار</div>
+            <div class="kpi-value" id="kpiVersion" style="font-size:20px;">--</div>
+            <div class="kpi-sub">نسخة النظام الحالية</div>
+          </div>
         </div>
       </div>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="card-header">
+          <h2>إدخال بيانات التنبؤ</h2>
+          <p>أدخل القيم المطلوبة لتنفيذ نموذج التنبؤ.</p>
+        </div>
+        <div class="card-body">
+          <form id="forecastForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="temperature">درجة الحرارة</label>
+                <input type="number" step="any" id="temperature" placeholder="مثال: 28" required />
+              </div>
+
+              <div class="field">
+                <label for="humidity">الرطوبة</label>
+                <input type="number" step="any" id="humidity" placeholder="مثال: 70" required />
+              </div>
+
+              <div class="field">
+                <label for="rainfall">الأمطار</label>
+                <input type="number" step="any" id="rainfall" placeholder="مثال: 0" required />
+              </div>
+
+              <div class="field">
+                <label for="cases_count">عدد الحالات الحالية</label>
+                <input type="number" step="any" id="cases_count" placeholder="مثال: 5" required />
+              </div>
+
+              <div class="field full">
+                <label for="severity_avg">متوسط شدة الإصابة</label>
+                <input type="number" step="any" id="severity_avg" placeholder="مثال: 8" required />
+              </div>
+            </div>
+
+            <div class="submit-row">
+              <button type="submit" class="btn btn-primary">تنفيذ التنبؤ</button>
+              <button type="button" class="btn btn-outline" onclick="fillDemoData()">تعبئة تجريبية</button>
+              <button type="button" class="btn btn-outline" onclick="resetForecastForm()">مسح الحقول</button>
+            </div>
+
+            <div class="loading" id="loadingText">جاري تنفيذ نموذج التنبؤ...</div>
+            <div class="error-box" id="errorBox"></div>
+            <div class="success-box" id="successBox"></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>نتيجة التنبؤ</h2>
+          <p>ملخص المخرجات الناتجة من نموذج Forecast.</p>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <h4>النتيجة الأساسية</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">الحالات المتوقعة</div>
+                <div class="value" id="predictedCases">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">مستوى الخطر</div>
+                <div class="value" id="riskLevelAr">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">كود الخطر</div>
+                <div class="value" id="riskLevelCode">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>الخصائص المستخدمة</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">الحرارة</div>
+                <div class="value" id="usedTemperature">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الرطوبة</div>
+                <div class="value" id="usedHumidity">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الأمطار</div>
+                <div class="value" id="usedRainfall">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">عدد الحالات</div>
+                <div class="value" id="usedCasesCount">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">متوسط الشدة</div>
+                <div class="value" id="usedSeverityAvg">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">التوقع الحي المباشر</div>
-        <div class="section-note">المسار: /forecast/live-risk</div>
+    <section class="card" style="margin-top:18px;">
+      <div class="card-header">
+        <h2>إرشادات استخدام نموذج التنبؤ</h2>
+        <p>أفضل الممارسات عند إدخال البيانات للحصول على نتائج أكثر منطقية.</p>
       </div>
       <div class="card-body">
-        <div class="grid-4">
-          <div class="info-box">
-            <div class="info-title">درجة الخطر</div>
-            <div class="kpi" id="liveScore">0%</div>
-            <div class="small">الخطر النهائي المباشر</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">مستوى الخطر</div>
-            <div class="kpi" id="liveLevel" style="font-size:20px">-</div>
-            <div class="small">تصنيف مباشر</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">عدد الحالات</div>
-            <div class="kpi" id="liveCases">0</div>
-            <div class="small">من التاريخ المسجل</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">متوسط الشدة</div>
-            <div class="kpi" id="liveAvgSeverity">0%</div>
-            <div class="small">من قاعدة البيانات</div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="liveRecommendations">
-          ستظهر هنا التوصيات المباشرة الخاصة بالتوقع الحي.
-        </div>
-
-        <div style="margin-top:14px">
-          <canvas id="riskBreakdownChart"></canvas>
-        </div>
+        <ul class="list-box">
+          <li>أدخل الرطوبة بقيمة بين 0 و100.</li>
+          <li>لا تستخدم قيم أمطار سالبة أو عدد حالات سالب.</li>
+          <li>متوسط الشدة يُفضل أن يكون مأخوذًا من بيانات فعلية أو من نتائج التشخيص المسجلة.</li>
+          <li>هذه الصفحة تعطي تقديرًا مساعدًا لاتخاذ القرار، وليست بديلًا عن التقييم الحقلي أو المختبري.</li>
+          <li>يمكن تعبئة القيم من نتائج التشخيص السابقة يدويًا أو عبر تطوير ربط إضافي لاحقًا.</li>
+        </ul>
       </div>
-    </div>
+    </section>
 
-  </div>
-
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">الحساب اليدوي للمخاطر</div>
-        <div class="section-note">المسار: /forecast/risk</div>
-      </div>
-      <div class="card-body">
-
-        <div class="grid-4">
-          <div class="field">
-            <label>حرارة يدوية</label>
-            <input id="manualTemp" type="number" value="25">
-          </div>
-          <div class="field">
-            <label>رطوبة يدوية</label>
-            <input id="manualHumidity" type="number" value="70">
-          </div>
-          <div class="field">
-            <label>أمطار يدوية</label>
-            <input id="manualRain" type="number" value="0">
-          </div>
-          <div class="field" style="display:flex;align-items:end;">
-            <button class="btn btn-primary" style="width:100%" onclick="loadManualRisk()">احسب يدويًا</button>
-          </div>
-        </div>
-
-        <div class="grid-4" style="margin-top:14px">
-          <div class="info-box">
-            <div class="info-title">الخطر اليدوي</div>
-            <div class="kpi" id="manualScore">0%</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">المستوى اليدوي</div>
-            <div class="kpi" id="manualLevel" style="font-size:20px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">درجة الطقس</div>
-            <div class="kpi" id="manualWeatherScore">0</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">درجة التاريخ</div>
-            <div class="kpi" id="manualHistoryScore">0</div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="manualRecommendations">
-          ستظهر هنا توصيات الحساب اليدوي.
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">توقع الذكاء الاصطناعي AI</div>
-        <div class="section-note">المسار: /forecast/ai</div>
-      </div>
-      <div class="card-body">
-        <div class="grid-3">
-          <div class="field">
-            <label>درجة الحرارة</label>
-            <input id="aiTemp" type="number" value="25">
-          </div>
-          <div class="field">
-            <label>الرطوبة</label>
-            <input id="aiHumidity" type="number" value="70">
-          </div>
-          <div class="field">
-            <label>الأمطار</label>
-            <input id="aiRain" type="number" value="0">
-          </div>
-          <div class="field">
-            <label>عدد الحالات</label>
-            <input id="aiCases" type="number" value="5">
-          </div>
-          <div class="field">
-            <label>متوسط الشدة</label>
-            <input id="aiSeverity" type="number" value="10">
-          </div>
-          <div class="field" style="display:flex;align-items:end;">
-            <button class="btn btn-success" style="width:100%" onclick="loadAIForecast()">تشغيل AI</button>
-          </div>
-        </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="aiForecastBox">
-          سيظهر هنا ناتج التوقع الذكي من النموذج.
-        </div>
-      </div>
-    </div>
-
-  </div>
-<div class="card">
-    <div class="section-header">
-      <div class="section-title">مقارنة مناطق المملكة</div>
-      <div class="section-note">المسار: /forecast/live-regions</div>
-    </div>
-    <div class="card-body">
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>الترتيب</th>
-              <th>المنطقة</th>
-              <th>المدينة</th>
-              <th>الخطر</th>
-              <th>الدرجة</th>
-              <th>الحرارة</th>
-              <th>الرطوبة</th>
-              <th>الأمطار</th>
-              <th>الحالات</th>
-              <th>متوسط الشدة</th>
-            </tr>
-          </thead>
-          <tbody id="regionsTable">
-            <tr><td colspan="10">بانتظار تحميل مقارنة المناطق...</td></tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="margin-top:16px">
-        <canvas id="regionsChart"></canvas>
-      </div>
-
+    <div class="footer-note">
+      Phytologic AI Forecast — واجهة تشغيل نموذج التنبؤ بالحالات ومستوى الخطر.
     </div>
   </div>
 
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">التحليل التنفيذي المباشر</div>
-      <div class="section-note">خلاصة القرار الزراعي</div>
-    </div>
-    <div class="card-body">
-      <div class="analysis-box" id="directAnalysis">
-        بعد تشغيل التحليل الشامل ستظهر هنا القراءة التنفيذية الكاملة.
-      </div>
-    </div>
-  </div>
+  <script>
+    const forecastForm = document.getElementById("forecastForm");
+    const loadingText = document.getElementById("loadingText");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
 
-</div>
-
-<script>
-const API = "http://127.0.0.1:8000";
-
-let cachedLiveRisk = null;
-let cachedManualRisk = null;
-let cachedRegions = [];
-let cachedWeather = null;
-
-let weatherChart = null;
-let regionsChart = null;
-let riskBreakdownChart = null;
-
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
-}
-
-function badgeHTML(level){
-  if(level === "مرتفع") return '<span class="badge badge-red">مرتفع</span>';
-  if(level === "متوسط") return '<span class="badge badge-orange">متوسط</span>';
-  if(level === "منخفض") return '<span class="badge badge-green">منخفض</span>';
-  return '<span class="badge badge-gray">غير متاح</span>';
-}
-
-function safeText(v, fallback="-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
-
-function currentInputs(){
-  return {
-    region: document.getElementById("region").value,
-    city: document.getElementById("city").value.trim() || "غير محدد",
-    disease: document.getElementById("disease").value.trim() || "الكل",
-    crop: document.getElementById("crop").value.trim() || "غير محدد"
-  };
-}
-
-function updateHeroFromLive(data){
-  document.getElementById("heroRegion").textContent = safeText(data.region);
-  document.getElementById("heroRisk").textContent = `${safeText(data.final_score,0)}%`;
-  document.getElementById("heroLevel").innerHTML = badgeHTML(data?.risk_level?.level_ar || "-");
-  document.getElementById("heroTemp").textContent = `${safeText(data?.live_weather?.temperature)}°`;
-  document.getElementById("heroHumidity").textContent = `${safeText(data?.live_weather?.humidity)}%`;
-}
-
-function updateTopRegionCard(){
-  if(cachedRegions && cachedRegions.length){
-    document.getElementById("heroTopRegion").textContent = cachedRegions[0].region || "-";
-  }
-}
-
-function destroyChart(chartObj){
-  if(chartObj){
-    chartObj.destroy();
-  }
-}
-
-async function loadLiveWeather(){
-  try{
-    setStatus("جاري تحميل الطقس الحقيقي...");
-    const x = currentInputs();
-
-    const url = `${API}/weather/current?region=${encodeURIComponent(x.region)}&city=${encodeURIComponent(x.city)}`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if(data.success === false){
-      throw new Error(data.error || "تعذر تحميل الطقس");
+    function safeText(v, fallback = "--") {
+      if (v === null || v === undefined || v === "") return fallback;
+      return v;
     }
 
-    cachedWeather = data;
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.textContent = message || "حدث خطأ غير متوقع";
+    }
 
-    document.getElementById("weatherTemp").textContent = `${safeText(data.weather?.temperature)}°`;
-    document.getElementById("weatherHumidity").textContent = `${safeText(data.weather?.humidity)}%`;
-    document.getElementById("weatherRain").textContent = safeText(data.weather?.rainfall);
-    document.getElementById("weatherSource").textContent = safeText(data.coords?.source);
+    function hideError() {
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
 
-    document.getElementById("weatherBox").innerHTML = `
-      <div class="ok-box">
-        تم تحميل الطقس الحقيقي للمنطقة <b>${safeText(data.region)}</b> / <b>${safeText(data.city)}</b>
-        عند الإحداثيات ${safeText(data.coords?.latitude)}, ${safeText(data.coords?.longitude)}
-      </div>
-    `;
+    function showSuccess(message) {
+      successBox.style.display = "block";
+      successBox.textContent = message || "";
+    }
 
-    destroyChart(weatherChart);
-    weatherChart = new Chart(document.getElementById("weatherChart"),{
-      type:"bar",
-      data:{
-        labels:["الحرارة","الرطوبة","الأمطار"],
-        datasets:[{
-          label:"الطقس الحالي",
-          data:[
-            Number(data.weather?.temperature || 0),
-            Number(data.weather?.humidity || 0),
-            Number(data.weather?.rainfall || 0)
-          ],
-          borderWidth:1
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false
+    function hideSuccess() {
+      successBox.style.display = "none";
+      successBox.textContent = "";
+    }
+
+    function setLoading(state) {
+      loadingText.style.display = state ? "block" : "none";
+    }
+
+    function riskPill(level, label) {
+      const val = String(level || "").toLowerCase();
+
+      if (val === "high") {
+        return `<span class="pill pill-high">${safeText(label)}</span>`;
       }
-    });
-
-    setStatus("تم تحميل الطقس الحقيقي بنجاح.");
-    return data;
-  }catch(err){
-    console.error(err);
-    document.getElementById("weatherBox").innerHTML = `<div class="error-box">تعذر تحميل الطقس الحقيقي: ${err.message}</div>`;
-    setStatus("تعذر تحميل الطقس الحقيقي.");
-    return null;
-  }
-}
-async function loadLiveRisk(){
-  try{
-    setStatus("جاري تحميل التوقع الحي...");
-    const x = currentInputs();
-
-    const url = `${API}/forecast/live-risk?region=${encodeURIComponent(x.region)}&city=${encodeURIComponent(x.city)}&disease=${encodeURIComponent(x.disease)}&crop=${encodeURIComponent(x.crop)}&save_if_high=true`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if(data.success === false){
-      throw new Error(data.error || "تعذر تحميل التوقع الحي");
-    }
-
-    cachedLiveRisk = data;
-
-    document.getElementById("liveScore").textContent = `${safeText(data.final_score,0)}%`;
-    document.getElementById("liveLevel").innerHTML = badgeHTML(data?.risk_level?.level_ar || "-");
-    document.getElementById("liveCases").textContent = safeText(data?.history?.cases_count,0);
-    document.getElementById("liveAvgSeverity").textContent = `${safeText(data?.history?.avg_severity,0)}%`;
-
-    const recs = Array.isArray(data.recommendations) ? data.recommendations : [];
-    document.getElementById("liveRecommendations").innerHTML =
-      recs.length
-      ? recs.map(r => `<div class="list-item">${r}</div>`).join("")
-      : "لا توجد توصيات مباشرة.";
-
-    updateHeroFromLive(data);
-
-    document.getElementById("aiTemp").value = data?.live_weather?.temperature ?? 25;
-    document.getElementById("aiHumidity").value = data?.live_weather?.humidity ?? 70;
-    document.getElementById("aiRain").value = data?.live_weather?.rainfall ?? 0;
-    document.getElementById("aiCases").value = data?.history?.cases_count ?? 0;
-    document.getElementById("aiSeverity").value = data?.history?.avg_severity ?? 0;
-
-    destroyChart(riskBreakdownChart);
-    riskBreakdownChart = new Chart(document.getElementById("riskBreakdownChart"),{
-      type:"doughnut",
-      data:{
-        labels:["درجة الطقس","درجة التاريخ"],
-        datasets:[{
-          data:[
-            Number(data.weather_score || 0),
-            Number(data.history?.history_score || 0)
-          ]
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false
+      if (val === "moderate") {
+        return `<span class="pill pill-moderate">${safeText(label)}</span>`;
       }
-    });
-
-    setStatus("تم تحميل التوقع الحي بنجاح.");
-    return data;
-  }catch(err){
-    console.error(err);
-    document.getElementById("liveRecommendations").innerHTML = `<div class="error-box">تعذر تحميل التوقع الحي: ${err.message}</div>`;
-    setStatus("تعذر تحميل التوقع الحي.");
-    return null;
-  }
-}
-
-async function loadManualRisk(){
-  try{
-    setStatus("جاري حساب التوقع اليدوي...");
-    const x = currentInputs();
-
-    const temperature = document.getElementById("manualTemp").value || 25;
-    const humidity = document.getElementById("manualHumidity").value || 70;
-    const rainfall = document.getElementById("manualRain").value || 0;
-
-    const url = `${API}/forecast/risk?region=${encodeURIComponent(x.region)}&city=${encodeURIComponent(x.city)}&disease=${encodeURIComponent(x.disease)}&crop=${encodeURIComponent(x.crop)}&temperature=${encodeURIComponent(temperature)}&humidity=${encodeURIComponent(humidity)}&rainfall=${encodeURIComponent(rainfall)}&save_if_high=true`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if(data.success === false){
-      throw new Error(data.error || "تعذر حساب التوقع اليدوي");
+      if (val === "low") {
+        return `<span class="pill pill-low">${safeText(label)}</span>`;
+      }
+      return `<span class="pill pill-neutral">${safeText(label)}</span>`;
     }
 
-    cachedManualRisk = data;
+    function resetForecastForm() {
+      forecastForm.reset();
+      hideError();
+      hideSuccess();
+      setLoading(false);
 
-    document.getElementById("manualScore").textContent = `${safeText(data.final_score,0)}%`;
-    document.getElementById("manualLevel").innerHTML = badgeHTML(data?.risk_level?.level_ar || "-");
-    document.getElementById("manualWeatherScore").textContent = safeText(data.weather_score,0);
-    document.getElementById("manualHistoryScore").textContent = safeText(data?.history?.history_score,0);
-
-    const recs = Array.isArray(data.recommendations) ? data.recommendations : [];
-    document.getElementById("manualRecommendations").innerHTML =
-      recs.length
-      ? recs.map(r => `<div class="list-item">${r}</div>`).join("")
-      : "لا توجد توصيات للحساب اليدوي.";
-
-    setStatus("تم حساب التوقع اليدوي بنجاح.");
-    return data;
-  }catch(err){
-    console.error(err);
-    document.getElementById("manualRecommendations").innerHTML = `<div class="error-box">تعذر حساب التوقع اليدوي: ${err.message}</div>`;
-    setStatus("تعذر حساب التوقع اليدوي.");
-    return null;
-  }
-}
-
-async function loadAIForecast(){
-  try{
-    setStatus("جاري تشغيل توقع AI...");
-    const temperature = document.getElementById("aiTemp").value || 25;
-    const humidity = document.getElementById("aiHumidity").value || 70;
-    const rainfall = document.getElementById("aiRain").value || 0;
-    const cases_count = document.getElementById("aiCases").value || 0;
-    const severity_avg = document.getElementById("aiSeverity").value || 0;
-
-    const url = `${API}/forecast/ai?temperature=${encodeURIComponent(temperature)}&humidity=${encodeURIComponent(humidity)}&rainfall=${encodeURIComponent(rainfall)}&cases_count=${encodeURIComponent(cases_count)}&severity_avg=${encodeURIComponent(severity_avg)}`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if(data.success === false){
-      throw new Error(data.error || "تعذر تشغيل توقع AI");
+      document.getElementById("predictedCases").textContent = "--";
+      document.getElementById("riskLevelAr").textContent = "--";
+      document.getElementById("riskLevelCode").textContent = "--";
+      document.getElementById("usedTemperature").textContent = "--";
+      document.getElementById("usedHumidity").textContent = "--";
+      document.getElementById("usedRainfall").textContent = "--";
+      document.getElementById("usedCasesCount").textContent = "--";
+      document.getElementById("usedSeverityAvg").textContent = "--";
     }
 
-    const f = data.forecast || {};
+    function fillDemoData() {
+      document.getElementById("temperature").value = 28;
+      document.getElementById("humidity").value = 70;
+      document.getElementById("rainfall").value = 0;
+      document.getElementById("cases_count").value = 5;
+      document.getElementById("severity_avg").value = 8;
+      hideError();
+      showSuccess("تمت تعبئة بيانات تجريبية.");
+    }
 
-    document.getElementById("aiForecastBox").innerHTML = `
-      <div class="list">
-        <div class="list-item"><span class="highlight">المدخلات:</span> حرارة ${temperature} / رطوبة ${humidity} / أمطار ${rainfall}</div>
-        <div class="list-item"><span class="highlight">عدد الحالات:</span> ${cases_count}</div>
-        <div class="list-item"><span class="highlight">متوسط الشدة:</span> ${severity_avg}%</div>
-        <div class="list-item"><span class="highlight">الحالات المتوقعة:</span> ${safeText(f.predicted_cases, "-")}</div>
-        <div class="list-item"><span class="highlight">مستوى الخطر:</span> ${safeText(f.risk_level_ar || f.risk_level || "-")}</div>
-      </div>
-    `;
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
 
-    setStatus("تم تشغيل توقع AI بنجاح.");
-    return data;
-  }catch(err){
-    console.error(err);
-    document.getElementById("aiForecastBox").innerHTML = `<div class="error-box">تعذر تشغيل توقع AI: ${err.message}</div>`;
-    setStatus("تعذر تشغيل توقع AI.");
-    return null;
-  }
-}
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed: ${url}`);
+      }
 
-async function loadRegionsComparison(){
-  try{
-    setStatus("جاري تحميل مقارنة المناطق...");
-    const x = currentInputs();
-
-    const url = `${API}/forecast/live-regions?disease=${encodeURIComponent(x.disease)}&crop=${encodeURIComponent(x.crop)}&save_if_high=false`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    cachedRegions = Array.isArray(data) ? data : [];
-
-    const tbody = document.getElementById("regionsTable");
-    tbody.innerHTML = "";
-
-    if(!cachedRegions.length){
-      tbody.innerHTML = `<tr><td colspan="10">لا توجد بيانات حاليًا.</td></tr>`;
-      setStatus("لا توجد بيانات مقارنة للمناطق.");
       return data;
     }
 
-    cachedRegions.forEach((r, index) => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${index + 1}</td>
-          <td>${safeText(r.region)}</td>
-          <td>${safeText(r.city)}</td>
-          <td>${badgeHTML(r.risk_level_ar)}</td>
-          <td>${safeText(r.final_score,0)}%</td>
-          <td>${safeText(r.weather?.temperature)}</td>
-          <td>${safeText(r.weather?.humidity)}</td>
-          <td>${safeText(r.weather?.rainfall)}</td>
-          <td>${safeText(r.cases_count,0)}</td>
-          <td>${safeText(r.avg_severity,0)}%</td>
-        </tr>
-      `;
-    });
+    async function checkHealth() {
+      try {
+        const data = await fetchJson("/system/health");
 
-    destroyChart(regionsChart);
-    regionsChart = new Chart(document.getElementById("regionsChart"),{
-      type:"bar",
-      data:{
-        labels:cachedRegions.map(r => r.region),
-        datasets:[{
-          label:"درجة الخطر",
-          data:cachedRegions.map(r => Number(r.final_score || 0)),
-          borderWidth:1
-        }]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false
+        document.getElementById("kpiSystemStatus").textContent = safeText(data.status);
+        document.getElementById("kpiForecastModel").textContent = safeText(data.forecast_model);
+        document.getElementById("kpiAiModel").textContent = safeText(data.ai_model);
+        document.getElementById("kpiVersion").textContent = safeText(data.version);
+
+        document.getElementById("heroForecastChip").innerHTML =
+          `<span>●</span><span>Forecast service: ${safeText(data.forecast_model)} | ${safeText(data.version)}</span>`;
+      } catch (err) {
+        document.getElementById("heroForecastChip").innerHTML =
+          `<span>●</span><span>تعذر فحص خدمة التنبؤ</span>`;
+      }
+    }
+
+    forecastForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      hideError();
+      hideSuccess();
+      setLoading(true);
+
+      try {
+        const temperature = document.getElementById("temperature").value.trim();
+        const humidity = document.getElementById("humidity").value.trim();
+        const rainfall = document.getElementById("rainfall").value.trim();
+        const cases_count = document.getElementById("cases_count").value.trim();
+        const severity_avg = document.getElementById("severity_avg").value.trim();
+
+        if (!temperature || !humidity || !rainfall || !cases_count || !severity_avg) {
+          throw new Error("يرجى تعبئة جميع الحقول المطلوبة");
+        }
+
+        const params = new URLSearchParams({
+          temperature,
+          humidity,
+          rainfall,
+          cases_count,
+          severity_avg
+        });
+
+        const data = await fetchJson(`/forecast/predict?${params.toString()}`);
+
+        document.getElementById("predictedCases").textContent = safeText(data.predicted_cases);
+        document.getElementById("riskLevelAr").innerHTML =
+          riskPill(data.risk_level_code, data.risk_level_ar);
+        document.getElementById("riskLevelCode").textContent = safeText(data.risk_level_code);
+
+        const f = data.features_used || {};
+        document.getElementById("usedTemperature").textContent = safeText(f.temperature);
+        document.getElementById("usedHumidity").textContent = safeText(f.humidity);
+        document.getElementById("usedRainfall").textContent = safeText(f.rainfall);
+        document.getElementById("usedCasesCount").textContent = safeText(f.cases_count);
+        document.getElementById("usedSeverityAvg").textContent = safeText(f.severity_avg);
+
+        showSuccess("تم تنفيذ التنبؤ بنجاح.");
+      } catch (err) {
+        showError(err.message || "فشل تنفيذ التنبؤ");
+      } finally {
+        setLoading(false);
       }
     });
 
-    updateTopRegionCard();
-    setStatus("تم تحميل مقارنة المناطق بنجاح.");
-    return data;
-  }catch(err){
-    console.error(err);
-    document.getElementById("regionsTable").innerHTML = `<tr><td colspan="10">تعذر تحميل مقارنة المناطق: ${err.message}</td></tr>`;
-    setStatus("تعذر تحميل مقارنة المناطق.");
-    return null;
-  }
-}
-
-function buildExecutiveAnalysis(){
-  const box = document.getElementById("directAnalysis");
-
-  const live = cachedLiveRisk;
-  const manual = cachedManualRisk;
-  const regions = cachedRegions;
-
-  if(!live){
-    box.innerHTML = "شغّل التحليل الشامل أولًا لعرض القراءة التنفيذية.";
-    return;
-  }
-
-  const topRegion = regions?.length ? regions[0] : null;
-  let compareText = "لا توجد مقارنة.";
-  if(live && manual){
-    const diff = Number(live.final_score || 0) - Number(manual.final_score || 0);
-    if(diff > 0){
-      compareText = `التوقع الحي أعلى من الحساب اليدوي بمقدار ${diff.toFixed(2)} نقطة، وهذا يعني أن الطقس الحقيقي الحالي يرفع الخطر أكثر من السيناريو اليدوي.`;
-    }else if(diff < 0){
-      compareText = `الحساب اليدوي أعلى من التوقع الحي بمقدار ${Math.abs(diff).toFixed(2)} نقطة، وهذا يعني أن المدخلات اليدوية أشد من الظروف الحالية.`;
-    }else{
-      compareText = "التوقع الحي والحساب اليدوي متقاربان جدًا.";
-    }
-  }
-
-  box.innerHTML = `
-    <div class="list">
-      <div class="list-item"><span class="highlight">المنطقة المختارة:</span> ${safeText(live.region)} / ${safeText(live.city)}</div>
-      <div class="list-item"><span class="highlight">الخطر الحالي:</span> ${safeText(live.final_score,0)}% - ${safeText(live.risk_level?.level_ar)}</div>
-      <div class="list-item"><span class="highlight">الطقس المباشر:</span> حرارة ${safeText(live.live_weather?.temperature)}°م، رطوبة ${safeText(live.live_weather?.humidity)}%، أمطار ${safeText(live.live_weather?.rainfall)}</div>
-      <div class="list-item"><span class="highlight">الوضع التاريخي:</span> عدد الحالات ${safeText(live.history?.cases_count,0)}، ومتوسط الشدة ${safeText(live.history?.avg_severity,0)}%</div>
-      <div class="list-item"><span class="highlight">مقارنة مباشر/يدوي:</span> ${compareText}</div>
-      <div class="list-item"><span class="highlight">أعلى منطقة حاليًا:</span> ${topRegion ? `${topRegion.region} بدرجة ${topRegion.final_score}% ومستوى ${topRegion.risk_level_ar}` : "غير متاح"}</div>
-      <div class="list-item"><span class="highlight">قراءة تنفيذية:</span>
-        ${
-          live.risk_level?.level_ar === "مرتفع"
-          ? "الخطر مرتفع ويستدعي تدخلًا سريعًا، فحصًا ميدانيًا مكثفًا، وتقليل الرطوبة والبدء بإجراءات وقائية عاجلة."
-          : live.risk_level?.level_ar === "متوسط"
-          ? "الخطر متوسط ويحتاج متابعة نشطة كل 2-3 أيام مع تجهيز برنامج وقائي مناسب."
-          : "الخطر منخفض حاليًا، مع استمرار المراقبة الدورية والنظافة الزراعية."
-        }
-      </div>
-    </div>
-  `;
-}
-
-async function runAllAnalysis(){
-  await loadLiveWeather();
-  await loadLiveRisk();
-  await loadManualRisk();
-  await loadRegionsComparison();
-  await loadAIForecast();
-  buildExecutiveAnalysis();
-}
-
-document.getElementById("region").addEventListener("change", function(){
-  document.getElementById("city").value =
-    this.value === "مكة" ? "جدة" :
-    this.value === "المدينة" ? "المدينة المنورة" :
-    this.value === "القصيم" ? "بريدة" :
-    this.value === "الشرقية" ? "الدمام" :
-    this.value === "عسير" ? "أبها" :
-    this.value === "جازان" ? "جازان" :
-    this.value === "نجران" ? "نجران" :
-    this.value === "الباحة" ? "الباحة" :
-    this.value === "حائل" ? "حائل" :
-    this.value === "تبوك" ? "تبوك" :
-    this.value === "الجوف" ? "سكاكا" :
-    this.value === "الحدود الشمالية" ? "عرعر" :
-    this.value;
-});
-
-setInterval(() => {
-  if(cachedLiveRisk){
-    loadLiveWeather();
-    loadLiveRisk();
-  }
-}, 180000);
-
-runAllAnalysis();
-</script>
-
+    window.addEventListener("DOMContentLoaded", checkHealth);
+  </script>
 </body>
 </html>
