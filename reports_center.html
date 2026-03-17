@@ -3,97 +3,138 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phytologic AI | Reports Center</title>
+  <title>Phytologic AI | Reports Center Pro</title>
 
   <style>
     *{box-sizing:border-box}
 
+    :root{
+      --bg:#f4f7fb;
+      --bg-soft:#eef5ff;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5f59;
+      --secondary:#1d4ed8;
+      --danger:#dc2626;
+      --success:#15803d;
+      --warning:#b45309;
+      --shadow:0 10px 24px rgba(15,23,42,.08);
+    }
+
     body{
       margin:0;
-      font-family:Tahoma, Arial, sans-serif;
-      background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
-      color:#0f172a;
+      font-family:Tahoma,Arial,sans-serif;
+      background:linear-gradient(180deg,var(--bg-soft) 0%,var(--bg) 100%);
+      color:var(--text);
     }
 
     .page{
-      max-width:1450px;
+      max-width:1500px;
       margin:0 auto;
       padding:18px;
     }
 
     .hero{
-      background:linear-gradient(135deg,#0b1220,#0f766e);
+      background:
+        linear-gradient(135deg, rgba(11,18,32,.98), rgba(15,118,110,.92)),
+        radial-gradient(circle at top left, rgba(255,255,255,.14), transparent 35%);
       color:#fff;
       border-radius:28px;
       padding:28px;
-      box-shadow:0 16px 34px rgba(15,23,42,.12);
+      box-shadow:0 18px 36px rgba(15,23,42,.12);
       margin-bottom:18px;
+    }
+
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:18px;
+      flex-wrap:wrap;
     }
 
     .hero h1{
       margin:0 0 10px;
       font-size:34px;
+      line-height:1.2;
     }
 
     .hero p{
       margin:0;
       line-height:1.9;
       color:rgba(255,255,255,.92);
-      max-width:1000px;
+      max-width:980px;
     }
 
-    .hero a{
-      display:inline-block;
+    .hero-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
       margin-top:16px;
+    }
+
+    .hero a,
+    .hero button{
       text-decoration:none;
       color:#fff;
       background:rgba(255,255,255,.12);
-      border:1px solid rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.16);
       padding:10px 14px;
       border-radius:12px;
-      font-weight:700;
+      font-weight:800;
+      cursor:pointer;
     }
 
-    .grid{
+    .layout{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:430px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .stack{
+      display:grid;
       gap:18px;
     }
 
     .card{
-      background:#fff;
-      border:1px solid #e2e8f0;
+      background:var(--card);
+      border:1px solid var(--border);
       border-radius:22px;
-      box-shadow:0 10px 24px rgba(15,23,42,.08);
+      box-shadow:var(--shadow);
       overflow:hidden;
     }
 
     .card-header{
       padding:18px 20px 12px;
       border-bottom:1px solid #edf2f7;
+      background:linear-gradient(180deg,#fff 0%,#fbfdff 100%);
     }
 
     .card-header h2,
     .card-header h3{
       margin:0;
-      font-size:22px;
+      font-size:21px;
     }
 
     .card-header p{
       margin:8px 0 0;
-      color:#64748b;
-      font-size:14px;
+      color:var(--muted);
+      font-size:13px;
       line-height:1.8;
     }
 
     .card-body{
-      padding:20px;
+      padding:18px;
     }
 
     .form-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:14px;
+      gap:12px;
     }
 
     .field{
@@ -108,31 +149,39 @@
 
     label{
       font-size:14px;
-      font-weight:700;
+      font-weight:800;
       color:#334155;
     }
 
     input[type="text"],
     input[type="number"],
-    input[type="file"]{
+    input[type="file"],
+    textarea{
       width:100%;
       border:1px solid #dbe2ea;
       border-radius:14px;
       padding:12px 14px;
-      background:#fff;
       font-size:14px;
+      background:#fff;
       outline:none;
       transition:.2s ease;
+      font-family:inherit;
     }
 
-    input:focus{
-      border-color:#0f766e;
+    textarea{
+      min-height:90px;
+      resize:vertical;
+    }
+
+    input:focus,
+    textarea:focus{
+      border-color:var(--primary);
       box-shadow:0 0 0 4px rgba(15,118,110,.08);
     }
 
     .btn-row{
       display:flex;
-      gap:12px;
+      gap:10px;
       flex-wrap:wrap;
       margin-top:14px;
     }
@@ -140,7 +189,7 @@
     button{
       border:none;
       border-radius:14px;
-      padding:12px 18px;
+      padding:12px 16px;
       font-size:14px;
       font-weight:800;
       cursor:pointer;
@@ -152,19 +201,29 @@
     }
 
     .btn-primary{
-      background:#0f766e;
+      background:var(--primary);
       color:#fff;
     }
 
+    .btn-primary:hover{
+      background:var(--primary-dark);
+    }
+
     .btn-secondary{
-      background:#1d4ed8;
+      background:var(--secondary);
       color:#fff;
     }
 
     .btn-light{
       background:#fff;
       color:#1d4ed8;
-      border:1px solid #dbe2ea;
+      border:1px solid var(--border);
+    }
+
+    .btn-danger{
+      background:#fff;
+      color:var(--danger);
+      border:1px solid #fecaca;
     }
 
     .status{
@@ -176,49 +235,155 @@
       line-height:1.8;
     }
 
+    .status.show{display:block}
     .status.info{
-      display:block;
       background:#eff6ff;
       color:#1d4ed8;
       border:1px solid #bfdbfe;
     }
-
     .status.success{
-      display:block;
       background:#ecfdf5;
       color:#166534;
       border:1px solid #bbf7d0;
     }
-
     .status.error{
-      display:block;
       background:#fef2f2;
       color:#991b1b;
       border:1px solid #fecaca;
     }
+    .status.warning{
+      background:#fff7ed;
+      color:#9a3412;
+      border:1px solid #fed7aa;
+    }
+
+    .guide-box{
+      background:#fffdf5;
+      border:1px solid #fde68a;
+      border-radius:16px;
+      padding:14px;
+      line-height:1.9;
+      font-size:14px;
+    }
+
+    .preview-wrap{
+      display:none;
+      margin-top:14px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+      background:#fafcff;
+    }
+
+    .preview-wrap.show{
+      display:block;
+    }
+
+    .preview-title{
+      font-weight:800;
+      margin-bottom:10px;
+    }
+
+    .preview-img{
+      width:100%;
+      max-height:340px;
+      object-fit:contain;
+      border-radius:14px;
+      background:#fff;
+      border:1px solid var(--border);
+    }
+
+    .preview-meta{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    .progress-wrap{
+      display:none;
+      margin-top:14px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid #bfdbfe;
+      background:#eff6ff;
+    }
+
+    .progress-wrap.show{
+      display:block;
+    }
+
+    .progress-title{
+      font-weight:800;
+      color:#1d4ed8;
+      margin-bottom:10px;
+    }
+
+    .progress-bar{
+      width:100%;
+      height:12px;
+      background:#dbeafe;
+      border-radius:999px;
+      overflow:hidden;
+      margin-bottom:10px;
+    }
+
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:#1d4ed8;
+      transition:width .35s ease;
+    }
+
+    .progress-steps{
+      display:grid;
+      gap:6px;
+      font-size:13px;
+      color:#1e3a8a;
+    }
+
+    .retry-box{
+      display:none;
+      background:#fff7ed;
+      border:1px solid #fdba74;
+      border-radius:18px;
+      padding:16px;
+      line-height:1.9;
+    }
+
+    .retry-box.show{
+      display:block;
+    }
+
+    .retry-title{
+      font-weight:900;
+      color:#9a3412;
+      margin-bottom:8px;
+      font-size:16px;
+    }
 
     .summary-grid{
       display:grid;
-      grid-template-columns:1fr 1fr;
+      grid-template-columns:repeat(3,1fr);
       gap:12px;
     }
 
     .summary-item{
       background:#f8fbff;
-      border:1px solid #e2e8f0;
+      border:1px solid var(--border);
       border-radius:16px;
       padding:14px;
     }
 
     .summary-item .label{
-      color:#64748b;
-      font-size:13px;
+      color:var(--muted);
+      font-size:12px;
       margin-bottom:6px;
     }
 
     .summary-item .value{
       color:#0f172a;
-      font-size:16px;
+      font-size:15px;
       font-weight:800;
       line-height:1.7;
       word-break:break-word;
@@ -226,7 +391,7 @@
 
     .section-title{
       margin:18px 0 12px;
-      font-size:18px;
+      font-size:17px;
       font-weight:800;
     }
 
@@ -237,7 +402,7 @@
 
     .list-item{
       background:#fff;
-      border:1px solid #e2e8f0;
+      border:1px solid var(--border);
       border-radius:14px;
       padding:12px 14px;
       line-height:1.8;
@@ -252,7 +417,7 @@
     }
 
     .question-text{
-      font-weight:700;
+      font-weight:800;
       margin-bottom:10px;
       line-height:1.8;
     }
@@ -270,7 +435,7 @@
       background:#fff;
       cursor:pointer;
       font-size:13px;
-      font-weight:700;
+      font-weight:800;
       user-select:none;
     }
 
@@ -295,27 +460,60 @@
 
     .img-box{
       background:#fff;
-      border:1px solid #e2e8f0;
+      border:1px solid var(--border);
       border-radius:16px;
       padding:14px;
     }
 
     .img-box h4{
       margin:0 0 12px;
-      font-size:17px;
+      font-size:16px;
     }
 
     .img-box img{
       width:100%;
-      max-height:430px;
+      max-height:420px;
       object-fit:contain;
       border-radius:12px;
       background:#f8fafc;
       display:none;
     }
 
-    pre{
-      margin:0;
+    .weather-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:12px;
+    }
+
+    .weather-item{
+      background:#f8fbff;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      text-align:center;
+    }
+
+    .weather-item .label{
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:8px;
+    }
+
+    .weather-item .value{
+      font-size:18px;
+      font-weight:800;
+      color:#0f172a;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:14px;
+    }
+
+    .tech-box{
+      display:none;
+      margin-top:10px;
       background:#0f172a;
       color:#e2e8f0;
       padding:16px;
@@ -324,6 +522,23 @@
       white-space:pre-wrap;
       line-height:1.7;
       font-size:12px;
+      min-height:180px;
+    }
+
+    .tech-box.show{
+      display:block;
+    }
+
+    .system-badge{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+      margin-top:10px;
     }
 
     .footer-note{
@@ -333,11 +548,18 @@
       margin-top:18px;
     }
 
-    @media (max-width:1000px){
-      .grid,
+    @media (max-width:1200px){
+      .layout{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width:900px){
       .form-grid,
       .summary-grid,
-      .img-grid{
+      .img-grid,
+      .mini-grid,
+      .weather-grid{
         grid-template-columns:1fr;
       }
     }
@@ -345,155 +567,259 @@
 </head>
 <body>
   <div class="page">
+
     <section class="hero">
-      <h1>مركز التقارير والتشخيص</h1>
-      <p>
-        ارفع صورة النبات وشغّل نموذج الذكاء الاصطناعي الكامل، ثم راجع النتيجة،
-        الأسئلة التشخيصية، الشدة، صور التفسير، واحفظ التقرير داخل النظام.
-      </p>
-      <a href="/">العودة للرئيسية</a>
+      <div class="hero-top">
+        <div>
+          <h1>مركز التقارير الاحترافي</h1>
+          <p>
+            منصة تشخيص متكاملة تربط بين تحليل الصورة، التوصيات، شدة الإصابة، الأسئلة التشخيصية،
+            الطقس الحقيقي، التوقع الحي، وحفظ التقرير داخل النظام.
+          </p>
+          <div class="hero-actions">
+            <a href="/">العودة للرئيسية</a>
+            <button onclick="checkSystemHealth()">فحص حالة النظام</button>
+            <button onclick="downloadJson()">تنزيل النتيجة JSON</button>
+            <button onclick="toggleTechDetails()">إظهار / إخفاء التفاصيل التقنية</button>
+          </div>
+          <div id="systemBadge" class="system-badge">حالة النظام: غير مفحوصة</div>
+        </div>
+      </div>
     </section>
 
-    <div class="grid">
-      <section class="card">
-        <div class="card-header">
-          <h2>بيانات الإدخال</h2>
-          <p>أدخل بيانات الحالة، ثم نفّذ التشخيص من خلال API الأساسي.</p>
-        </div>
-        <div class="card-body">
-          <div class="form-grid">
-            <div class="field full">
-              <label for="file">صورة النبات</label>
-              <input type="file" id="file" accept="image/*" />
+    <div class="layout">
+
+      <div class="stack">
+        <section class="card">
+          <div class="card-header">
+            <h2>بيانات الإدخال</h2>
+            <p>ابدأ باتباع التعليمات، ثم اختر الصورة، ثم شغّل التشخيص.</p>
+          </div>
+          <div class="card-body">
+
+            <div class="guide-box">
+              <strong>تعليمات أخذ الصورة:</strong><br>
+              - قرّب الكاميرا من الورقة المصابة<br>
+              - اجعل البقع واضحة وكبيرة داخل الصورة<br>
+              - صوّر ورقة واحدة قدر الإمكان<br>
+              - استخدم إضاءة واضحة وتجنب الظلال<br>
+              - تجنب الخلفيات المعقدة<br>
+              - لا تلتقط صورة بعيدة أو مهزوزة
             </div>
 
-            <div class="field">
-              <label for="farmer_name">اسم المزارع</label>
-              <input type="text" id="farmer_name" placeholder="مثال: أحمد محمد" />
+            <div class="form-grid" style="margin-top:14px;">
+              <div class="field full">
+                <label for="file">صورة النبات</label>
+                <input type="file" id="file" accept="image/*" capture="environment" onchange="previewSelectedImage(event)" />
+              </div>
+
+              <div class="field">
+                <label for="farmer_name">اسم المزارع</label>
+                <input type="text" id="farmer_name" placeholder="مثال: أحمد محمد" />
+              </div>
+
+              <div class="field">
+                <label for="farm_name">اسم المزرعة</label>
+                <input type="text" id="farm_name" placeholder="مثال: مزرعة الأمل" />
+              </div>
+
+              <div class="field">
+                <label for="crop">المحصول</label>
+                <input type="text" id="crop" placeholder="مثال: طماطم" />
+              </div>
+
+              <div class="field">
+                <label for="city">المدينة</label>
+                <input type="text" id="city" placeholder="مثال: جدة" />
+              </div>
+
+              <div class="field">
+                <label for="region">المنطقة</label>
+                <input type="text" id="region" placeholder="مثال: مكة" />
+              </div>
+
+              <div class="field">
+                <label for="latitude">خط العرض</label>
+                <input type="number" step="any" id="latitude" placeholder="اختياري" />
+              </div>
+
+              <div class="field">
+                <label for="longitude">خط الطول</label>
+                <input type="number" step="any" id="longitude" placeholder="اختياري" />
+              </div>
+
+              <div class="field full">
+                <label for="notes">ملاحظات إضافية</label>
+                <textarea id="notes" placeholder="أي ملاحظات عن الحالة أو الأعراض أو تاريخ الإصابة"></textarea>
+              </div>
             </div>
 
-            <div class="field">
-              <label for="farm_name">اسم المزرعة</label>
-              <input type="text" id="farm_name" placeholder="مثال: مزرعة النخيل" />
+            <div id="previewWrap" class="preview-wrap">
+              <div class="preview-title">معاينة الصورة الحالية</div>
+              <img id="previewImage" class="preview-img" alt="Preview">
+              <div id="previewMeta" class="preview-meta">لم يتم اختيار صورة بعد.</div>
             </div>
 
-            <div class="field">
-              <label for="crop">المحصول</label>
-              <input type="text" id="crop" placeholder="مثال: طماطم" />
+            <div id="progressWrap" class="progress-wrap">
+              <div class="progress-title">مراحل التحليل</div>
+              <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+              </div>
+              <div id="progressSteps" class="progress-steps">
+                <div>بانتظار بدء التحليل...</div>
+              </div>
             </div>
 
-            <div class="field">
-              <label for="city">المدينة</label>
-              <input type="text" id="city" placeholder="مثال: جدة" />
+            <div class="btn-row">
+              <button class="btn-primary" onclick="runDiagnosis()">تشغيل التشخيص</button>
+              <button class="btn-secondary" onclick="saveCurrentDiagnosis()">حفظ التقرير</button>
+              <button class="btn-light" onclick="loadWeatherForecast()">تحديث الطقس</button>
+              <button class="btn-danger" onclick="clearAllData()">مسح</button>
             </div>
 
-            <div class="field">
-              <label for="region">المنطقة</label>
-              <input type="text" id="region" placeholder="مثال: مكة" />
+            <div id="statusBox" class="status info show">ابدأ باختيار صورة واضحة للورقة المصابة.</div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h3>الطقس الحقيقي والتوقع الحي</h3>
+            <p>بيانات طقس مباشرة من Open-Meteo حسب المدينة أو الإحداثيات.</p>
+          </div>
+          <div class="card-body">
+            <div class="weather-grid">
+              <div class="weather-item">
+                <div class="label">الحرارة الحالية</div>
+                <div class="value" id="weatherTemp">--</div>
+              </div>
+              <div class="weather-item">
+                <div class="label">الرطوبة الحالية</div>
+                <div class="value" id="weatherHumidity">--</div>
+              </div>
+              <div class="weather-item">
+                <div class="label">الهطول الحالي</div>
+                <div class="value" id="weatherRain">--</div>
+              </div>
+              <div class="weather-item">
+                <div class="label">سرعة الرياح</div>
+                <div class="value" id="weatherWind">--</div>
+              </div>
             </div>
 
-            <div class="field">
-              <label for="latitude">خط العرض</label>
-              <input type="number" step="any" id="latitude" placeholder="اختياري" />
+            <div class="section-title">التوقع الساعي</div>
+            <div id="hourlyForecastList" class="list-box">
+              <div class="list-item">لا توجد بيانات بعد.</div>
             </div>
 
-            <div class="field">
-              <label for="longitude">خط الطول</label>
-              <input type="number" step="any" id="longitude" placeholder="اختياري" />
+            <div class="section-title">التوقع اليومي</div>
+            <div id="dailyForecastList" class="list-box">
+              <div class="list-item">لا توجد بيانات بعد.</div>
             </div>
           </div>
+        </section>
+      </div>
 
-          <div class="btn-row">
-            <button class="btn-primary" onclick="runDiagnosis()">تشغيل التشخيص</button>
-            <button class="btn-secondary" onclick="saveCurrentDiagnosis()">حفظ التقرير</button>
-            <button class="btn-light" onclick="clearAllData()">مسح</button>
+      <div class="stack">
+        <section class="card">
+          <div class="card-header">
+            <h2>ملخص النتيجة</h2>
+            <p>يتم تعبئته مباشرة من استجابة <code>/diagnose</code>.</p>
           </div>
+          <div class="card-body">
 
-          <div id="statusBox" class="status info">جاهز لاستقبال الصورة وتشغيل التشخيص.</div>
-        </div>
-      </section>
+            <div id="retryBox" class="retry-box">
+              <div class="retry-title">يوصى بإعادة التصوير بصورة أقرب</div>
+              <div>
+                التشخيص الحالي يحتاج تأكيد إضافي. للحصول على نتيجة أدق:
+                التقط صورة أقرب للورقة المصابة، وركّز على البقع المرضية بوضوح،
+                وتجنب الخلفية المعقدة أو الإضاءة الضعيفة.
+              </div>
+            </div>
 
-      <section class="card">
-        <div class="card-header">
-          <h2>ملخص النتيجة</h2>
-          <p>يتم تعبئته مباشرة من استجابة <code>/diagnose</code>.</p>
-        </div>
-        <div class="card-body">
-          <div class="summary-grid">
-            <div class="summary-item"><div class="label">أفضل تشخيص</div><div class="value" id="bestClass">--</div></div>
-            <div class="summary-item"><div class="label">نسبة الثقة</div><div class="value" id="bestConfidence">--</div></div>
-            <div class="summary-item"><div class="label">التشخيص الثاني</div><div class="value" id="secondClass">--</div></div>
-            <div class="summary-item"><div class="label">ثقة التشخيص الثاني</div><div class="value" id="secondConfidence">--</div></div>
-            <div class="summary-item"><div class="label">مستوى الثقة</div><div class="value" id="confidenceLevel">--</div></div>
-            <div class="summary-item"><div class="label">حالة القرار</div><div class="value" id="decisionStatus">--</div></div>
-            <div class="summary-item"><div class="label">النبات</div><div class="value" id="plantName">--</div></div>
-            <div class="summary-item"><div class="label">المرض</div><div class="value" id="diseaseAr">--</div></div>
-            <div class="summary-item"><div class="label">المسبب</div><div class="value" id="causeName">--</div></div>
-            <div class="summary-item"><div class="label">شدة الإصابة</div><div class="value" id="severityInfo">--</div></div>
+            <div class="summary-grid" style="margin-top:14px;">
+              <div class="summary-item"><div class="label">أفضل تشخيص</div><div class="value" id="bestClass">--</div></div>
+              <div class="summary-item"><div class="label">نسبة الثقة</div><div class="value" id="bestConfidence">--</div></div>
+              <div class="summary-item"><div class="label">التشخيص الثاني</div><div class="value" id="secondClass">--</div></div>
+              <div class="summary-item"><div class="label">ثقة التشخيص الثاني</div><div class="value" id="secondConfidence">--</div></div>
+              <div class="summary-item"><div class="label">مستوى الثقة</div><div class="value" id="confidenceLevel">--</div></div>
+              <div class="summary-item"><div class="label">حالة القرار</div><div class="value" id="decisionStatus">--</div></div>
+              <div class="summary-item"><div class="label">النبات</div><div class="value" id="plantName">--</div></div>
+              <div class="summary-item"><div class="label">المرض</div><div class="value" id="diseaseAr">--</div></div>
+              <div class="summary-item"><div class="label">المسبب</div><div class="value" id="causeName">--</div></div>
+              <div class="summary-item"><div class="label">شدة الإصابة</div><div class="value" id="severityInfo">--</div></div>
+              <div class="summary-item"><div class="label">درجة الحرارة</div><div class="value" id="diagWeatherTemp">--</div></div>
+              <div class="summary-item"><div class="label">الرطوبة</div><div class="value" id="diagWeatherHumidity">--</div></div>
+            </div>
+
+            <div class="mini-grid" style="margin-top:18px;">
+              <div>
+                <div class="section-title">التوصيات</div>
+                <div id="adviceList" class="list-box">
+                  <div class="list-item">لا توجد توصيات بعد.</div>
+                </div>
+              </div>
+
+              <div>
+                <div class="section-title">برنامج المكافحة</div>
+                <div id="pesticideList" class="list-box">
+                  <div class="list-item">لا توجد بيانات بعد.</div>
+                </div>
+              </div>
+            </div>
           </div>
+        </section>
 
-          <div class="section-title">التوصيات</div>
-          <div class="list-box" id="adviceList">
-            <div class="list-item">لا توجد توصيات بعد.</div>
+        <section class="card">
+          <div class="card-header">
+            <h3>الأسئلة التشخيصية</h3>
+            <p>أسئلة داعمة للقرار تأتي من API مباشرة.</p>
           </div>
+          <div class="card-body">
+            <div id="questionsWrap" class="list-box">
+              <div class="list-item">لا توجد أسئلة تشخيصية بعد.</div>
+            </div>
+          </div>
+        </section>
 
-          <div class="section-title">برنامج المكافحة</div>
-          <div class="list-box" id="pesticideList">
-            <div class="list-item">لا توجد بيانات بعد.</div>
+        <section class="card">
+          <div class="card-header">
+            <h3>الصور التوضيحية</h3>
+            <p>صور Grad-CAM وصورة شدة الإصابة.</p>
           </div>
-        </div>
-      </section>
+          <div class="card-body">
+            <div class="img-grid">
+              <div class="img-box">
+                <h4>Grad-CAM</h4>
+                <img id="gradcamImage" alt="GradCAM" />
+              </div>
+              <div class="img-box">
+                <h4>تحديد شدة الإصابة</h4>
+                <img id="severityImage" alt="Severity" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="card-header">
+            <h3>التفاصيل التقنية</h3>
+            <p>هذه البيانات للمراجعة الفنية فقط، وهي مخفية افتراضيًا.</p>
+          </div>
+          <div class="card-body">
+            <pre id="techBox" class="tech-box">لا توجد نتيجة بعد.</pre>
+          </div>
+        </section>
+      </div>
+
     </div>
 
-    <section class="card" style="margin-top:18px;">
-      <div class="card-header">
-        <h3>الأسئلة التشخيصية</h3>
-        <p>هذه الأسئلة تأتي مباشرة من API التشخيص.</p>
-      </div>
-      <div class="card-body">
-        <div id="questionsWrap" class="list-box">
-          <div class="list-item">لا توجد أسئلة تشخيصية بعد.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:18px;">
-      <div class="card-header">
-        <h3>الصور التوضيحية</h3>
-        <p>صور Grad-CAM وصورة شدة الإصابة إن كانت متاحة.</p>
-      </div>
-      <div class="card-body">
-        <div class="img-grid">
-          <div class="img-box">
-            <h4>Grad-CAM</h4>
-            <img id="gradcamImage" alt="GradCAM" />
-          </div>
-          <div class="img-box">
-            <h4>تحديد شدة الإصابة</h4>
-            <img id="severityImage" alt="Severity" />
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:18px;">
-      <div class="card-header">
-        <h3>النتيجة الخام</h3>
-        <p>الـ JSON الكامل القادم من <code>/diagnose</code>.</p>
-      </div>
-      <div class="card-body">
-        <pre id="rawResult">لا توجد نتيجة بعد.</pre>
-      </div>
-    </section>
-
-    <div class="footer-note">
-      Phytologic AI Reports Center
-    </div>
+    <div class="footer-note">Phytologic AI Reports Center Pro</div>
   </div>
 
   <script>
     let lastDiagnosisResult = null;
     let questionAnswers = {};
+    let lastWeatherForecast = null;
 
     function safe(v, fallback='--'){
       return (v === null || v === undefined || v === '') ? fallback : v;
@@ -505,12 +831,66 @@
 
     function setStatus(type, message){
       const box = document.getElementById('statusBox');
-      box.className = 'status ' + type;
+      box.className = 'status show ' + type;
       box.textContent = message;
     }
 
     function clearList(id, text){
       document.getElementById(id).innerHTML = `<div class="list-item">${text}</div>`;
+    }
+
+    function toggleTechDetails(){
+      document.getElementById('techBox').classList.toggle('show');
+    }
+
+    function showProgress(){
+      document.getElementById('progressWrap').classList.add('show');
+    }
+
+    function hideProgress(){
+      document.getElementById('progressWrap').classList.remove('show');
+    }
+
+    function updateProgress(percent, steps){
+      document.getElementById('progressFill').style.width = percent + '%';
+      document.getElementById('progressSteps').innerHTML = steps.map(s => `<div>${s}</div>`).join('');
+    }
+
+    function previewSelectedImage(event){
+      const file = event.target.files[0];
+      const wrap = document.getElementById('previewWrap');
+      const img = document.getElementById('previewImage');
+      const meta = document.getElementById('previewMeta');
+
+      if(!file){
+        wrap.classList.remove('show');
+        img.src = '';
+        meta.textContent = 'لم يتم اختيار صورة بعد.';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e){
+        img.src = e.target.result;
+        wrap.classList.add('show');
+        meta.textContent = `اسم الملف: ${file.name} | الحجم: ${(file.size / 1024).toFixed(1)} KB`;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function evaluatePhotoRetryNeed(data){
+      const best = Number(data.best_prediction?.confidence || 0);
+      const second = Number(data.second_prediction?.confidence || 0);
+      const diff = Math.abs(best - second);
+
+      const needRetry = best < 60 || diff < 10 || data.decision_status === 'غير مؤكد';
+
+      const box = document.getElementById('retryBox');
+      if(needRetry){
+        box.classList.add('show');
+      }else{
+        box.classList.remove('show');
+      }
     }
 
     function renderAdvice(advice){
@@ -598,6 +978,7 @@
         gradcam.style.display = 'block';
       } else {
         gradcam.style.display = 'none';
+        gradcam.src = '';
       }
 
       if(data.severity && data.severity.severity_overlay_b64){
@@ -605,6 +986,7 @@
         severity.style.display = 'block';
       } else {
         severity.style.display = 'none';
+        severity.src = '';
       }
     }
 
@@ -625,11 +1007,104 @@
         setText('severityInfo', '--');
       }
 
+      setText('diagWeatherTemp', data.weather?.temperature !== undefined && data.weather?.temperature !== null ? data.weather.temperature + ' °م' : '--');
+      setText('diagWeatherHumidity', data.weather?.humidity !== undefined && data.weather?.humidity !== null ? data.weather.humidity + ' %' : '--');
+
       renderAdvice(data.disease_info?.advice || []);
       renderPesticide(data.pesticide_program);
       renderQuestions(data.questions || []);
       renderImages(data);
-      document.getElementById('rawResult').textContent = JSON.stringify(data, null, 2);
+      document.getElementById('techBox').textContent = JSON.stringify(data, null, 2);
+
+      evaluatePhotoRetryNeed(data);
+    }
+
+    function renderWeatherForecast(data){
+      const current = data.current || {};
+      const hourly = data.hourly || {};
+      const daily = data.daily || {};
+
+      setText('weatherTemp', current.temperature_2m !== undefined ? current.temperature_2m + ' °م' : '--');
+      setText('weatherHumidity', current.relative_humidity_2m !== undefined ? current.relative_humidity_2m + ' %' : '--');
+      setText('weatherRain', current.precipitation !== undefined ? current.precipitation + ' مم' : '--');
+      setText('weatherWind', current.wind_speed_10m !== undefined ? current.wind_speed_10m + ' كم/س' : '--');
+
+      const hourlyWrap = document.getElementById('hourlyForecastList');
+      if(hourly.time && hourly.time.length){
+        hourlyWrap.innerHTML = hourly.time.map((t, i) => `
+          <div class="list-item">
+            <strong>${t}</strong><br>
+            الحرارة: ${hourly.temperature_2m?.[i] ?? '--'} °م |
+            الرطوبة: ${hourly.relative_humidity_2m?.[i] ?? '--'} % |
+            المطر: ${hourly.precipitation?.[i] ?? '--'} مم
+          </div>
+        `).join('');
+      } else {
+        hourlyWrap.innerHTML = '<div class="list-item">لا توجد بيانات ساعية.</div>';
+      }
+
+      const dailyWrap = document.getElementById('dailyForecastList');
+      if(daily.time && daily.time.length){
+        dailyWrap.innerHTML = daily.time.map((t, i) => `
+          <div class="list-item">
+            <strong>${t}</strong><br>
+            العظمى: ${daily.temperature_2m_max?.[i] ?? '--'} °م |
+            الصغرى: ${daily.temperature_2m_min?.[i] ?? '--'} °م |
+            مجموع المطر: ${daily.precipitation_sum?.[i] ?? '--'} مم
+          </div>
+        `).join('');
+      } else {
+        dailyWrap.innerHTML = '<div class="list-item">لا توجد بيانات يومية.</div>';
+      }
+    }
+
+    async function loadWeatherForecast(showWarning=true){
+      try{
+        const city = document.getElementById('city').value.trim();
+        const region = document.getElementById('region').value.trim();
+        const latitude = document.getElementById('latitude').value.trim();
+        const longitude = document.getElementById('longitude').value.trim();
+
+        const params = new URLSearchParams();
+        if(city) params.append('city', city);
+        if(region) params.append('region', region);
+        if(latitude) params.append('latitude', latitude);
+        if(longitude) params.append('longitude', longitude);
+
+        const res = await fetch('/weather/forecast?' + params.toString());
+        const data = await res.json();
+
+        if(!res.ok){
+          if(showWarning){
+            setStatus('warning', data.error || 'تعذر تحميل بيانات الطقس.');
+          }
+          return false;
+        }
+
+        lastWeatherForecast = data;
+        renderWeatherForecast(data);
+        return true;
+      }catch(err){
+        console.error(err);
+        return false;
+      }
+    }
+
+    async function checkSystemHealth(){
+      try{
+        const res = await fetch('/system/health');
+        const data = await res.json();
+
+        if(!res.ok){
+          document.getElementById('systemBadge').textContent = 'حالة النظام: فشل الفحص';
+          return;
+        }
+
+        document.getElementById('systemBadge').textContent =
+          `حالة النظام: ${safe(data.status)} | AI: ${safe(data.ai_model)} | Forecast: ${safe(data.forecast_model)}`;
+      }catch(err){
+        document.getElementById('systemBadge').textContent = 'حالة النظام: خطأ في الفحص';
+      }
     }
 
     async function runDiagnosis(){
@@ -640,6 +1115,11 @@
           return;
         }
 
+        showProgress();
+        updateProgress(10, [
+          'تم اختيار الصورة بنجاح.',
+          'جاري رفع الصورة إلى النظام...'
+        ]);
         setStatus('info', 'جاري رفع الصورة وتشغيل التشخيص...');
 
         const fd = new FormData();
@@ -655,6 +1135,12 @@
         if(lat) fd.append('latitude', lat);
         if(lon) fd.append('longitude', lon);
 
+        updateProgress(30, [
+          'تم رفع الصورة.',
+          'جاري تحليل نمط الإصابة...',
+          'جاري التحقق من أفضل تشخيص...'
+        ]);
+
         const res = await fetch('/diagnose', {
           method: 'POST',
           body: fd
@@ -663,19 +1149,55 @@
         const data = await res.json();
 
         if(!res.ok){
+          hideProgress();
           setStatus('error', data.error || 'فشل التشخيص.');
-          document.getElementById('rawResult').textContent = JSON.stringify(data, null, 2);
+          document.getElementById('techBox').textContent = JSON.stringify(data, null, 2);
           return;
         }
+
+        updateProgress(60, [
+          'تم استخراج التشخيص الأولي.',
+          'جاري حساب شدة الإصابة...',
+          'جاري إعداد التوصيات وبرنامج المكافحة...'
+        ]);
 
         lastDiagnosisResult = data;
         questionAnswers = {};
         renderSummary(data);
 
-        setStatus('success', 'تم التشخيص بنجاح. يمكنك الآن حفظ التقرير.');
+        updateProgress(80, [
+          'تم تجهيز النتيجة.',
+          'جاري تحديث الطقس الحقيقي...',
+          'جاري تحميل التوقع الحي...'
+        ]);
+
+        const weatherLoaded = await loadWeatherForecast(false);
+
+        updateProgress(100, [
+          'اكتمل تحليل الصورة.',
+          weatherLoaded ? 'تم تحديث الطقس والتوقع الحي.' : 'تعذر تحديث الطقس حاليًا.',
+          'النتيجة النهائية جاهزة للعرض.'
+        ]);
+
+        if(!weatherLoaded){
+          if(data.decision_status === 'غير مؤكد' || Number(data.best_prediction?.confidence || 0) < 60){
+            setStatus('warning', 'تم التشخيص، لكن تعذر تحديث الطقس حاليًا، ويوصى بإعادة التصوير بصورة أقرب للحصول على نتيجة أدق.');
+          } else {
+            setStatus('warning', 'تم التشخيص بنجاح، لكن تعذر تحديث بيانات الطقس حاليًا.');
+          }
+          return;
+        }
+
+        if(data.decision_status === 'غير مؤكد' || Number(data.best_prediction?.confidence || 0) < 60){
+          setStatus('warning', 'تم تحديث الطقس، لكن يوصى بإعادة التصوير بصورة أقرب للحصول على نتيجة أدق.');
+        } else {
+          setStatus('success', 'تم التشخيص وتحديث الطقس بنجاح.');
+        }
+
       }catch(err){
+        hideProgress();
         setStatus('error', 'حدث خطأ أثناء تنفيذ التشخيص.');
-        document.getElementById('rawResult').textContent = String(err);
+        document.getElementById('techBox').textContent = String(err);
       }
     }
 
@@ -703,7 +1225,10 @@
           severity_percent: lastDiagnosisResult.severity?.severity_percent_est,
           cause: lastDiagnosisResult.disease_info?.cause,
           image_path: lastDiagnosisResult.image_path || "",
-          question_answers: questionAnswers
+          question_answers: questionAnswers,
+          notes: document.getElementById('notes').value,
+          weather_snapshot: lastDiagnosisResult.weather || null,
+          forecast_snapshot: lastWeatherForecast || null
         };
 
         const res = await fetch('/api/diagnosis', {
@@ -727,36 +1252,57 @@
 
     function clearAllData(){
       document.getElementById('file').value = '';
-      ['farmer_name','farm_name','crop','city','region','latitude','longitude'].forEach(id => {
+      ['farmer_name','farm_name','crop','city','region','latitude','longitude','notes'].forEach(id => {
         document.getElementById(id).value = '';
       });
 
       lastDiagnosisResult = null;
+      lastWeatherForecast = null;
       questionAnswers = {};
 
-      setText('bestClass','--');
-      setText('bestConfidence','--');
-      setText('secondClass','--');
-      setText('secondConfidence','--');
-      setText('confidenceLevel','--');
-      setText('decisionStatus','--');
-      setText('plantName','--');
-      setText('diseaseAr','--');
-      setText('causeName','--');
-      setText('severityInfo','--');
+      ['bestClass','bestConfidence','secondClass','secondConfidence','confidenceLevel','decisionStatus','plantName','diseaseAr','causeName','severityInfo','diagWeatherTemp','diagWeatherHumidity','weatherTemp','weatherHumidity','weatherRain','weatherWind'].forEach(id => setText(id,'--'));
 
       clearList('adviceList','لا توجد توصيات بعد.');
       clearList('pesticideList','لا توجد بيانات بعد.');
       clearList('questionsWrap','لا توجد أسئلة تشخيصية بعد.');
+      clearList('hourlyForecastList','لا توجد بيانات بعد.');
+      clearList('dailyForecastList','لا توجد بيانات بعد.');
 
+      document.getElementById('retryBox').classList.remove('show');
       document.getElementById('gradcamImage').style.display = 'none';
       document.getElementById('severityImage').style.display = 'none';
       document.getElementById('gradcamImage').src = '';
       document.getElementById('severityImage').src = '';
-      document.getElementById('rawResult').textContent = 'لا توجد نتيجة بعد.';
+      document.getElementById('techBox').textContent = 'لا توجد نتيجة بعد.';
+      document.getElementById('techBox').classList.remove('show');
+      document.getElementById('previewWrap').classList.remove('show');
+      document.getElementById('previewImage').src = '';
+      document.getElementById('previewMeta').textContent = 'لم يتم اختيار صورة بعد.';
+      hideProgress();
+      updateProgress(0, ['بانتظار بدء التحليل...']);
 
       setStatus('info', 'تم مسح البيانات.');
     }
+
+    function downloadJson(){
+      if(!lastDiagnosisResult){
+        setStatus('warning', 'لا توجد نتيجة لتنزيلها.');
+        return;
+      }
+
+      const blob = new Blob([JSON.stringify(lastDiagnosisResult, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'diagnosis_result.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkSystemHealth();
+      updateProgress(0, ['بانتظار بدء التحليل...']);
+    });
   </script>
 </body>
 </html>
