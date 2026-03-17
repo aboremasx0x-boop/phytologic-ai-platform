@@ -85,6 +85,7 @@ PAGE_FILE_MAP = {
     "dashboard": "dashboard.html",
     "alerts": "alerts.html",
     "report_center": "report_center.html",
+    "reports_center": "reports_center.html",
     "farmers": "farmers.html",
     "admin": "admin.html",
     "national_center": "national_center.html",
