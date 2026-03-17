@@ -1,474 +1,1271 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - مركز التقارير</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | مركز التقارير</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * { box-sizing: border-box; }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --success:#15803d;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+      --radius:22px;
+    }
 
-.page{
-max-width:1500px;
-margin:16px auto;
-padding:0 14px 28px;
-}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
+      color:var(--text);
+    }
 
-.hero{
-background:
-linear-gradient(135deg,rgba(11,24,68,.97),rgba(20,124,85,.90)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:26px;
-padding:24px 26px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
+    .page{
+      max-width:1500px;
+      margin:0 auto;
+      padding:18px;
+    }
 
-.hero-title{
-font-size:34px;
-font-weight:800;
-margin:0 0 8px 0;
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(8,47,73,.97), rgba(15,118,110,.92)),
+        radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 35%);
+      color:white;
+      border-radius:28px;
+      padding:28px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
 
-.hero-sub{
-font-size:14px;
-line-height:1.9;
-opacity:.95;
-max-width:900px;
-}
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
 
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:14px;
-margin-bottom:16px;
-}
+    .hero h1{
+      margin:0 0 10px;
+      font-size:32px;
+    }
 
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-}
+    .hero p{
+      margin:0;
+      line-height:1.9;
+      max-width:880px;
+      color:rgba(255,255,255,.9);
+      font-size:15px;
+    }
 
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:8px;
-font-weight:700;
-}
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:20px;
+    }
 
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 18px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
+    .btn:hover{ transform:translateY(-1px); }
 
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
+    .btn-white{
+      background:white;
+      color:#0b5b55;
+    }
 
-.section-title{
-font-size:18px;
-font-weight:800;
-}
+    .btn-white:hover{ background:#f4f7ff; }
 
-.card-body{
-padding:16px;
-}
+    .btn-glass{
+      background:rgba(255,255,255,.12);
+      color:white;
+      border:1px solid rgba(255,255,255,.18);
+    }
 
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
+    .btn-glass:hover{ background:rgba(255,255,255,.18); }
 
-.field label{
-display:block;
-font-size:13px;
-margin-bottom:8px;
-font-weight:700;
-color:#64748b;
-}
+    .btn-primary{
+      background:var(--primary);
+      color:white;
+    }
 
-.field input,.field select{
-width:100%;
-padding:12px;
-border-radius:14px;
-border:1px solid #dbe4f2;
-font-size:14px;
-}
+    .btn-primary:hover{
+      background:var(--primary-dark);
+    }
 
-.toolbar{
-margin-top:14px;
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
+    .btn-outline{
+      background:white;
+      color:var(--secondary);
+      border:1px solid #cbd5e1;
+    }
 
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-weight:800;
-cursor:pointer;
-font-size:14px;
-}
+    .btn-outline:hover{
+      background:#f8fbff;
+    }
 
-.btn-primary{
-background:#16a34a;
-color:white;
-}
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-.btn-dark{
-background:#1e293b;
-color:white;
-}
+    .grid{
+      display:grid;
+      gap:18px;
+    }
 
-.btn-secondary{
-background:#2563eb;
-color:white;
-}
+    .grid-2{ grid-template-columns:1.1fr .9fr; }
+    .grid-3{ grid-template-columns:repeat(3,1fr); }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
 
-.table-wrap{
-overflow:auto;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-min-width:900px;
-}
+    .card-header{
+      padding:18px 20px 12px;
+      border-bottom:1px solid #edf2f7;
+    }
 
-th,td{
-padding:11px;
-border-bottom:1px solid #edf2fb;
-font-size:13px;
-}
+    .card-header h2,
+    .card-header h3{
+      margin:0;
+      font-size:20px;
+    }
 
-th{
-background:#f8fbff;
-font-weight:800;
-}
+    .card-header p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-.badge{
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
-color:white;
-font-weight:700;
-}
+    .card-body{ padding:20px; }
 
-.badge-green{background:#16a34a}
-.badge-blue{background:#2563eb}
-.badge-brown{background:#8b5e34}
-.badge-gray{background:#64748b}
+    .kpi{
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      min-height:118px;
+    }
 
-.status-bar{
-margin-top:10px;
-padding:10px;
-border-radius:14px;
-background:#eef4ff;
-border:1px solid #dbe7ff;
-font-size:13px;
-}
-</style>
+    .kpi-label{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
+
+    .kpi-value{
+      font-size:28px;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    .kpi-sub{
+      margin-top:8px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.8;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+      color:#1f2937;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"]{
+      width:100%;
+      border:1px solid #dbe2ea;
+      border-radius:14px;
+      padding:13px 14px;
+      background:#fff;
+      font-size:15px;
+      outline:none;
+    }
+
+    input:focus{
+      border-color:#0f766e;
+      box-shadow:0 0 0 4px rgba(15,118,110,.08);
+    }
+
+    .submit-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .preview-box{
+      border:1px dashed #cbd5e1;
+      border-radius:18px;
+      min-height:260px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#f8fbff;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .preview-box img{
+      max-width:100%;
+      max-height:420px;
+      display:block;
+      object-fit:contain;
+    }
+
+    .placeholder{
+      color:var(--muted);
+      text-align:center;
+      padding:20px;
+      line-height:1.9;
+      font-size:15px;
+    }
+
+    .loading{
+      display:none;
+      margin-top:14px;
+      color:var(--secondary);
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .error-box, .success-box{
+      display:none;
+      margin-top:16px;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      line-height:1.9;
+    }
+
+    .error-box{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+
+    .success-box{
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
+
+    .info-box{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:#fcfdff;
+    }
+
+    .info-box h4{
+      margin:0 0 12px;
+      font-size:17px;
+    }
+
+    .info-list{
+      display:grid;
+      gap:10px;
+    }
+
+    .info-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding-bottom:10px;
+      border-bottom:1px dashed #e5e7eb;
+    }
+
+    .info-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
+
+    .key{
+      color:var(--muted);
+      font-size:14px;
+    }
+
+    .value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      text-align:left;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
+
+    .pill-low{
+      background:#ecfdf5;
+      color:#166534;
+    }
+
+    .pill-moderate{
+      background:#fff7ed;
+      color:#9a3412;
+    }
+
+    .pill-high{
+      background:#fef2f2;
+      color:#991b1b;
+    }
+
+    .pill-neutral{
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .confidence-bar{
+      width:100%;
+      height:10px;
+      border-radius:999px;
+      background:#e5e7eb;
+      overflow:hidden;
+      margin-top:8px;
+    }
+
+    .confidence-fill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#0f766e,#22c55e);
+      width:0%;
+      transition:width .4s ease;
+    }
+
+    .images-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+    }
+
+    .img-card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      background:white;
+    }
+
+    .img-head{
+      padding:12px 14px;
+      border-bottom:1px solid var(--border);
+      font-weight:700;
+      background:#f8fbff;
+    }
+
+    .img-body{
+      min-height:280px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff;
+      padding:12px;
+    }
+
+    .img-card img{
+      max-width:100%;
+      max-height:350px;
+      object-fit:contain;
+    }
+
+    .list-box{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:10px;
+    }
+
+    .list-box li{
+      border:1px solid #edf2f7;
+      background:#fafcff;
+      border-radius:14px;
+      padding:12px 14px;
+      line-height:1.9;
+      font-size:14px;
+    }
+
+    .table-wrap{
+      overflow-x:auto;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:white;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+    }
+
+    thead{ background:#f8fbff; }
+
+    th,td{
+      text-align:right;
+      padding:14px 16px;
+      border-bottom:1px solid #edf2f7;
+      font-size:14px;
+      vertical-align:top;
+    }
+
+    th{
+      color:#334155;
+      font-weight:800;
+    }
+
+    tr:hover td{ background:#fbfdff; }
+
+    .empty{
+      color:var(--muted);
+      text-align:center;
+      padding:24px 10px;
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    .footer-note{
+      text-align:center;
+      color:#64748b;
+      padding:18px 10px 8px;
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    @media (max-width:1200px){
+      .grid-4, .grid-3, .grid-2, .mini-grid, .images-grid, .form-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
-
 <body>
-
-<div class="page">
-
-<div class="hero">
-<h1 class="hero-title">مركز التقارير الزراعية</h1>
-<div class="hero-sub">
-لوحة تقارير موحدة لعرض وتحليل بيانات المزارعين والمحاصيل والمناطق داخل النظام.
-يمكن إنشاء تقارير يومية وأسبوعية وشهرية وتصديرها.
-</div>
-</div>
-
-<div class="stats-grid">
-
-<div class="stat-card">
-<div class="stat-label">إجمالي المزارعين</div>
-<div class="stat-value" id="totalFarmers">0</div>
-</div>
-
-<div class="stat-card">
-<div class="stat-label">عدد المناطق</div>
-<div class="stat-value" id="regionsCount">0</div>
-</div>
-
-<div class="stat-card">
-<div class="stat-label">عدد المحاصيل</div>
-<div class="stat-value" id="cropsCount">0</div>
-</div>
-
-<div class="stat-card">
-<div class="stat-label">آخر تحديث</div>
-<div class="stat-value" id="lastUpdate" style="font-size:20px">-</div>
-</div>
-
-</div>
-<div class="card">
-<div class="section-header">
-<div class="section-title">إعداد التقرير</div>
-</div>
-
-<div class="card-body">
-
-<div class="grid-3">
-
-<div class="field">
-<label>نوع التقرير</label>
-<select id="reportType">
-<option value="daily">يومي</option>
-<option value="weekly">أسبوعي</option>
-<option value="monthly">شهري</option>
-<option value="all">كامل</option>
-</select>
-</div>
-
-<div class="field">
-<label>تصفية المنطقة</label>
-<input id="regionFilter" placeholder="مثال: الرياض">
-</div>
-
-<div class="field">
-<label>تصفية المحصول</label>
-<input id="cropFilter" placeholder="مثال: نخيل">
-</div>
-
-</div>
-
-<div class="toolbar">
-
-<button class="btn btn-primary" onclick="generateReport()">إنشاء التقرير</button>
-
-<button class="btn btn-secondary" onclick="exportCSV()">تصدير CSV</button>
-
-<button class="btn btn-dark" onclick="exportJSON()">تصدير JSON</button>
-
-<button class="btn btn-dark" onclick="printReport()">طباعة التقرير</button>
-
-</div>
-
-<div class="status-bar" id="statusBar">
-جاهز لإنشاء التقرير.
-</div>
-
-</div>
-</div>
-<div class="card">
-
-<div class="section-header">
-<div class="section-title">نتائج التقرير</div>
-</div>
-
-<div class="card-body">
-
-<div class="table-wrap">
-
-<table>
-
-<thead>
-<tr>
-<th>#</th>
-<th>المزارع</th>
-<th>الهاتف</th>
-<th>المزرعة</th>
-<th>المنطقة</th>
-<th>المدينة</th>
-<th>المحصول</th>
-<th>تاريخ التسجيل</th>
-</tr>
-</thead>
-
-<tbody id="reportTable">
-<tr>
-<td colspan="8">لم يتم إنشاء تقرير بعد</td>
-</tr>
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-</div>
-<script>
-
-const API = "http://127.0.0.1:8000";
-
-let farmersData = [];
-let reportData = [];
-
-function setStatus(msg){
-document.getElementById("statusBar").textContent = msg;
-}
-
-async function loadFarmers(){
-
-setStatus("جاري تحميل البيانات...")
-
-const res = await fetch(API + "/farmers");
-
-farmersData = await res.json();
-
-document.getElementById("totalFarmers").textContent = farmersData.length;
-
-const regions = new Set();
-const crops = new Set();
-
-farmersData.forEach(f=>{
-regions.add(f.region);
-crops.add(f.crop);
-});
-
-document.getElementById("regionsCount").textContent = regions.size;
-document.getElementById("cropsCount").textContent = crops.size;
-
-document.getElementById("lastUpdate").textContent =
-new Date().toLocaleTimeString();
-
-setStatus("تم تحميل البيانات بنجاح");
-
-}
-
-function generateReport(){
-
-let region = document.getElementById("regionFilter").value.trim();
-let crop = document.getElementById("cropFilter").value.trim();
-
-reportData = farmersData.filter(f=>{
-
-if(region && f.region !== region) return false;
-if(crop && f.crop !== crop) return false;
-
-return true;
-
-});
-
-renderTable();
-
-setStatus("تم إنشاء التقرير");
-
-}
-
-function renderTable(){
-
-const table = document.getElementById("reportTable");
-
-if(!reportData.length){
-
-table.innerHTML =
-'<tr><td colspan="8">لا توجد بيانات مطابقة</td></tr>';
-
-return;
-
-}
-
-table.innerHTML = reportData.map((f,i)=>`
-
-<tr>
-
-<td>${i+1}</td>
-<td>${f.name}</td>
-<td>${f.phone}</td>
-<td>${f.farm_name}</td>
-<td><span class="badge badge-green">${f.region}</span></td>
-<td>${f.city}</td>
-<td><span class="badge badge-blue">${f.crop}</span></td>
-<td>${f.created_at}</td>
-
-</tr>
-
-`).join("");
-
-}
-
-function exportJSON(){
-
-const blob =
-new Blob([JSON.stringify(reportData,null,2)],{type:"application/json"});
-
-const a = document.createElement("a");
-
-a.href = URL.createObjectURL(blob);
-
-a.download="farmers_report.json";
-
-a.click();
-
-}
-
-function exportCSV(){
-
-let rows = [
-["name","phone","farm","region","city","crop"]
-];
-
-reportData.forEach(f=>{
-rows.push([
-f.name,
-f.phone,
-f.farm_name,
-f.region,
-f.city,
-f.crop
-]);
-});
-
-let csv = rows.map(r=>r.join(",")).join("\n");
-
-const blob =
-new Blob([csv],{type:"text/csv"});
-
-const a=document.createElement("a");
-
-a.href = URL.createObjectURL(blob);
-
-a.download="farmers_report.csv";
-
-a.click();
-
-}
-
-function printReport(){
-window.print();
-}
-
-loadFarmers();
-
-</script>
-
+  <div class="page">
+
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>مركز التقارير</h1>
+          <p>
+            صفحة مركزية لإنتاج التقارير من الصور النباتية، عرض نتائج التشخيص، تنزيل PDF، ومراجعة
+            مؤشرات المنصة، الإحصائيات العامة، وأحدث التنبيهات في مكان واحد.
+          </p>
+        </div>
+
+        <div class="status-chip" id="heroReportChip">
+          <span>●</span>
+          <span>جاري تجهيز مركز التقارير...</span>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="refreshCenter()">تحديث المركز</button>
+        <button class="btn btn-glass" onclick="checkHealth()">فحص النظام</button>
+        <button class="btn btn-glass" onclick="window.location.href='/pages/dashboard'">لوحة التحكم</button>
+        <button class="btn btn-glass" onclick="window.location.href='/pages/alerts'">التنبيهات</button>
+        <button class="btn btn-glass" onclick="window.location.href='/'">الرئيسية</button>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <h2>المؤشرات الرئيسية</h2>
+        <p>ملخص عام للتشخيصات والتنبيهات وجاهزية النظام.</p>
+      </div>
+      <div class="card-body">
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">إجمالي الحالات</div>
+            <div class="kpi-value" id="kpiTotalCases">--</div>
+            <div class="kpi-sub">عدد التشخيصات في قاعدة البيانات</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">متوسط شدة الإصابة</div>
+            <div class="kpi-value" id="kpiAvgSeverity">--</div>
+            <div class="kpi-sub">متوسط نسبة الشدة عبر الحالات</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">إجمالي التنبيهات</div>
+            <div class="kpi-value" id="kpiTotalAlerts">--</div>
+            <div class="kpi-sub">جميع السجلات في alerts</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">جاهزية النظام</div>
+            <div class="kpi-value" id="kpiSystemReady" style="font-size:22px;">--</div>
+            <div class="kpi-sub" id="kpiSystemVersion">--</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="card-header">
+          <h2>توليد تقرير من صورة</h2>
+          <p>ارفع صورة النبات وشغّل التشخيص ثم نزّل تقرير PDF مباشرة.</p>
+        </div>
+        <div class="card-body">
+          <form id="reportForm">
+            <div class="form-grid">
+              <div class="field full">
+                <label for="imageFile">صورة النبات</label>
+                <input type="file" id="imageFile" accept="image/*" required />
+              </div>
+
+              <div class="field">
+                <label for="farmer_name">اسم المزارع</label>
+                <input type="text" id="farmer_name" placeholder="مثال: نجيب" />
+              </div>
+
+              <div class="field">
+                <label for="farm_name">اسم المزرعة</label>
+                <input type="text" id="farm_name" placeholder="مثال: مزرعة الخير" />
+              </div>
+
+              <div class="field">
+                <label for="crop">المحصول</label>
+                <input type="text" id="crop" placeholder="مثال: طماطم" />
+              </div>
+
+              <div class="field">
+                <label for="region">المنطقة</label>
+                <input type="text" id="region" placeholder="مثال: مكة" />
+              </div>
+
+              <div class="field">
+                <label for="city">المدينة</label>
+                <input type="text" id="city" placeholder="مثال: جدة" />
+              </div>
+
+              <div class="field">
+                <label for="latitude">Latitude</label>
+                <input type="number" step="any" id="latitude" placeholder="21.4858" />
+              </div>
+
+              <div class="field">
+                <label for="longitude">Longitude</label>
+                <input type="number" step="any" id="longitude" placeholder="39.1925" />
+              </div>
+            </div>
+
+            <div class="submit-row">
+              <button type="submit" class="btn btn-primary">تشخيص وإنشاء تقرير</button>
+              <button type="button" class="btn btn-outline" id="downloadPdfBtn" disabled>تنزيل PDF</button>
+              <button type="button" class="btn btn-outline" onclick="resetReportCenter()">إعادة تعيين</button>
+            </div>
+
+            <div class="loading" id="loadingText">جاري تحليل الصورة وتجهيز التقرير...</div>
+            <div class="error-box" id="errorBox"></div>
+            <div class="success-box" id="successBox"></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>معاينة الصورة</h2>
+          <p>معاينة الصورة المرفوعة قبل إصدار التقرير.</p>
+        </div>
+        <div class="card-body">
+          <div class="preview-box">
+            <img id="previewImage" alt="معاينة الصورة" style="display:none;" />
+            <div class="placeholder" id="previewPlaceholder">
+              لم يتم رفع صورة بعد<br>
+              اختر صورة واضحة لورقة النبات أو الجزء المصاب
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" style="margin-top:18px;">
+      <div class="card-header">
+        <h2>ملخص التقرير الناتج</h2>
+        <p>النتيجة الأساسية، معلومات المرض، الشدة، والطقس المرتبط بالحالة.</p>
+      </div>
+      <div class="card-body">
+        <div class="mini-grid">
+          <div class="info-box">
+            <h4>القرار التشخيصي</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">أفضل تشخيص</div>
+                <div class="value" id="bestClass">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الثقة</div>
+                <div class="value" id="bestConfidence">--</div>
+              </div>
+              <div class="confidence-bar">
+                <div class="confidence-fill" id="bestConfidenceBar"></div>
+              </div>
+              <div class="info-item">
+                <div class="key">التشخيص الثاني</div>
+                <div class="value" id="secondClass">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الثقة الثانية</div>
+                <div class="value" id="secondConfidence">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">مستوى الثقة</div>
+                <div class="value" id="confidenceLevel">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">حالة القرار</div>
+                <div class="value" id="decisionStatus">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>معلومات المرض</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">النبات</div>
+                <div class="value" id="plantName">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">اسم المرض</div>
+                <div class="value" id="diseaseAr">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">المسبب</div>
+                <div class="value" id="diseaseCause">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الشدة</div>
+                <div class="value" id="severityText">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">المستوى</div>
+                <div class="value" id="severityBadgeWrap">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الطقس</div>
+                <div class="value" id="weatherQuick">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mini-grid" style="margin-top:14px;">
+          <div class="info-box">
+            <h4>التوصيات الزراعية</h4>
+            <ul class="list-box" id="adviceList">
+              <li>لا توجد نتائج بعد.</li>
+            </ul>
+          </div>
+
+          <div class="info-box">
+            <h4>برنامج المكافحة</h4>
+            <ul class="list-box" id="pesticideList">
+              <li>لا توجد نتائج بعد.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:18px;">
+      <div class="card-header">
+        <h2>الصور التحليلية</h2>
+        <p>عرض Grad-CAM وطبقة شدة الإصابة المرتبطة بالتقرير.</p>
+      </div>
+      <div class="card-body">
+        <div class="images-grid">
+          <div class="img-card">
+            <div class="img-head">Grad-CAM</div>
+            <div class="img-body">
+              <img id="gradcamImage" alt="GradCAM" style="display:none;" />
+              <div class="placeholder" id="gradcamPlaceholder">لا توجد صورة بعد</div>
+            </div>
+          </div>
+
+          <div class="img-card">
+            <div class="img-head">Severity Overlay</div>
+            <div class="img-body">
+              <img id="severityOverlayImage" alt="Severity Overlay" style="display:none;" />
+              <div class="placeholder" id="severityOverlayPlaceholder">لا توجد صورة بعد</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid grid-2" style="margin-top:18px;">
+      <section class="card">
+        <div class="card-header">
+          <h2>إحصائيات عامة</h2>
+          <p>ملخص الحالات الأكثر شيوعًا والمناطق الأكثر تسجيلًا.</p>
+        </div>
+        <div class="card-body">
+          <div class="mini-grid">
+            <div class="info-box">
+              <h4>ملخص الحالات</h4>
+              <div class="info-list">
+                <div class="info-item">
+                  <div class="key">إجمالي الحالات</div>
+                  <div class="value" id="sumTotalCases">--</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">متوسط الشدة</div>
+                  <div class="value" id="sumAvgSeverity">--</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">أكثر مرض</div>
+                  <div class="value" id="sumTopDisease">--</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">أكثر منطقة</div>
+                  <div class="value" id="sumTopRegion">--</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="info-box">
+              <h4>صحة النظام</h4>
+              <div class="info-list">
+                <div class="info-item">
+                  <div class="key">الحالة</div>
+                  <div class="value" id="healthStatus">--</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">نموذج الصور</div>
+                  <div class="value" id="healthAi">--</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">نموذج التنبؤ</div>
+                  <div class="value" id="healthForecast">--</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">SMS</div>
+                  <div class="value" id="healthSms">--</div>
+                </div>
+                <div class="info-item">
+                  <div class="key">الإصدار</div>
+                  <div class="value" id="healthVersion">--</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>أحدث التنبيهات</h2>
+          <p>عرض آخر التنبيهات من النظام مع إمكانية التصدير.</p>
+        </div>
+        <div class="card-body">
+          <div class="submit-row" style="margin-top:0; margin-bottom:14px;">
+            <button type="button" class="btn btn-outline" onclick="downloadAlertsJson()">تصدير JSON</button>
+            <button type="button" class="btn btn-outline" onclick="loadAlertsPreview()">تحديث التنبيهات</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>المنطقة</th>
+                  <th>المرض</th>
+                  <th>درجة الخطر</th>
+                  <th>المستوى</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="alertsPreviewBody">
+                <tr>
+                  <td colspan="6" class="empty">جاري تحميل التنبيهات...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer-note">
+      Phytologic AI Report Center — مركز موحد لإنتاج التقارير، مراجعة النتائج، وتنزيل الملفات.
+    </div>
+  </div>
+
+  <script>
+    let lastReportFormData = null;
+    let lastDiagnosisResult = null;
+
+    const reportForm = document.getElementById("reportForm");
+    const imageFile = document.getElementById("imageFile");
+    const previewImage = document.getElementById("previewImage");
+    const previewPlaceholder = document.getElementById("previewPlaceholder");
+    const loadingText = document.getElementById("loadingText");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
+    const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+
+    function safeText(v, fallback = "--") {
+      if (v === null || v === undefined || v === "") return fallback;
+      return v;
+    }
+
+    function fmtNum(v, fallback = "--") {
+      if (v === null || v === undefined || isNaN(v)) return fallback;
+      return Number(v).toFixed(2);
+    }
+
+    function formatPercent(v) {
+      if (v === null || v === undefined || isNaN(v)) return "--";
+      return `${Number(v).toFixed(2)}%`;
+    }
+
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.textContent = message || "حدث خطأ غير متوقع";
+    }
+
+    function hideError() {
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
+
+    function showSuccess(message) {
+      successBox.style.display = "block";
+      successBox.textContent = message || "";
+    }
+
+    function hideSuccess() {
+      successBox.style.display = "none";
+      successBox.textContent = "";
+    }
+
+    function setLoading(state) {
+      loadingText.style.display = state ? "block" : "none";
+    }
+
+    function severityPill(level, labelText) {
+      const val = String(level || "").toLowerCase();
+      const text = labelText || "--";
+
+      if (val === "low" || text === "منخفضة" || text === "منخفض") {
+        return `<span class="pill pill-low">${text}</span>`;
+      }
+      if (val === "moderate" || text === "متوسطة" || text === "متوسط") {
+        return `<span class="pill pill-moderate">${text}</span>`;
+      }
+      if (val === "high" || text === "مرتفعة" || text === "مرتفع") {
+        return `<span class="pill pill-high">${text}</span>`;
+      }
+      return `<span class="pill pill-neutral">${text}</span>`;
+    }
+
+    function riskPill(level) {
+      const val = String(level || "").toLowerCase();
+
+      if (val === "high" || val === "مرتفع") {
+        return `<span class="pill pill-high">${safeText(level)}</span>`;
+      }
+      if (val === "moderate" || val === "متوسط") {
+        return `<span class="pill pill-moderate">${safeText(level)}</span>`;
+      }
+      if (val === "low" || val === "منخفض") {
+        return `<span class="pill pill-low">${safeText(level)}</span>`;
+      }
+      return `<span class="pill pill-neutral">${safeText(level)}</span>`;
+    }
+
+    function setImagePreviewFromFile(file) {
+      if (!file) {
+        previewImage.style.display = "none";
+        previewImage.src = "";
+        previewPlaceholder.style.display = "block";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        previewImage.src = e.target.result;
+        previewImage.style.display = "block";
+        previewPlaceholder.style.display = "none";
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setBase64Image(imgElementId, placeholderId, base64Value) {
+      const img = document.getElementById(imgElementId);
+      const placeholder = document.getElementById(placeholderId);
+
+      if (base64Value) {
+        img.src = `data:image/png;base64,${base64Value}`;
+        img.style.display = "block";
+        placeholder.style.display = "none";
+      } else {
+        img.src = "";
+        img.style.display = "none";
+        placeholder.style.display = "block";
+      }
+    }
+
+    function resetReportCenter() {
+      reportForm.reset();
+      lastReportFormData = null;
+      lastDiagnosisResult = null;
+      downloadPdfBtn.disabled = true;
+      hideError();
+      hideSuccess();
+      setLoading(false);
+      setImagePreviewFromFile(null);
+
+      document.getElementById("bestClass").textContent = "--";
+      document.getElementById("bestConfidence").textContent = "--";
+      document.getElementById("secondClass").textContent = "--";
+      document.getElementById("secondConfidence").textContent = "--";
+      document.getElementById("confidenceLevel").textContent = "--";
+      document.getElementById("decisionStatus").textContent = "--";
+      document.getElementById("plantName").textContent = "--";
+      document.getElementById("diseaseAr").textContent = "--";
+      document.getElementById("diseaseCause").textContent = "--";
+      document.getElementById("severityText").textContent = "--";
+      document.getElementById("severityBadgeWrap").innerHTML = "--";
+      document.getElementById("weatherQuick").textContent = "--";
+      document.getElementById("bestConfidenceBar").style.width = "0%";
+
+      document.getElementById("adviceList").innerHTML = `<li>لا توجد نتائج بعد.</li>`;
+      document.getElementById("pesticideList").innerHTML = `<li>لا توجد نتائج بعد.</li>`;
+
+      setBase64Image("gradcamImage", "gradcamPlaceholder", null);
+      setBase64Image("severityOverlayImage", "severityOverlayPlaceholder", null);
+    }
+
+    imageFile.addEventListener("change", function() {
+      const file = this.files[0];
+      setImagePreviewFromFile(file);
+    });
+
+    reportForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      hideError();
+      hideSuccess();
+      setLoading(true);
+      downloadPdfBtn.disabled = true;
+
+      try {
+        const file = imageFile.files[0];
+        if (!file) {
+          throw new Error("الرجاء اختيار صورة أولًا");
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("farmer_name", document.getElementById("farmer_name").value || "");
+        formData.append("farm_name", document.getElementById("farm_name").value || "");
+        formData.append("crop", document.getElementById("crop").value || "");
+        formData.append("city", document.getElementById("city").value || "");
+        formData.append("region", document.getElementById("region").value || "");
+        formData.append("latitude", document.getElementById("latitude").value || "0");
+        formData.append("longitude", document.getElementById("longitude").value || "0");
+
+        const res = await fetch("/diagnose", {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "فشل تنفيذ التشخيص");
+        }
+
+        lastReportFormData = formData;
+        lastDiagnosisResult = data;
+        renderDiagnosisResult(data);
+        downloadPdfBtn.disabled = false;
+        showSuccess("تم إنشاء التقرير الأولي بنجاح. يمكنك الآن تنزيل PDF.");
+      } catch (err) {
+        showError(err.message || "حدث خطأ أثناء إنشاء التقرير");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    downloadPdfBtn.addEventListener("click", async function() {
+      if (!lastReportFormData) {
+        showError("لا توجد عملية جاهزة لتنزيل التقرير.");
+        return;
+      }
+
+      try {
+        hideError();
+        hideSuccess();
+
+        const pdfFormData = new FormData();
+        const file = imageFile.files[0];
+        pdfFormData.append("file", file);
+        pdfFormData.append("farmer_name", document.getElementById("farmer_name").value || "");
+        pdfFormData.append("farm_name", document.getElementById("farm_name").value || "");
+        pdfFormData.append("crop", document.getElementById("crop").value || "");
+        pdfFormData.append("city", document.getElementById("city").value || "");
+        pdfFormData.append("region", document.getElementById("region").value || "");
+        pdfFormData.append("latitude", document.getElementById("latitude").value || "0");
+        pdfFormData.append("longitude", document.getElementById("longitude").value || "0");
+
+        const res = await fetch("/diagnose/pdf", {
+          method: "POST",
+          body: pdfFormData
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || "فشل تنزيل PDF");
+        }
+
+        const blob = await res.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "diagnosis_report.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        showSuccess("تم تنزيل تقرير PDF بنجاح.");
+      } catch (err) {
+        showError(err.message || "تعذر تنزيل PDF");
+      }
+    });
+
+    function renderDiagnosisResult(data) {
+      document.getElementById("bestClass").textContent = safeText(data?.best_prediction?.class_name);
+      document.getElementById("bestConfidence").textContent = formatPercent(data?.best_prediction?.confidence);
+      document.getElementById("secondClass").textContent = safeText(data?.second_prediction?.class_name);
+      document.getElementById("secondConfidence").textContent = formatPercent(data?.second_prediction?.confidence);
+      document.getElementById("confidenceLevel").textContent = safeText(data?.confidence_level);
+      document.getElementById("decisionStatus").textContent = safeText(data?.decision_status);
+      document.getElementById("bestConfidenceBar").style.width = `${Number(data?.best_prediction?.confidence || 0)}%`;
+
+      document.getElementById("plantName").textContent = safeText(data?.disease_info?.plant);
+      document.getElementById("diseaseAr").textContent = safeText(data?.disease_info?.disease_ar);
+      document.getElementById("diseaseCause").textContent = safeText(data?.disease_info?.cause);
+
+      const sevPercent = data?.severity?.severity_percent_est;
+      const sevLabelAr = data?.severity?.label?.ar;
+      const sevLevel = data?.severity?.severity_level;
+
+      document.getElementById("severityText").textContent =
+        `${safeText(sevLabelAr)} (${formatPercent(sevPercent)})`;
+
+      document.getElementById("severityBadgeWrap").innerHTML =
+        severityPill(sevLevel, sevLabelAr);
+
+      const wt = data?.weather?.temperature;
+      const wh = data?.weather?.humidity;
+      const wr = data?.weather?.rainfall;
+      document.getElementById("weatherQuick").textContent =
+        (wt != null || wh != null || wr != null)
+          ? `T:${wt ?? "--"}°م | H:${wh ?? "--"}% | R:${wr ?? "--"}`
+          : "--";
+
+      const advice = Array.isArray(data?.disease_info?.advice) ? data.disease_info.advice : [];
+      document.getElementById("adviceList").innerHTML = advice.length
+        ? advice.map(item => `<li>${item}</li>`).join("")
+        : `<li>لا توجد توصيات متاحة.</li>`;
+
+      const pestMain = data?.pesticide_program?.main || {};
+      const pesticideRows = [
+        `الخيار الأساسي: ${safeText(pestMain.title_ar)}`,
+        `المادة الفعالة: ${safeText(pestMain.active_ingredient)}`,
+        `الاسم التجاري: ${safeText(pestMain.trade_name)}`,
+        `النوع: ${safeText(pestMain.type)}`,
+        `الجرعة: ${safeText(pestMain.dose)}`,
+        `فترة الأمان: ${safeText(pestMain.phi)}`,
+        `قرار الرش: ${safeText(pestMain.spray_message_ar)}`
+      ];
+      document.getElementById("pesticideList").innerHTML =
+        pesticideRows.map(item => `<li>${item}</li>`).join("");
+
+      setBase64Image("gradcamImage", "gradcamPlaceholder", data?.gradcam_image);
+      setBase64Image("severityOverlayImage", "severityOverlayPlaceholder", data?.severity?.severity_overlay_b64);
+    }
+
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed: ${url}`);
+      }
+
+      return data;
+    }
+
+    async function loadStatsSummary() {
+      const data = await fetchJson("/stats/summary");
+
+      document.getElementById("kpiTotalCases").textContent = safeText(data.total_cases, 0);
+      document.getElementById("kpiAvgSeverity").textContent = `${fmtNum(data.avg_severity, 0)}%`;
+      document.getElementById("sumTotalCases").textContent = safeText(data.total_cases, 0);
+      document.getElementById("sumAvgSeverity").textContent = `${fmtNum(data.avg_severity, 0)}%`;
+      document.getElementById("sumTopDisease").textContent = safeText(data?.top_disease?.name);
+      document.getElementById("sumTopRegion").textContent = safeText(data?.top_region?.name);
+    }
+
+    async function loadAlertsSummary() {
+      const data = await fetchJson("/alerts/summary");
+      document.getElementById("kpiTotalAlerts").textContent = safeText(data.total_alerts, 0);
+    }
+
+    async function loadAlertsPreview() {
+      const data = await fetchJson("/alerts/all");
+      const body = document.getElementById("alertsPreviewBody");
+
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" class="empty">لا توجد تنبيهات حاليًا.</td></tr>`;
+        return;
+      }
+
+      const topFive = data.slice(0, 5);
+
+      body.innerHTML = topFive.map((row, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.disease_name)}</td>
+          <td>${row.risk_score != null ? `${fmtNum(row.risk_score)}%` : "--"}</td>
+          <td>${riskPill(row.risk_level)}</td>
+          <td>${safeText(row.created_at)}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("heroReportChip").innerHTML =
+        `<span>●</span><span>تم تحميل ${data.length} تنبيه في مركز التقارير</span>`;
+    }
+
+    async function checkHealth() {
+      const data = await fetchJson("/system/health");
+
+      document.getElementById("healthStatus").textContent = safeText(data.status);
+      document.getElementById("healthAi").textContent = safeText(data.ai_model);
+      document.getElementById("healthForecast").textContent = safeText(data.forecast_model);
+      document.getElementById("healthSms").textContent = data.sms_configured ? "configured" : "not configured";
+      document.getElementById("healthVersion").textContent = safeText(data.version);
+
+      document.getElementById("kpiSystemReady").textContent =
+        data.status === "running" ? "جاهز" : safeText(data.status);
+      document.getElementById("kpiSystemVersion").textContent =
+        `الإصدار: ${safeText(data.version)}`;
+    }
+
+    async function downloadAlertsJson() {
+      try {
+        const res = await fetch("/export/alerts/json");
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "تعذر تصدير البيانات");
+        }
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "alerts_export.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        showError(err.message || "فشل تصدير ملف JSON");
+      }
+    }
+
+    async function refreshCenter() {
+      try {
+        await Promise.all([
+          loadStatsSummary(),
+          loadAlertsSummary(),
+          loadAlertsPreview(),
+          checkHealth()
+        ]);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("heroReportChip").innerHTML =
+          `<span>●</span><span>حدث خطأ أثناء تحديث مركز التقارير</span>`;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", refreshCenter);
+  </script>
 </body>
 </html>
