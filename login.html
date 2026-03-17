@@ -1,662 +1,643 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - تسجيل الدخول</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | Login</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    *{
+      box-sizing:border-box;
+      margin:0;
+      padding:0;
+    }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:
-linear-gradient(135deg, rgba(9,18,48,.96), rgba(13,94,95,.92)),
-linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-min-height:100vh;
-color:#1f2937;
-direction:rtl;
-text-align:right;
-overflow-x:hidden;
-}
+    :root{
+      --bg:#f4f7fb;
+      --bg-soft:#eef5ff;
+      --card:#ffffff;
+      --card-2:#fbfdff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --danger:#dc2626;
+      --success:#15803d;
+      --shadow:0 18px 40px rgba(15,23,42,.10);
+      --radius:24px;
+    }
 
-.page{
-min-height:100vh;
-display:grid;
-grid-template-columns:1.1fr .9fr;
-}
+    body{
+      font-family:Tahoma,Arial,sans-serif;
+      background:
+        linear-gradient(180deg,var(--bg-soft) 0%,var(--bg) 100%);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
 
-.left-side{
-position:relative;
-padding:42px 42px 28px;
-color:white;
-display:flex;
-flex-direction:column;
-justify-content:space-between;
-overflow:hidden;
-}
+    .page{
+      width:100%;
+      max-width:1180px;
+      display:grid;
+      grid-template-columns:1.05fr .95fr;
+      gap:22px;
+      align-items:stretch;
+    }
 
-.left-side:before{
-content:"";
-position:absolute;
-top:-80px;
-left:-80px;
-width:240px;
-height:240px;
-border-radius:50%;
-background:rgba(255,255,255,.07);
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(8,47,73,.98), rgba(15,118,110,.92)),
+        radial-gradient(circle at top left, rgba(255,255,255,.16), transparent 35%);
+      color:#fff;
+      border-radius:32px;
+      padding:34px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+      min-height:680px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
 
-.left-side:after{
-content:"";
-position:absolute;
-bottom:-100px;
-right:-70px;
-width:280px;
-height:280px;
-border-radius:50%;
-background:rgba(255,255,255,.06);
-}
+    .hero::after{
+      content:"";
+      position:absolute;
+      inset:auto -60px -60px auto;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      background:rgba(255,255,255,.08);
+      filter:blur(2px);
+    }
 
-.brand{
-position:relative;
-z-index:2;
-display:flex;
-align-items:center;
-gap:14px;
-}
+    .brand{
+      position:relative;
+      z-index:1;
+    }
 
-.brand-badge{
-width:58px;
-height:58px;
-border-radius:18px;
-display:grid;
-place-items:center;
-background:rgba(255,255,255,.12);
-font-size:28px;
-font-weight:800;
-box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-}
+    .brand-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      border:1px solid rgba(255,255,255,.16);
+      background:rgba(255,255,255,.12);
+      margin-bottom:16px;
+    }
 
-.brand-text h1{
-margin:0;
-font-size:28px;
-font-weight:800;
-}
+    .hero h1{
+      font-size:40px;
+      line-height:1.2;
+      margin-bottom:14px;
+    }
 
-.brand-text p{
-margin:6px 0 0;
-font-size:13px;
-opacity:.88;
-}
+    .hero p{
+      font-size:16px;
+      line-height:1.95;
+      color:rgba(255,255,255,.92);
+      max-width:560px;
+    }
 
-.hero{
-position:relative;
-z-index:2;
-max-width:640px;
-margin-top:24px;
-}
+    .hero-cards{
+      position:relative;
+      z-index:1;
+      display:grid;
+      gap:14px;
+      margin-top:30px;
+    }
 
-.hero h2{
-margin:0 0 12px;
-font-size:38px;
-line-height:1.35;
-font-weight:800;
-}
+    .mini-card{
+      background:rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:20px;
+      padding:16px;
+      backdrop-filter:blur(6px);
+    }
 
-.hero p{
-margin:0;
-font-size:15px;
-line-height:2;
-opacity:.92;
-}
+    .mini-card h3{
+      font-size:17px;
+      margin-bottom:8px;
+    }
 
-.features{
-position:relative;
-z-index:2;
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:14px;
-margin-top:32px;
-max-width:760px;
-}
+    .mini-card p{
+      font-size:13px;
+      line-height:1.8;
+      color:rgba(255,255,255,.88);
+    }
 
-.feature{
-background:rgba(255,255,255,.10);
-border:1px solid rgba(255,255,255,.10);
-border-radius:18px;
-padding:16px;
-backdrop-filter:blur(8px);
-}
+    .login-card{
+      background:linear-gradient(180deg,var(--card) 0%,var(--card-2) 100%);
+      border:1px solid var(--border);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      padding:34px 28px;
+      min-height:680px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+    }
 
-.feature-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:8px;
-}
+    .login-head{
+      margin-bottom:26px;
+    }
 
-.feature-desc{
-font-size:13px;
-line-height:1.9;
-opacity:.92;
-}
-.left-footer{
-position:relative;
-z-index:2;
-font-size:12px;
-opacity:.85;
-margin-top:26px;
-line-height:1.9;
-}
+    .login-head .small{
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:8px;
+    }
 
-.right-side{
-display:flex;
-align-items:center;
-justify-content:center;
-padding:28px;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-}
+    .login-head h2{
+      font-size:30px;
+      margin-bottom:10px;
+    }
 
-.login-card{
-width:100%;
-max-width:500px;
-background:white;
-border:1px solid #e7edf8;
-border-radius:28px;
-box-shadow:0 18px 42px rgba(0,0,0,.10);
-overflow:hidden;
-}
+    .login-head p{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-.card-head{
-padding:22px 24px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-}
+    .form{
+      display:grid;
+      gap:16px;
+    }
 
-.card-title{
-margin:0;
-font-size:24px;
-font-weight:800;
-color:#0f172a;
-}
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
 
-.card-subtitle{
-margin-top:8px;
-font-size:13px;
-color:#64748b;
-line-height:1.9;
-}
+    .field label{
+      font-size:14px;
+      font-weight:800;
+      color:#1f2937;
+    }
 
-.card-body{
-padding:24px;
-}
+    .input-wrap{
+      position:relative;
+    }
 
-.grid{
-display:grid;
-gap:16px;
-}
+    .field input{
+      width:100%;
+      border:1px solid #dbe2ea;
+      border-radius:16px;
+      padding:14px 14px;
+      background:#fff;
+      font-size:15px;
+      outline:none;
+      transition:.2s ease;
+    }
 
-.field label{
-display:block;
-font-size:13px;
-font-weight:700;
-color:#64748b;
-margin-bottom:8px;
-}
+    .field input:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(15,118,110,.08);
+    }
 
-.field input{
-width:100%;
-padding:14px 15px;
-border-radius:16px;
-border:1px solid #dbe4f2;
-background:#fff;
-font-size:14px;
-outline:none;
-transition:.2s;
-}
+    .toggle-password{
+      position:absolute;
+      left:10px;
+      top:50%;
+      transform:translateY(-50%);
+      border:none;
+      background:transparent;
+      cursor:pointer;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:800;
+      padding:6px 8px;
+      border-radius:10px;
+    }
 
-.field input:focus{
-border-color:#2563eb;
-box-shadow:0 0 0 4px rgba(37,99,235,.08);
-}
+    .toggle-password:hover{
+      background:#f3f7fb;
+    }
 
-.inline-row{
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:12px;
-flex-wrap:wrap;
-}
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
 
-.checkbox-wrap{
-display:flex;
-align-items:center;
-gap:8px;
-font-size:13px;
-color:#475569;
-}
+    .checkbox-wrap{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      color:var(--muted);
+      font-weight:700;
+    }
 
-.checkbox-wrap input{
-accent-color:#2563eb;
-}
+    .checkbox-wrap input{
+      width:16px;
+      height:16px;
+      accent-color:var(--primary);
+    }
 
-.hint-box{
-padding:13px 14px;
-border-radius:16px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-line-height:1.9;
-color:#475569;
-}
+    .link{
+      text-decoration:none;
+      color:var(--secondary);
+      font-size:13px;
+      font-weight:800;
+    }
 
-.demo-box{
-padding:13px 14px;
-border-radius:16px;
-background:#eff6ff;
-border:1px solid #bfdbfe;
-font-size:13px;
-line-height:1.9;
-color:#1d4ed8;
-}
+    .link:hover{
+      text-decoration:underline;
+    }
 
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:4px;
-}
+    .btn{
+      border:none;
+      border-radius:16px;
+      padding:14px 18px;
+      font-size:15px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.2s ease;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
 
-.btn{
-padding:14px 18px;
-border:none;
-border-radius:16px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
+    .btn:hover{
+      transform:translateY(-1px);
+    }
 
-.btn-primary{
-background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
-color:white;
-box-shadow:0 8px 16px rgba(37,99,235,.22);
-}
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+    }
 
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
+    .btn-primary:hover{
+      background:var(--primary-dark);
+    }
 
-.btn-secondary{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
+    .btn-outline{
+      background:#fff;
+      color:var(--secondary);
+      border:1px solid var(--border);
+    }
 
-.btn:hover{
-transform:translateY(-1px);
-}
+    .btn-outline:hover{
+      background:#f8fbff;
+    }
 
-.status-bar{
-margin-top:12px;
-padding:12px 14px;
-border-radius:16px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
+    .actions{
+      display:grid;
+      gap:12px;
+      margin-top:8px;
+    }
 
-.result-box{
-margin-top:14px;
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-min-height:74px;
-}
+    .divider{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin:6px 0;
+      color:var(--muted);
+      font-size:13px;
+      font-weight:700;
+    }
 
-.ok-box{
-background:#ecfdf5;
-border:1px solid #a7f3d0;
-color:#047857;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .divider::before,
+    .divider::after{
+      content:"";
+      flex:1;
+      height:1px;
+      background:var(--border);
+    }
 
-.error-box{
-background:#fef2f2;
-border:1px solid #fecaca;
-color:#b91c1c;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .error-box,
+    .success-box,
+    .info-box{
+      display:none;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      line-height:1.8;
+    }
 
-@media(max-width:1100px){
-.page{
-grid-template-columns:1fr;
-}
-.left-side{
-min-height:auto;
-padding-bottom:10px;
-}
-.hero h2{
-font-size:30px;
-}
-.features{
-grid-template-columns:1fr;
-}
-}
+    .error-box{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
 
-@media(max-width:640px){
-.left-side,
-.right-side{
-padding:18px;
-}
-.hero h2{
-font-size:25px;
-}
-.card-body,
-.card-head{
-padding:18px;
-}
-}
-</style>
+    .success-box{
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .info-box{
+      display:block;
+      background:#eff6ff;
+      color:#1d4ed8;
+      border:1px solid #bfdbfe;
+    }
+
+    .footer-note{
+      margin-top:18px;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.8;
+    }
+
+    .quick-accounts{
+      display:grid;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .quick-account{
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px 14px;
+      background:#fff;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+
+    .quick-account:hover{
+      background:#f8fbff;
+      transform:translateY(-1px);
+    }
+
+    .quick-account strong{
+      font-size:14px;
+    }
+
+    .quick-account span{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    @media (max-width:1020px){
+      .page{
+        grid-template-columns:1fr;
+      }
+
+      .hero,
+      .login-card{
+        min-height:auto;
+      }
+
+      .hero{
+        padding:28px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
 
-<div class="page">
-
-  <div class="left-side">
-    <div>
+    <section class="hero">
       <div class="brand">
-        <div class="brand-badge">🌿</div>
-        <div class="brand-text">
-          <h1>Phytologic AI</h1>
-          <p>Unified Plant Health Platform</p>
-        </div>
-      </div>
-
-      <div class="hero">
-        <h2>بوابة دخول موحدة لمنصة التشخيص، التنبؤ، التنبيهات، والمراقبة الوطنية</h2>
+        <div class="brand-badge">Phytologic AI Platform</div>
+        <h1>تسجيل الدخول إلى المنصة</h1>
         <p>
-          صفحة دخول احترافية بنفس الهوية الموحدة للمنصة، ومهيأة للعمل الآن بوضع تجريبي محلي،
-          وجاهزة للربط لاحقًا مع أي API حقيقي للمصادقة دون الحاجة لإعادة تصميم الواجهة.
+          ادخل إلى بيئة العمل الذكية لإدارة التشخيصات النباتية، التنبؤ بالحالات،
+          متابعة التنبيهات، تشغيل الواجهات الإدارية، ومراقبة المنصة من مكان واحد.
         </p>
       </div>
 
-      <div class="features">
-        <div class="feature">
-          <div class="feature-title">التشخيص الذكي</div>
-          <div class="feature-desc">رفع الصور، تحليل الإصابة، حساب الشدة، والتقرير PDF.</div>
+      <div class="hero-cards">
+        <div class="mini-card">
+          <h3>التشخيص والتقارير</h3>
+          <p>رفع صور النبات، تحليل الحالة، إنتاج تقارير PDF، ومراجعة Grad-CAM وشدة الإصابة.</p>
         </div>
-        <div class="feature">
-          <div class="feature-title">التوقعات الزراعية</div>
-          <div class="feature-desc">طقس حقيقي، توقع حي، مقارنة مناطق، وتحليل AI.</div>
+
+        <div class="mini-card">
+          <h3>التنبؤ والتنبيهات</h3>
+          <p>تقدير عدد الحالات ومستوى الخطر ومراجعة التنبيهات التشغيلية والوطنية.</p>
         </div>
-        <div class="feature">
-          <div class="feature-title">مركز العمليات</div>
-          <div class="feature-desc">متابعة لحظية للتنبيهات والمخاطر على مستوى المناطق.</div>
-        </div>
-        <div class="feature">
-          <div class="feature-title">المنظور الوطني</div>
-          <div class="feature-desc">لوحات وطنية وإدارية ضمن واجهة موحدة ومترابطة.</div>
+
+        <div class="mini-card">
+          <h3>الإدارة والتشغيل</h3>
+          <p>الوصول إلى Admin و OPS و National Center ولوحات المراقبة الموحدة.</p>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="left-footer">
-      هذه الصفحة لا تفترض وجود API تسجيل دخول غير موجود. عند إضافة endpoint حقيقي للمصادقة،
-      سيتم تعديل جزء JavaScript فقط مع الإبقاء على نفس التصميم.
-    </div>
+    <section class="login-card">
+      <div class="login-head">
+        <div class="small">Welcome Back</div>
+        <h2>تسجيل الدخول</h2>
+        <p>أدخل بيانات الحساب للمتابعة إلى لوحة المنصة.</p>
+      </div>
+
+      <div class="info-box">
+        هذه الصفحة تعمل حاليًا كواجهة تسجيل دخول جاهزة للربط. تم تضمين تحقق تجريبي محلي،
+        ويمكن لاحقًا ربطها مع endpoint حقيقي مثل <code>/auth/login</code>.
+      </div>
+
+      <form class="form" id="loginForm">
+        <div class="field">
+          <label for="username">البريد الإلكتروني أو اسم المستخدم</label>
+          <div class="input-wrap">
+            <input
+              type="text"
+              id="username"
+              placeholder="مثال: admin@phytologic.ai"
+              autocomplete="username"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">كلمة المرور</label>
+          <div class="input-wrap">
+            <input
+              type="password"
+              id="password"
+              placeholder="أدخل كلمة المرور"
+              autocomplete="current-password"
+              required
+            />
+            <button type="button" class="toggle-password" onclick="togglePassword()">إظهار</button>
+          </div>
+        </div>
+
+        <div class="row">
+          <label class="checkbox-wrap">
+            <input type="checkbox" id="rememberMe" />
+            <span>تذكّرني</span>
+          </label>
+
+          <a href="#" class="link" onclick="showForgotPassword(event)">نسيت كلمة المرور؟</a>
+        </div>
+
+        <div class="error-box" id="errorBox"></div>
+        <div class="success-box" id="successBox"></div>
+
+        <div class="actions">
+          <button type="submit" class="btn btn-primary">دخول إلى المنصة</button>
+        </div>
+
+        <div class="divider">أو استخدم دخولًا تجريبيًا</div>
+
+        <div class="quick-accounts">
+          <div class="quick-account" onclick="fillAccount('admin@phytologic.ai','admin123')">
+            <div>
+              <strong>حساب المدير</strong><br>
+              <span>admin@phytologic.ai</span>
+            </div>
+            <span>Admin</span>
+          </div>
+
+          <div class="quick-account" onclick="fillAccount('ops@phytologic.ai','ops123')">
+            <div>
+              <strong>حساب العمليات</strong><br>
+              <span>ops@phytologic.ai</span>
+            </div>
+            <span>OPS</span>
+          </div>
+
+          <div class="quick-account" onclick="fillAccount('national@phytologic.ai','national123')">
+            <div>
+              <strong>حساب المركز الوطني</strong><br>
+              <span>national@phytologic.ai</span>
+            </div>
+            <span>National</span>
+          </div>
+        </div>
+      </form>
+
+      <div class="footer-note">
+        Phytologic AI Login — واجهة تسجيل دخول جاهزة للربط مع نظام مصادقة فعلي.
+      </div>
+    </section>
+
   </div>
 
-  <div class="right-side">
-    <div class="login-card">
-      <div class="card-head">
-        <h3 class="card-title">تسجيل الدخول</h3>
-        <div class="card-subtitle">
-          أدخل بيانات الدخول للوصول إلى المنصة. يمكن تشغيل الصفحة الآن بوضع تجريبي،
-          أو ربطها لاحقًا مع API مصادقة حقيقي.
-        </div>
-      </div>
-<div class="card-body">
+  <script>
+    const loginForm = document.getElementById("loginForm");
+    const usernameInput = document.getElementById("username");
+    const passwordInput = document.getElementById("password");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
 
-        <div class="grid">
-          <div class="field">
-            <label>اسم المستخدم / البريد الإلكتروني</label>
-            <input id="username" type="text" placeholder="example@domain.com أو admin">
-          </div>
-
-          <div class="field">
-            <label>كلمة المرور</label>
-            <input id="password" type="password" placeholder="أدخل كلمة المرور">
-          </div>
-
-          <div class="inline-row">
-            <label class="checkbox-wrap">
-              <input id="rememberMe" type="checkbox">
-              <span>تذكرني</span>
-            </label>
-
-            <label class="checkbox-wrap">
-              <input id="demoMode" type="checkbox" checked>
-              <span>تشغيل الوضع التجريبي</span>
-            </label>
-          </div>
-
-          <div class="hint-box">
-            <b>مهم:</b> حسب الكود الذي أرسلته، لا يوجد حاليًا endpoint حقيقي لتسجيل الدخول داخل الـ API.
-            لذلك هذه الصفحة تعمل الآن بطريقة آمنة كواجهة دخول محلية، ويمكن تحويلها لاحقًا إلى مصادقة حقيقية بسهولة.
-          </div>
-
-          <div class="demo-box">
-            <b>بيانات تجريبية مقترحة:</b><br>
-            المستخدم: <b>admin</b><br>
-            كلمة المرور: <b>123456</b>
-          </div>
-
-          <div class="toolbar">
-            <button class="btn btn-primary" onclick="loginNow()">دخول</button>
-            <button class="btn btn-dark" onclick="fillDemoCredentials()">تعبئة تجريبية</button>
-            <button class="btn btn-secondary" onclick="clearLoginForm()">إعادة ضبط</button>
-          </div>
-
-          <div class="status-bar" id="statusBar">جاهز لتسجيل الدخول.</div>
-
-          <div class="result-box" id="resultBox">
-            ستظهر هنا نتيجة عملية الدخول.
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-const API = "http://127.0.0.1:8000";
-const DEFAULT_SUCCESS_PAGE = "layout_shell.html";
-
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
-}
-
-function safeText(v, fallback="-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
-
-function fillDemoCredentials(){
-  document.getElementById("username").value = "admin";
-  document.getElementById("password").value = "123456";
-  setStatus("تمت تعبئة بيانات تجريبية.");
-}
-
-function clearLoginForm(){
-  document.getElementById("username").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("rememberMe").checked = false;
-  document.getElementById("demoMode").checked = true;
-  document.getElementById("resultBox").innerHTML = "ستظهر هنا نتيجة عملية الدخول.";
-  setStatus("تمت إعادة ضبط نموذج الدخول.");
-}
-
-function saveSession(username){
-  const remember = document.getElementById("rememberMe").checked;
-  const payload = {
-    username: username,
-    login_time: new Date().toISOString(),
-    mode: document.getElementById("demoMode").checked ? "demo" : "api"
-  };
-
-  if(remember){
-    localStorage.setItem("phytologic_login_session", JSON.stringify(payload));
-  }else{
-    sessionStorage.setItem("phytologic_login_session", JSON.stringify(payload));
-  }
-}
-async function loginNow(){
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
-  const demoMode = document.getElementById("demoMode").checked;
-
-  if(!username || !password){
-    document.getElementById("resultBox").innerHTML = `
-      <div class="error-box">يرجى إدخال اسم المستخدم وكلمة المرور.</div>
-    `;
-    setStatus("فشل تسجيل الدخول: الحقول ناقصة.");
-    return;
-  }
-
-  setStatus("جاري التحقق من بيانات الدخول...");
-
-  try{
-    if(demoMode){
-      if(
-        (username === "admin" && password === "123456") ||
-        (username === "nalmasoud" && password === "123456")
-      ){
-        saveSession(username);
-
-        document.getElementById("resultBox").innerHTML = `
-          <div class="ok-box">
-            تم تسجيل الدخول بنجاح في الوضع التجريبي.<br>
-            سيتم تحويلك إلى المنصة الرئيسية.
-          </div>
-        `;
-
-        setStatus("تم تسجيل الدخول بنجاح.");
-        setTimeout(() => {
-          window.location.href = DEFAULT_SUCCESS_PAGE;
-        }, 900);
-      }else{
-        document.getElementById("resultBox").innerHTML = `
-          <div class="error-box">
-            بيانات الدخول التجريبية غير صحيحة.<br>
-            جرّب: admin / 123456
-          </div>
-        `;
-        setStatus("بيانات الدخول التجريبية غير صحيحة.");
-      }
-
-      return;
-    }
-
-    /*
-      جاهز للربط لاحقًا مع API حقيقي.
-      عندما تضيف endpoint مثل /login أو /auth/login
-      استبدل هذا الجزء فقط.
-    */
-
-    const guessedEndpoints = [
-      `${API}/login`,
-      `${API}/auth/login`,
-      `${API}/users/login`,
-      `${API}/token`
+    const demoAccounts = [
+      { username: "admin@phytologic.ai", password: "admin123", redirect: "/pages/admin" },
+      { username: "ops@phytologic.ai", password: "ops123", redirect: "/pages/ops" },
+      { username: "national@phytologic.ai", password: "national123", redirect: "/pages/national_center" }
     ];
 
-    let foundEndpoint = null;
+    function showError(message){
+      errorBox.style.display = "block";
+      errorBox.textContent = message || "حدث خطأ غير متوقع";
+      successBox.style.display = "none";
+      successBox.textContent = "";
+    }
 
-    for(const ep of guessedEndpoints){
-      try{
-        const testRes = await fetch(ep, {
-          method: "OPTIONS"
-        });
-        if(testRes){
-          foundEndpoint = ep;
-          break;
-        }
-      }catch(e){
+    function showSuccess(message){
+      successBox.style.display = "block";
+      successBox.textContent = message || "";
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
+
+    function clearMessages(){
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+      successBox.style.display = "none";
+      successBox.textContent = "";
+    }
+
+    function togglePassword(){
+      const btn = document.querySelector(".toggle-password");
+      if(passwordInput.type === "password"){
+        passwordInput.type = "text";
+        btn.textContent = "إخفاء";
+      }else{
+        passwordInput.type = "password";
+        btn.textContent = "إظهار";
       }
     }
 
-    if(!foundEndpoint){
-      document.getElementById("resultBox").innerHTML = `
-        <div class="error-box">
-          لا يوجد حاليًا endpoint حقيقي لتسجيل الدخول داخل الـ API الحالي.<br>
-          فعّل "الوضع التجريبي" الآن، أو أضف مسار Login في الخادم ثم اربطه هنا.
-        </div>
-      `;
-      setStatus("لم يتم العثور على API تسجيل دخول.");
-      return;
+    function fillAccount(username, password){
+      usernameInput.value = username;
+      passwordInput.value = password;
+      clearMessages();
+      showSuccess("تمت تعبئة بيانات الدخول التجريبية.");
     }
 
-    const response = await fetch(foundEndpoint, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password
-      })
+    function showForgotPassword(e){
+      e.preventDefault();
+      showError("ميزة استعادة كلمة المرور غير مربوطة بعد. يمكن ربطها لاحقًا مع خدمة بريد أو API مخصص.");
+    }
+
+    function saveRememberedUser(username){
+      const remember = document.getElementById("rememberMe").checked;
+      if(remember){
+        localStorage.setItem("phytologic_remembered_user", username);
+      }else{
+        localStorage.removeItem("phytologic_remembered_user");
+      }
+    }
+
+    function loadRememberedUser(){
+      const saved = localStorage.getItem("phytologic_remembered_user");
+      if(saved){
+        usernameInput.value = saved;
+        document.getElementById("rememberMe").checked = true;
+      }
+    }
+
+    loginForm.addEventListener("submit", function(e){
+      e.preventDefault();
+      clearMessages();
+
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if(!username){
+        showError("يرجى إدخال البريد الإلكتروني أو اسم المستخدم.");
+        return;
+      }
+
+      if(!password){
+        showError("يرجى إدخال كلمة المرور.");
+        return;
+      }
+
+      const account = demoAccounts.find(
+        acc => acc.username.toLowerCase() === username.toLowerCase() && acc.password === password
+      );
+
+      if(!account){
+        showError("بيانات الدخول غير صحيحة في الوضع التجريبي.");
+        return;
+      }
+
+      saveRememberedUser(username);
+      showSuccess("تم تسجيل الدخول بنجاح. جاري التحويل...");
+
+      setTimeout(() => {
+        window.location.href = account.redirect;
+      }, 900);
     });
 
-    const result = await response.json().catch(() => ({}));
-
-    if(response.ok){
-      saveSession(username);
-
-      document.getElementById("resultBox").innerHTML = `
-        <div class="ok-box">
-          تم تسجيل الدخول عبر API بنجاح.
-        </div>
-      `;
-      setStatus("تم تسجيل الدخول عبر API.");
-      setTimeout(() => {
-        window.location.href = DEFAULT_SUCCESS_PAGE;
-      }, 900);
-    }else{
-      document.getElementById("resultBox").innerHTML = `
-        <div class="error-box">
-          فشل تسجيل الدخول عبر API.<br>
-          ${safeText(result.error, "الاستجابة لا تحتوي على رسالة خطأ واضحة")}
-        </div>
-      `;
-      setStatus("فشل تسجيل الدخول عبر API.");
-    }
-
-  }catch(err){
-    console.error(err);
-    document.getElementById("resultBox").innerHTML = `
-      <div class="error-box">
-        حدث خطأ أثناء محاولة تسجيل الدخول.<br>
-        ${err.message}
-      </div>
-    `;
-    setStatus("تعذر تنفيذ عملية الدخول.");
-  }
-}
-
-fillDemoCredentials();
-</script>
-
+    window.addEventListener("DOMContentLoaded", loadRememberedUser);
+  </script>
 </body>
 </html>
