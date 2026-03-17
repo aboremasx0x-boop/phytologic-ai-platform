@@ -1,978 +1,1012 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - لوحة الجهات</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | Admin Panel</title>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { box-sizing: border-box; }
 
-<style>
-*{box-sizing:border-box}
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --success:#15803d;
+      --dark:#0b1220;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+      --radius:22px;
+    }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
+      color:var(--text);
+    }
 
-.page{
-max-width:1550px;
-margin:16px auto;
-padding:0 14px 28px;
-}
+    .page{
+      max-width:1550px;
+      margin:0 auto;
+      padding:18px;
+    }
 
-.hero{
-background:
-linear-gradient(135deg,rgba(17,24,39,.97),rgba(30,64,175,.88)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:26px;
-padding:24px 26px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
+    .navbar{
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:18px;
+      position:sticky;
+      top:12px;
+      z-index:20;
+    }
 
-.hero:before{
-content:"";
-position:absolute;
-left:-40px;
-top:-40px;
-width:180px;
-height:180px;
-background:rgba(255,255,255,.06);
-border-radius:50%;
-}
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
 
-.hero:after{
-content:"";
-position:absolute;
-right:-25px;
-bottom:-25px;
-width:230px;
-height:230px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-}
+    .brand-title{
+      font-size:22px;
+      font-weight:800;
+      color:#0b5b55;
+    }
 
-.hero-title{
-font-size:34px;
-font-weight:800;
-margin:0 0 8px 0;
-position:relative;
-z-index:1;
-}
+    .brand-sub{
+      font-size:13px;
+      color:var(--muted);
+    }
 
-.hero-sub{
-font-size:14px;
-line-height:1.9;
-opacity:.95;
-position:relative;
-z-index:1;
-max-width:980px;
-}
+    .nav-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:14px;
-margin-bottom:16px;
-}
+    .nav-links a{
+      text-decoration:none;
+      color:#0f172a;
+      background:#fff;
+      border:1px solid #dbe5ef;
+      border-radius:14px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:700;
+      transition:.2s ease;
+    }
 
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px 18px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-min-height:112px;
-}
+    .nav-links a:hover{
+      background:#f8fbff;
+      transform:translateY(-1px);
+    }
 
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:10px;
-font-weight:700;
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(11,18,32,.98), rgba(15,118,110,.90)),
+        radial-gradient(circle at top left, rgba(255,255,255,.15), transparent 35%);
+      color:white;
+      border-radius:30px;
+      padding:32px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
 
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
 
-.stat-sub{
-font-size:12px;
-color:#94a3b8;
-margin-top:8px;
-line-height:1.6;
-}
+    .hero h1{
+      margin:0 0 12px;
+      font-size:38px;
+      line-height:1.2;
+    }
 
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
+    .hero p{
+      margin:0;
+      line-height:1.95;
+      max-width:930px;
+      color:rgba(255,255,255,.92);
+      font-size:16px;
+    }
 
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-.section-title{
-font-size:18px;
-font-weight:800;
-color:#0f172a;
-}
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:22px;
+    }
 
-.section-note{
-font-size:12px;
-color:#64748b;
-}
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 18px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.card-body{
-padding:16px;
-}
+    .btn:hover{ transform:translateY(-1px); }
 
-.grid-2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
+    .btn-white{
+      background:white;
+      color:#0b5b55;
+    }
 
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
+    .btn-white:hover{ background:#f4f7ff; }
 
-.grid-4{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:14px;
-}
+    .btn-glass{
+      background:rgba(255,255,255,.12);
+      color:white;
+      border:1px solid rgba(255,255,255,.18);
+    }
 
-.field label{
-display:block;
-font-size:13px;
-color:#64748b;
-margin-bottom:8px;
-font-weight:700;
-}
+    .btn-glass:hover{ background:rgba(255,255,255,.18); }
 
-.field input,
-.field select{
-width:100%;
-padding:12px 14px;
-border-radius:14px;
-border:1px solid #dbe4f2;
-background:#fff;
-font-size:14px;
-outline:none;
-transition:.2s;
-}
+    .btn-primary{
+      background:var(--primary);
+      color:white;
+    }
 
-.field input:focus,
-.field select:focus{
-border-color:#2563eb;
-box-shadow:0 0 0 4px rgba(37,99,235,.08);
-}
+    .btn-primary:hover{
+      background:var(--primary-dark);
+    }
 
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:8px;
-}
+    .btn-outline{
+      background:white;
+      color:var(--secondary);
+      border:1px solid #cbd5e1;
+    }
 
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
+    .btn-outline:hover{
+      background:#f8fbff;
+    }
 
-.btn-primary{
-background:linear-gradient(180deg,#2563eb 0%,#1d4ed8 100%);
-color:white;
-box-shadow:0 8px 16px rgba(37,99,235,.22);
-}
+    .btn-danger{
+      background:#fff1f2;
+      color:#be123c;
+      border:1px solid #fecdd3;
+    }
 
-.btn-secondary{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
+    .btn-danger:hover{
+      background:#ffe4e6;
+    }
 
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
+    .grid{
+      display:grid;
+      gap:18px;
+    }
 
-.btn-success{
-background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
-color:white;
-}
+    .grid-2{ grid-template-columns:1fr 1fr; }
+    .grid-3{ grid-template-columns:repeat(3,1fr); }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
 
-.btn:hover{
-transform:translateY(-1px);
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-.info-box{
-padding:14px;
-border-radius:16px;
-border:1px solid #ecf2fb;
-background:#fbfdff;
-}
+    .card-header{
+      padding:18px 20px 12px;
+      border-bottom:1px solid #edf2f7;
+    }
 
-.info-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:10px;
-color:#111827;
-}
+    .card-header h2,
+    .card-header h3{
+      margin:0;
+      font-size:20px;
+    }
 
-.kpi{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .card-header p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-.small{
-font-size:12px;
-color:#64748b;
-line-height:1.8;
-}
+    .card-body{
+      padding:20px;
+    }
 
-.status-bar{
-margin-top:12px;
-padding:11px 12px;
-border-radius:14px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
+    .kpi{
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      min-height:118px;
+    }
 
-.analysis-box{
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-}
+    .kpi-label{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
 
-.list{
-display:grid;
-gap:8px;
-}
+    .kpi-value{
+      font-size:28px;
+      font-weight:800;
+      color:var(--text);
+    }
 
-.list-item{
-padding:10px 12px;
-border-radius:14px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-}
+    .kpi-sub{
+      margin-top:8px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.8;
+    }
 
-.highlight{
-color:#0f172a;
-font-weight:800;
-}
+    .info-box{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:#fcfdff;
+      margin-bottom:14px;
+    }
 
-.table-wrap{
-overflow:auto;
-}
+    .info-box:last-child{
+      margin-bottom:0;
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-min-width:900px;
-}
+    .info-box h4{
+      margin:0 0 12px;
+      font-size:17px;
+    }
 
-th,td{
-padding:11px 10px;
-text-align:right;
-border-bottom:1px solid #edf2fb;
-font-size:13px;
-}
+    .info-list{
+      display:grid;
+      gap:10px;
+    }
 
-th{
-background:#f8fbff;
-color:#334155;
-font-weight:800;
-}
+    .info-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding-bottom:10px;
+      border-bottom:1px dashed #e5e7eb;
+    }
 
-.badge{
-display:inline-block;
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-color:white;
-}
+    .info-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
 
-.badge-green{background:#16a34a}
-.badge-orange{background:#d97706}
-.badge-red{background:#dc2626}
-.badge-gray{background:#64748b}
+    .key{
+      color:var(--muted);
+      font-size:14px;
+    }
 
-.error-box{
-background:#fef2f2;
-border:1px solid #fecaca;
-color:#b91c1c;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      text-align:left;
+    }
 
-.ok-box{
-background:#ecfdf5;
-border:1px solid #a7f3d0;
-color:#047857;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .toolbar{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:14px;
+    }
 
-canvas{
-max-height:340px;
-}
+    .toolbar-left,
+    .toolbar-right{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
-@media(max-width:1450px){
-.stats-grid{grid-template-columns:repeat(3,1fr)}
-.grid-4{grid-template-columns:repeat(2,1fr)}
-.grid-3{grid-template-columns:1fr 1fr}
-.grid-2{grid-template-columns:1fr}
-}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
 
-@media(max-width:780px){
-.stats-grid,.grid-4,.grid-3{grid-template-columns:1fr}
-.hero-title{font-size:26px}
-}
-</style>
+    .pill-low{
+      background:#ecfdf5;
+      color:#166534;
+    }
+
+    .pill-moderate{
+      background:#fff7ed;
+      color:#9a3412;
+    }
+
+    .pill-high{
+      background:#fef2f2;
+      color:#991b1b;
+    }
+
+    .pill-neutral{
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .table-wrap{
+      overflow-x:auto;
+      border:1px solid var(--border);
+      border-radius:18px;
+      background:white;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:840px;
+    }
+
+    thead{ background:#f8fbff; }
+
+    th,td{
+      text-align:right;
+      padding:14px 16px;
+      border-bottom:1px solid #edf2f7;
+      font-size:14px;
+      vertical-align:top;
+    }
+
+    th{
+      color:#334155;
+      font-weight:800;
+    }
+
+    tr:hover td{ background:#fbfdff; }
+
+    .empty{
+      color:var(--muted);
+      text-align:center;
+      padding:24px 10px;
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    .form-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+    }
+
+    .field{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+
+    .field.full{
+      grid-column:1 / -1;
+    }
+
+    label{
+      font-size:14px;
+      font-weight:700;
+      color:#1f2937;
+    }
+
+    input[type="text"],
+    input[type="number"]{
+      width:100%;
+      border:1px solid #dbe2ea;
+      border-radius:14px;
+      padding:13px 14px;
+      background:#fff;
+      font-size:15px;
+      outline:none;
+    }
+
+    input:focus{
+      border-color:#0f766e;
+      box-shadow:0 0 0 4px rgba(15,118,110,.08);
+    }
+
+    .submit-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:18px;
+    }
+
+    .loading{
+      display:none;
+      margin-top:14px;
+      color:var(--secondary);
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .error-box, .success-box{
+      display:none;
+      margin-top:16px;
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:14px;
+      line-height:1.9;
+    }
+
+    .error-box{
+      background:#fef2f2;
+      color:#991b1b;
+      border:1px solid #fecaca;
+    }
+
+    .success-box{
+      background:#ecfdf5;
+      color:#166534;
+      border:1px solid #bbf7d0;
+    }
+
+    .footer-note{
+      text-align:center;
+      color:#64748b;
+      padding:18px 10px 8px;
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    @media (max-width:1200px){
+      .grid-4, .grid-3, .grid-2, .form-grid{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
 
-<div class="page">
-
-  <div class="hero">
-    <h1 class="hero-title">لوحة الجهات - Phytologic AI</h1>
-    <div class="hero-sub">
-      لوحة تشغيل مركزية للجهات الزراعية والإدارية، تعرض مؤشرات الحالات والتنبيهات والمزارعين، وتتيح المتابعة السريعة للمناطق، الأمراض، والتنبيهات مع أدوات تشغيل مباشرة وإرسال رسائل SMS يدويًا.
-    </div>
-  </div>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">إجمالي الحالات</div>
-      <div class="stat-value" id="totalCases">0</div>
-      <div class="stat-sub">من /stats/summary</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">متوسط الشدة</div>
-      <div class="stat-value" id="avgSeverity">0%</div>
-      <div class="stat-sub">الشدة العامة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أكثر مرض</div>
-      <div class="stat-value" id="topDisease" style="font-size:20px">-</div>
-      <div class="stat-sub">الأكثر تكرارًا</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">أكثر منطقة</div>
-      <div class="stat-value" id="topRegion" style="font-size:20px">-</div>
-      <div class="stat-sub">الأعلى تسجيلًا</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">إجمالي التنبيهات</div>
-      <div class="stat-value" id="totalAlerts">0</div>
-      <div class="stat-sub">من /alerts/summary</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">إجمالي المزارعين</div>
-      <div class="stat-value" id="totalFarmers">0</div>
-      <div class="stat-sub">من /farmers</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">أدوات لوحة الجهات</div>
-      <div class="section-note">تحديث وتشغيل وتصدير</div>
-    </div>
-    <div class="card-body">
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="loadAdminDashboard()">تحديث شامل</button>
-        <button class="btn btn-secondary" onclick="exportAdminJson()">تصدير JSON</button>
-        <button class="btn btn-dark" onclick="buildExecutiveAnalysis()">إعادة بناء التحليل</button>
-        <button class="btn btn-success" onclick="toggleAutoRefresh()">تشغيل/إيقاف التحديث التلقائي</button>
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-title">Phytologic AI Admin</div>
+        <div class="brand-sub">لوحة إدارة عليا لمراقبة وتشغيل المنصة</div>
       </div>
-      <div class="status-bar" id="statusBar">جاهز لتحميل لوحة الجهات.</div>
-    </div>
-  </div>
-<div class="grid-2">
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">الملخص التنفيذي السريع</div>
-        <div class="section-note">من الحالات والتنبيهات والمزارعين</div>
+      <div class="nav-links">
+        <a href="/">الرئيسية</a>
+        <a href="/pages/dashboard">لوحة التحكم</a>
+        <a href="/pages/alerts">التنبيهات</a>
+        <a href="/pages/report_center">مركز التقارير</a>
+        <a href="/pages/farmers">المزارعون</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>لوحة الإدارة العليا</h1>
+          <p>
+            هذه الصفحة مخصصة لإدارة ومراقبة النظام من مستوى أعلى، وتشمل فحص الصحة التشغيلية،
+            مراجعة الإحصائيات والتنبيهات، تصدير البيانات، وتشغيل أدوات إدارية مباشرة مثل إرسال
+            رسائل تنبيه لمنطقة محددة.
+          </p>
+        </div>
+
+        <div class="status-chip" id="heroAdminChip">
+          <span>●</span>
+          <span>جاري فحص الحالة الإدارية...</span>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn btn-white" onclick="refreshAdmin()">تحديث كامل</button>
+        <button class="btn btn-glass" onclick="checkHealth()">فحص النظام</button>
+        <button class="btn btn-glass" onclick="downloadAlertsJson()">تصدير التنبيهات JSON</button>
+      </div>
+    </section>
+
+    <section class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <h2>مؤشرات الإدارة</h2>
+        <p>ملخص مباشر للحالات، التنبيهات، وصحة خدمات المنصة.</p>
       </div>
       <div class="card-body">
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">إجمالي الحالات</div>
+            <div class="kpi-value" id="kpiTotalCases">--</div>
+            <div class="kpi-sub">عدد جميع التشخيصات المسجلة</div>
+          </div>
 
-        <div class="grid-3">
-          <div class="info-box">
-            <div class="info-title">إجمالي الحالات</div>
-            <div class="kpi" id="sumCases">0</div>
-            <div class="small">عدد التشخيصات الكلي</div>
+          <div class="kpi">
+            <div class="kpi-label">إجمالي التنبيهات</div>
+            <div class="kpi-value" id="kpiTotalAlerts">--</div>
+            <div class="kpi-sub">عدد جميع التنبيهات في النظام</div>
           </div>
-          <div class="info-box">
-            <div class="info-title">التنبيهات المرتفعة</div>
-            <div class="kpi" id="sumHighAlerts">0</div>
-            <div class="small">الحالات الحرجة</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">آخر منطقة متأثرة</div>
-            <div class="kpi" id="sumLatestRegion" style="font-size:18px">-</div>
-            <div class="small">آخر تنبيه مسجل</div>
-          </div>
-        </div>
 
-        <div style="margin-top:14px" class="analysis-box" id="summaryNarrative">
-          ستظهر هنا قراءة مختصرة للوضع العام.
+          <div class="kpi">
+            <div class="kpi-label">التنبيهات العالية</div>
+            <div class="kpi-value" id="kpiHighAlerts">--</div>
+            <div class="kpi-sub">حالات الخطر المرتفع</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">حالة النظام</div>
+            <div class="kpi-value" id="kpiSystemReady" style="font-size:22px;">--</div>
+            <div class="kpi-sub" id="kpiSystemVersion">--</div>
+          </div>
         </div>
       </div>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="card-header">
+          <h2>الحالة التشغيلية</h2>
+          <p>فحص العناصر الرئيسية داخل المنصة.</p>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <h4>فحص النظام</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">الحالة</div>
+                <div class="value" id="healthStatus">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">نموذج الصور</div>
+                <div class="value" id="healthAi">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">نموذج التنبؤ</div>
+                <div class="value" id="healthForecast">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">قاعدة البيانات</div>
+                <div class="value" id="healthDatabase">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">SMS</div>
+                <div class="value" id="healthSms">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الإصدار</div>
+                <div class="value" id="healthVersion">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>أهم المؤشرات</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">أكثر مرض شيوعًا</div>
+                <div class="value" id="topDiseaseName">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">أكثر منطقة تسجيلًا</div>
+                <div class="value" id="topRegionName">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">آخر تنبيه</div>
+                <div class="value" id="latestAlertDisease">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">منطقة آخر تنبيه</div>
+                <div class="value" id="latestAlertRegion">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>أدوات الإدارة</h2>
+          <p>تنفيذ عمليات إدارية مباشرة من الواجهة.</p>
+        </div>
+        <div class="card-body">
+          <form id="smsForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="sms_region">المنطقة</label>
+                <input type="text" id="sms_region" placeholder="مثال: مكة" />
+              </div>
+
+              <div class="field">
+                <label for="sms_disease">اسم المرض</label>
+                <input type="text" id="sms_disease" placeholder="مثال: اللفحة المبكرة" />
+              </div>
+
+              <div class="field">
+                <label for="sms_risk_score">درجة الخطر</label>
+                <input type="number" step="any" id="sms_risk_score" placeholder="75" />
+              </div>
+            </div>
+
+            <div class="submit-row">
+              <button type="submit" class="btn btn-primary">إرسال SMS للمنطقة</button>
+              <button type="button" class="btn btn-outline" onclick="fillSmsDemo()">تعبئة تجريبية</button>
+              <button type="button" class="btn btn-danger" onclick="downloadAlertsJson()">تصدير التنبيهات</button>
+            </div>
+
+            <div class="loading" id="loadingText">جاري تنفيذ العملية الإدارية...</div>
+            <div class="error-box" id="errorBox"></div>
+            <div class="success-box" id="successBox"></div>
+          </form>
+        </div>
+      </section>
     </div>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">إرسال SMS يدوي</div>
-        <div class="section-note">المسار: /alerts/send-sms</div>
+    <section class="card" style="margin-top:18px;">
+      <div class="card-header">
+        <h2>جدول الأمراض</h2>
+        <p>عرض عدد الحالات لكل مرض مسجل.</p>
       </div>
       <div class="card-body">
-
-        <div class="grid-3">
-          <div class="field">
-            <label>المنطقة</label>
-            <input id="smsRegion" type="text" placeholder="مثال: الرياض">
-          </div>
-          <div class="field">
-            <label>اسم المرض</label>
-            <input id="smsDisease" type="text" placeholder="مثال: لفحة مبكرة">
-          </div>
-          <div class="field">
-            <label>درجة الخطر</label>
-            <input id="smsRisk" type="number" placeholder="مثال: 82">
-          </div>
-        </div>
-
         <div class="toolbar">
-          <button class="btn btn-primary" onclick="sendSMSAlert()">إرسال الرسائل</button>
+          <div class="toolbar-left">
+            <span class="pill pill-neutral">/stats/diseases</span>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-outline" onclick="loadDiseases()">تحديث</button>
+          </div>
         </div>
 
-        <div style="margin-top:14px" class="analysis-box" id="smsResultBox">
-          نتيجة الإرسال ستظهر هنا.
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">الأمراض الأكثر تكرارًا</div>
-        <div class="section-note">المسار: /stats/diseases</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="diseasesChart"></canvas>
-        </div>
         <div class="table-wrap">
           <table>
             <thead>
               <tr>
                 <th>#</th>
                 <th>المرض</th>
-                <th>العدد</th>
+                <th>عدد الحالات</th>
               </tr>
             </thead>
-            <tbody id="diseasesTable">
-              <tr><td colspan="3">بانتظار البيانات...</td></tr>
+            <tbody id="diseasesTableBody">
+              <tr><td colspan="3" class="empty">جاري تحميل البيانات...</td></tr>
             </tbody>
           </table>
         </div>
       </div>
+    </section>
+
+    <div class="grid grid-2" style="margin-top:18px;">
+      <section class="card">
+        <div class="card-header">
+          <h2>جدول المناطق</h2>
+          <p>عدد الحالات حسب المنطقة.</p>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>المنطقة</th>
+                  <th>عدد الحالات</th>
+                </tr>
+              </thead>
+              <tbody id="regionsTableBody">
+                <tr><td colspan="3" class="empty">جاري تحميل البيانات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>التنبيهات الأخيرة</h2>
+          <p>آخر التنبيهات من النظام.</p>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>المنطقة</th>
+                  <th>المرض</th>
+                  <th>الدرجة</th>
+                  <th>المستوى</th>
+                  <th>التاريخ</th>
+                </tr>
+              </thead>
+              <tbody id="alertsTableBody">
+                <tr><td colspan="6" class="empty">جاري تحميل التنبيهات...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
     </div>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">المناطق الأعلى تسجيلًا</div>
-        <div class="section-note">المسار: /stats/regions</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="regionsChart"></canvas>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المنطقة</th>
-                <th>العدد</th>
-              </tr>
-            </thead>
-            <tbody id="regionsTable">
-              <tr><td colspan="3">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div>
-<div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">المزارعون المسجلون</div>
-        <div class="section-note">المسار: /farmers</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="farmersRegionsChart"></canvas>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>الاسم</th>
-                <th>الهاتف</th>
-                <th>المزرعة</th>
-                <th>المنطقة</th>
-                <th>المدينة</th>
-                <th>المحصول</th>
-                <th>التاريخ</th>
-              </tr>
-            </thead>
-            <tbody id="farmersTable">
-              <tr><td colspan="8">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">التنبيهات الأخيرة</div>
-        <div class="section-note">المسار: /alerts</div>
-      </div>
-      <div class="card-body">
-        <div style="margin-bottom:16px">
-          <canvas id="alertsLevelsChart"></canvas>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المنطقة</th>
-                <th>المدينة</th>
-                <th>المرض</th>
-                <th>درجة الخطر</th>
-                <th>المستوى</th>
-                <th>التاريخ</th>
-              </tr>
-            </thead>
-            <tbody id="alertsTable">
-              <tr><td colspan="7">بانتظار البيانات...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">التحليل التنفيذي المباشر</div>
-      <div class="section-note">قراءة تشغيلية موجّهة للجهة الإدارية</div>
-    </div>
-    <div class="card-body">
-      <div class="analysis-box" id="executiveAnalysis">
-        بعد تحميل البيانات ستظهر هنا قراءة تنفيذية مباشرة.
-      </div>
+    <div class="footer-note">
+      Phytologic AI Admin Panel — واجهة إدارة عليا لمراقبة وتشغيل المنصة.
     </div>
   </div>
 
-</div>
+  <script>
+    const smsForm = document.getElementById("smsForm");
+    const loadingText = document.getElementById("loadingText");
+    const errorBox = document.getElementById("errorBox");
+    const successBox = document.getElementById("successBox");
 
-<script>
-const API = "http://127.0.0.1:8000";
-
-let adminCache = {
-  summary:null,
-  diseases:[],
-  regions:[],
-  alertsSummary:null,
-  alerts:[],
-  farmers:[]
-};
-
-let autoRefresh = false;
-let autoRefreshTimer = null;
-
-let diseasesChart = null;
-let regionsChart = null;
-let farmersRegionsChart = null;
-let alertsLevelsChart = null;
-
-function setStatus(msg){
-  document.getElementById("statusBar").textContent = msg;
-}
-
-function safeText(v, fallback="-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
-
-function destroyChart(chartObj){
-  if(chartObj){
-    chartObj.destroy();
-  }
-}
-
-function badgeHTML(level){
-  if(level === "مرتفع") return '<span class="badge badge-red">مرتفع</span>';
-  if(level === "متوسط") return '<span class="badge badge-orange">متوسط</span>';
-  if(level === "منخفض") return '<span class="badge badge-green">منخفض</span>';
-  return '<span class="badge badge-gray">غير متاح</span>';
-}
-
-async function fetchJson(url){
-  const res = await fetch(url);
-  return await res.json();
-}
-
-function exportAdminJson(){
-  const blob = new Blob([JSON.stringify(adminCache, null, 2)], {type:"application/json"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "admin_dashboard_data.json";
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-function toggleAutoRefresh(){
-  autoRefresh = !autoRefresh;
-
-  if(autoRefresh){
-    autoRefreshTimer = setInterval(loadAdminDashboard, 180000);
-    setStatus("تم تشغيل التحديث التلقائي كل 3 دقائق.");
-  }else{
-    clearInterval(autoRefreshTimer);
-    setStatus("تم إيقاف التحديث التلقائي.");
-  }
-}
-
-function renderSummary(){
-  const s = adminCache.summary || {};
-  const a = adminCache.alertsSummary || {};
-  const farmers = adminCache.farmers || [];
-
-  document.getElementById("totalCases").textContent = safeText(s.total_cases,0);
-  document.getElementById("avgSeverity").textContent = `${safeText(s.avg_severity,0)}%`;
-  document.getElementById("topDisease").textContent = safeText(s.top_disease?.name,"-");
-  document.getElementById("topRegion").textContent = safeText(s.top_region?.name,"-");
-  document.getElementById("totalAlerts").textContent = safeText(a.total_alerts,0);
-  document.getElementById("totalFarmers").textContent = farmers.length;
-
-  document.getElementById("sumCases").textContent = safeText(s.total_cases,0);
-  document.getElementById("sumHighAlerts").textContent = safeText(a.high_alerts,0);
-  document.getElementById("sumLatestRegion").textContent = safeText(a.latest_alert?.region,"-");
-
-  document.getElementById("summaryNarrative").innerHTML = `
-    <div class="list">
-      <div class="list-item">إجمالي الحالات الحالية هو <span class="highlight">${safeText(s.total_cases,0)}</span> حالة.</div>
-      <div class="list-item">متوسط شدة الإصابة العام هو <span class="highlight">${safeText(s.avg_severity,0)}%</span>.</div>
-      <div class="list-item">المرض الأكثر تكرارًا هو <span class="highlight">${safeText(s.top_disease?.name,"-")}</span>.</div>
-      <div class="list-item">عدد المزارعين المسجلين حاليًا هو <span class="highlight">${farmers.length}</span>.</div>
-    </div>
-  `;
-}
-function renderDiseases(){
-  const rows = adminCache.diseases || [];
-  const tbody = document.getElementById("diseasesTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
-    return;
-  }
-
-  rows.forEach((r, i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${safeText(r.disease)}</td>
-        <td>${safeText(r.count,0)}</td>
-      </tr>
-    `;
-  });
-
-  destroyChart(diseasesChart);
-  diseasesChart = new Chart(document.getElementById("diseasesChart"),{
-    type:"bar",
-    data:{
-      labels:rows.map(r => r.disease),
-      datasets:[{
-        label:"عدد الحالات",
-        data:rows.map(r => Number(r.count || 0)),
-        borderWidth:1
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
-
-function renderRegions(){
-  const rows = adminCache.regions || [];
-  const tbody = document.getElementById("regionsTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="3">لا توجد بيانات.</td></tr>`;
-    return;
-  }
-
-  rows.forEach((r, i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${safeText(r.region)}</td>
-        <td>${safeText(r.count,0)}</td>
-      </tr>
-    `;
-  });
-
-  destroyChart(regionsChart);
-  regionsChart = new Chart(document.getElementById("regionsChart"),{
-    type:"bar",
-    data:{
-      labels:rows.map(r => r.region),
-      datasets:[{
-        label:"عدد الحالات",
-        data:rows.map(r => Number(r.count || 0)),
-        borderWidth:1
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false}
-  });
-}
-
-function renderFarmers(){
-  const rows = adminCache.farmers || [];
-  const tbody = document.getElementById("farmersTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="8">لا توجد بيانات.</td></tr>`;
-  }else{
-    rows.forEach((r, i) => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(r.name)}</td>
-          <td>${safeText(r.phone)}</td>
-          <td>${safeText(r.farm_name)}</td>
-          <td>${safeText(r.region)}</td>
-          <td>${safeText(r.city)}</td>
-          <td>${safeText(r.crop)}</td>
-          <td>${safeText(r.created_at)}</td>
-        </tr>
-      `;
-    });
-  }
-
-  const regionCounts = {};
-  rows.forEach(r => {
-    const region = safeText(r.region,"غير محدد");
-    regionCounts[region] = (regionCounts[region] || 0) + 1;
-  });
-
-  destroyChart(farmersRegionsChart);
-  farmersRegionsChart = new Chart(document.getElementById("farmersRegionsChart"),{
-    type:"doughnut",
-    data:{
-      labels:Object.keys(regionCounts),
-      datasets:[{
-        data:Object.values(regionCounts)
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,cutout:"70%"}
-  });
-}
-
-function renderAlerts(){
-  const rows = adminCache.alerts || [];
-  const tbody = document.getElementById("alertsTable");
-  tbody.innerHTML = "";
-
-  if(!rows.length){
-    tbody.innerHTML = `<tr><td colspan="7">لا توجد بيانات.</td></tr>`;
-  }else{
-    rows.slice(0,20).forEach((r, i) => {
-      tbody.innerHTML += `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(r.region)}</td>
-          <td>${safeText(r.city)}</td>
-          <td>${safeText(r.disease_name)}</td>
-          <td>${safeText(r.risk_score,0)}</td>
-          <td>${badgeHTML(r.risk_level)}</td>
-          <td>${safeText(r.created_at)}</td>
-        </tr>
-      `;
-    });
-  }
-
-  const high = rows.filter(r => r.risk_level === "مرتفع").length;
-  const moderate = rows.filter(r => r.risk_level === "متوسط").length;
-  const low = rows.filter(r => r.risk_level === "منخفض").length;
-
-  destroyChart(alertsLevelsChart);
-  alertsLevelsChart = new Chart(document.getElementById("alertsLevelsChart"),{
-    type:"doughnut",
-    data:{
-      labels:["مرتفع","متوسط","منخفض"],
-      datasets:[{
-        data:[high, moderate, low]
-      }]
-    },
-    options:{responsive:true,maintainAspectRatio:false,cutout:"70%"}
-  });
-}
-
-function buildExecutiveAnalysis(){
-  const s = adminCache.summary || {};
-  const a = adminCache.alertsSummary || {};
-  const farmers = adminCache.farmers || [];
-  const alerts = adminCache.alerts || [];
-  const latestAlert = a.latest_alert || null;
-
-  document.getElementById("executiveAnalysis").innerHTML = `
-    <div class="list">
-      <div class="list-item"><span class="highlight">الوضع العام:</span> توجد ${safeText(s.total_cases,0)} حالة مسجلة بمتوسط شدة ${safeText(s.avg_severity,0)}%.</div>
-      <div class="list-item"><span class="highlight">أكثر مرض انتشارًا:</span> ${safeText(s.top_disease?.name,"-")}.</div>
-      <div class="list-item"><span class="highlight">أهم منطقة حاليًا:</span> ${safeText(s.top_region?.name,"-")}.</div>
-      <div class="list-item"><span class="highlight">المزارعون المسجلون:</span> ${farmers.length} مزارعًا.</div>
-      <div class="list-item"><span class="highlight">التنبيهات:</span> الإجمالي ${safeText(a.total_alerts,0)}، المرتفعة ${safeText(a.high_alerts,0)}، المتوسطة ${safeText(a.moderate_alerts,0)}.</div>
-      <div class="list-item"><span class="highlight">آخر تنبيه:</span> ${
-        latestAlert
-        ? `${safeText(latestAlert.region)} - ${safeText(latestAlert.disease_name)} - درجة ${safeText(latestAlert.risk_score,0)}`
-        : "لا يوجد تنبيه مسجل"
-      }</div>
-      <div class="list-item"><span class="highlight">التوصية التشغيلية:</span> ${
-        Number(a.high_alerts || 0) > 0
-        ? "يوصى بتفعيل استجابة ميدانية عاجلة في المناطق ذات التنبيهات المرتفعة وإشعار المزارعين بسرعة."
-        : Number(a.moderate_alerts || 0) > 0
-        ? "الوضع يحتاج متابعة منظمة واستباقية مع توسيع المراقبة في المناطق الأعلى تسجيلًا."
-        : "الوضع مستقر نسبيًا حاليًا مع أهمية استمرار التتبع الروتيني."
-      }</div>
-    </div>
-  `;
-}
-
-async function sendSMSAlert(){
-  try{
-    const region = document.getElementById("smsRegion").value.trim();
-    const disease = document.getElementById("smsDisease").value.trim();
-    const risk = document.getElementById("smsRisk").value.trim();
-
-    if(!region || !disease || !risk){
-      document.getElementById("smsResultBox").innerHTML = `<div class="error-box">يرجى تعبئة المنطقة واسم المرض ودرجة الخطر.</div>`;
-      return;
+    function safeText(v, fallback = "--") {
+      if (v === null || v === undefined || v === "") return fallback;
+      return v;
     }
 
-    const url = `${API}/alerts/send-sms?region=${encodeURIComponent(region)}&disease_name=${encodeURIComponent(disease)}&risk_score=${encodeURIComponent(risk)}`;
-    const data = await fetchJson(url);
-
-    if(data.success === false){
-      throw new Error(data.error || "فشل الإرسال");
+    function fmtNum(v, fallback = "--") {
+      if (v === null || v === undefined || isNaN(v)) return fallback;
+      return Number(v).toFixed(2);
     }
 
-    document.getElementById("smsResultBox").innerHTML = `
-      <div class="ok-box">
-        تم تنفيذ العملية بنجاح.<br>
-        عدد الرسائل المرسلة: <b>${safeText(data.sent_count,0)}</b>
-      </div>
-    `;
-  }catch(err){
-    console.error(err);
-    document.getElementById("smsResultBox").innerHTML = `<div class="error-box">تعذر إرسال الرسائل: ${err.message}</div>`;
-  }
-}
+    function riskPill(level) {
+      const val = String(level || "").toLowerCase();
 
-async function loadAdminDashboard(){
-  try{
-    setStatus("جاري تحميل لوحة الجهات...");
+      if (val === "high" || val === "مرتفع") {
+        return `<span class="pill pill-high">${safeText(level)}</span>`;
+      }
+      if (val === "moderate" || val === "متوسط") {
+        return `<span class="pill pill-moderate">${safeText(level)}</span>`;
+      }
+      if (val === "low" || val === "منخفض") {
+        return `<span class="pill pill-low">${safeText(level)}</span>`;
+      }
+      return `<span class="pill pill-neutral">${safeText(level)}</span>`;
+    }
 
-    const [summary, diseases, regions, alertsSummary, alerts, farmers] = await Promise.all([
-      fetchJson(`${API}/stats/summary`),
-      fetchJson(`${API}/stats/diseases`),
-      fetchJson(`${API}/stats/regions`),
-      fetchJson(`${API}/alerts/summary`),
-      fetchJson(`${API}/alerts?limit=100`),
-      fetchJson(`${API}/farmers`)
-    ]);
+    function showError(message) {
+      errorBox.style.display = "block";
+      errorBox.textContent = message || "حدث خطأ غير متوقع";
+    }
 
-    adminCache.summary = summary;
-    adminCache.diseases = Array.isArray(diseases) ? diseases : [];
-    adminCache.regions = Array.isArray(regions) ? regions : [];
-    adminCache.alertsSummary = alertsSummary;
-    adminCache.alerts = Array.isArray(alerts) ? alerts : [];
-    adminCache.farmers = Array.isArray(farmers) ? farmers : [];
+    function hideError() {
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
 
-    renderSummary();
-    renderDiseases();
-    renderRegions();
-    renderFarmers();
-    renderAlerts();
-    buildExecutiveAnalysis();
+    function showSuccess(message) {
+      successBox.style.display = "block";
+      successBox.textContent = message || "";
+    }
 
-    setStatus("تم تحميل لوحة الجهات بنجاح.");
-  }catch(err){
-    console.error(err);
-    document.getElementById("executiveAnalysis").innerHTML = `<div class="error-box">تعذر تحميل لوحة الجهات: ${err.message}</div>`;
-    setStatus("تعذر تحميل لوحة الجهات.");
-  }
-}
+    function hideSuccess() {
+      successBox.style.display = "none";
+      successBox.textContent = "";
+    }
 
-loadAdminDashboard();
-</script>
+    function setLoading(state) {
+      loadingText.style.display = state ? "block" : "none";
+    }
 
+    function fillSmsDemo() {
+      document.getElementById("sms_region").value = "مكة";
+      document.getElementById("sms_disease").value = "اللفحة المبكرة في الطماطم";
+      document.getElementById("sms_risk_score").value = "82";
+      hideError();
+      showSuccess("تمت تعبئة بيانات تجريبية.");
+    }
+
+    async function fetchJson(url, options = {}) {
+      const res = await fetch(url, options);
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed: ${url}`);
+      }
+
+      return data;
+    }
+
+    async function checkHealth() {
+      try {
+        const data = await fetchJson("/system/health");
+
+        document.getElementById("healthStatus").textContent = safeText(data.status);
+        document.getElementById("healthAi").textContent = safeText(data.ai_model);
+        document.getElementById("healthForecast").textContent = safeText(data.forecast_model);
+        document.getElementById("healthDatabase").textContent = safeText(data.database);
+        document.getElementById("healthSms").textContent = data.sms_configured ? "configured" : "not configured";
+        document.getElementById("healthVersion").textContent = safeText(data.version);
+
+        document.getElementById("kpiSystemReady").textContent =
+          data.status === "running" ? "جاهز" : safeText(data.status);
+        document.getElementById("kpiSystemVersion").textContent =
+          `الإصدار: ${safeText(data.version)}`;
+
+        document.getElementById("heroAdminChip").innerHTML =
+          `<span>●</span><span>Admin status: ${safeText(data.status)} | ${safeText(data.version)}</span>`;
+      } catch (err) {
+        document.getElementById("heroAdminChip").innerHTML =
+          `<span>●</span><span>تعذر فحص الحالة الإدارية</span>`;
+      }
+    }
+
+    async function loadSummary() {
+      const stats = await fetchJson("/stats/summary");
+      const alerts = await fetchJson("/alerts/summary");
+
+      document.getElementById("kpiTotalCases").textContent = safeText(stats.total_cases, 0);
+      document.getElementById("kpiTotalAlerts").textContent = safeText(alerts.total_alerts, 0);
+      document.getElementById("kpiHighAlerts").textContent = safeText(alerts.high_alerts, 0);
+
+      document.getElementById("topDiseaseName").textContent = safeText(stats?.top_disease?.name);
+      document.getElementById("topRegionName").textContent = safeText(stats?.top_region?.name);
+
+      const latest = alerts.latest_alert || {};
+      document.getElementById("latestAlertDisease").textContent = safeText(latest.disease_name);
+      document.getElementById("latestAlertRegion").textContent = safeText(latest.region);
+    }
+
+    async function loadDiseases() {
+      const data = await fetchJson("/stats/diseases");
+      const body = document.getElementById("diseasesTableBody");
+
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="3" class="empty">لا توجد بيانات أمراض.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.map((row, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(row.disease)}</td>
+          <td>${safeText(row.count, 0)}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadRegions() {
+      const data = await fetchJson("/stats/regions");
+      const body = document.getElementById("regionsTableBody");
+
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="3" class="empty">لا توجد بيانات مناطق.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.map((row, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.count, 0)}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function loadAlerts() {
+      const data = await fetchJson("/alerts/all");
+      const body = document.getElementById("alertsTableBody");
+
+      if (!Array.isArray(data) || data.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" class="empty">لا توجد تنبيهات.</td></tr>`;
+        return;
+      }
+
+      const recent = data.slice(0, 8);
+
+      body.innerHTML = recent.map((row, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${safeText(row.region)}</td>
+          <td>${safeText(row.disease_name)}</td>
+          <td>${row.risk_score != null ? `${fmtNum(row.risk_score)}%` : "--"}</td>
+          <td>${riskPill(row.risk_level)}</td>
+          <td>${safeText(row.created_at)}</td>
+        </tr>
+      `).join("");
+    }
+
+    async function downloadAlertsJson() {
+      try {
+        const res = await fetch("/export/alerts/json");
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || "تعذر تصدير البيانات");
+        }
+
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "alerts_export.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (err) {
+        showError(err.message || "فشل تصدير JSON");
+      }
+    }
+
+    smsForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      hideError();
+      hideSuccess();
+      setLoading(true);
+
+      try {
+        const region = document.getElementById("sms_region").value.trim();
+        const disease_name = document.getElementById("sms_disease").value.trim();
+        const risk_score = document.getElementById("sms_risk_score").value.trim();
+
+        if (!region) throw new Error("المنطقة مطلوبة");
+        if (!disease_name) throw new Error("اسم المرض مطلوب");
+        if (!risk_score) throw new Error("درجة الخطر مطلوبة");
+
+        const params = new URLSearchParams({
+          region,
+          disease_name,
+          risk_score
+        });
+
+        const data = await fetchJson(`/alerts/send-region-sms?${params.toString()}`, {
+          method: "POST"
+        });
+
+        showSuccess(`تمت العملية بنجاح. عدد النتائج: ${safeText(data.count, 0)}`);
+      } catch (err) {
+        showError(err.message || "فشل تنفيذ العملية الإدارية");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    async function refreshAdmin() {
+      try {
+        await Promise.all([
+          checkHealth(),
+          loadSummary(),
+          loadDiseases(),
+          loadRegions(),
+          loadAlerts()
+        ]);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("heroAdminChip").innerHTML =
+          `<span>●</span><span>حدث خطأ أثناء تحديث لوحة الإدارة</span>`;
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", refreshAdmin);
+  </script>
 </body>
 </html>
