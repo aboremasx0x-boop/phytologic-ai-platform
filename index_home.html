@@ -1,1673 +1,743 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phytologic AI - التشخيص الذكي</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Phytologic AI | Index Home</title>
 
-<style>
-*{box-sizing:border-box}
+  <style>
+    * { box-sizing: border-box; }
 
-body{
-margin:0;
-font-family:Tahoma,Arial,sans-serif;
-background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
-color:#1f2937;
-direction:rtl;
-text-align:right;
-}
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --primary:#0f766e;
+      --primary-dark:#0b5b55;
+      --secondary:#1d4ed8;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --success:#15803d;
+      --shadow:0 14px 32px rgba(15,23,42,.08);
+      --radius:22px;
+    }
 
-.page{
-max-width:1550px;
-margin:16px auto;
-padding:0 14px 28px;
-}
+    body{
+      margin:0;
+      font-family:Tahoma, Arial, sans-serif;
+      background:linear-gradient(180deg,#eef5ff 0%,#f8fbff 100%);
+      color:var(--text);
+    }
 
-.hero{
-background:
-linear-gradient(135deg,rgba(12,25,68,.97),rgba(16,97,73,.90)),
-radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
-color:white;
-border-radius:26px;
-padding:24px 26px;
-box-shadow:0 18px 40px rgba(0,0,0,.16);
-margin-bottom:16px;
-position:relative;
-overflow:hidden;
-}
+    .page{
+      max-width:1500px;
+      margin:0 auto;
+      padding:18px;
+    }
 
-.hero:before{
-content:"";
-position:absolute;
-left:-40px;
-top:-40px;
-width:180px;
-height:180px;
-background:rgba(255,255,255,.06);
-border-radius:50%;
-}
+    .navbar{
+      background:rgba(255,255,255,.9);
+      backdrop-filter:blur(10px);
+      border:1px solid var(--border);
+      border-radius:22px;
+      box-shadow:var(--shadow);
+      padding:14px 18px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-bottom:18px;
+      position:sticky;
+      top:12px;
+      z-index:20;
+    }
 
-.hero:after{
-content:"";
-position:absolute;
-right:-25px;
-bottom:-25px;
-width:230px;
-height:230px;
-background:rgba(255,255,255,.05);
-border-radius:50%;
-}
+    .brand{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+    }
 
-.hero-title{
-font-size:34px;
-font-weight:800;
-margin:0 0 8px 0;
-position:relative;
-z-index:1;
-}
+    .brand-title{
+      font-size:22px;
+      font-weight:800;
+      color:#0b5b55;
+    }
 
-.hero-sub{
-font-size:14px;
-line-height:1.9;
-opacity:.95;
-position:relative;
-z-index:1;
-max-width:980px;
-}
+    .brand-sub{
+      font-size:13px;
+      color:var(--muted);
+    }
 
-.stats-grid{
-display:grid;
-grid-template-columns:repeat(6,1fr);
-gap:14px;
-margin-bottom:16px;
-}
+    .nav-links{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
 
-.stat-card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:20px;
-padding:16px 18px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-min-height:112px;
-}
+    .nav-links a{
+      text-decoration:none;
+      color:#0f172a;
+      background:#fff;
+      border:1px solid #dbe5ef;
+      border-radius:14px;
+      padding:10px 14px;
+      font-size:14px;
+      font-weight:700;
+      transition:.2s ease;
+    }
 
-.stat-label{
-font-size:13px;
-color:#6b7280;
-margin-bottom:10px;
-font-weight:700;
-}
+    .nav-links a:hover{
+      background:#f8fbff;
+      transform:translateY(-1px);
+    }
 
-.stat-value{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .hero{
+      background:
+        linear-gradient(135deg, rgba(8,47,73,.97), rgba(15,118,110,.92)),
+        radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 35%);
+      color:white;
+      border-radius:30px;
+      padding:32px;
+      box-shadow:var(--shadow);
+      margin-bottom:18px;
+    }
 
-.stat-sub{
-font-size:12px;
-color:#94a3b8;
-margin-top:8px;
-line-height:1.6;
-}
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
 
-.card{
-background:white;
-border:1px solid #e7edf8;
-border-radius:22px;
-box-shadow:0 10px 24px rgba(0,0,0,.05);
-overflow:hidden;
-margin-bottom:16px;
-}
+    .hero h1{
+      margin:0 0 12px;
+      font-size:38px;
+      line-height:1.2;
+    }
 
-.section-header{
-padding:14px 16px;
-background:#f8fbff;
-border-bottom:1px solid #e9eef7;
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap;
-}
+    .hero p{
+      margin:0;
+      line-height:1.95;
+      max-width:920px;
+      color:rgba(255,255,255,.92);
+      font-size:16px;
+    }
 
-.section-title{
-font-size:18px;
-font-weight:800;
-color:#0f172a;
-}
+    .status-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:11px 15px;
+      border-radius:999px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      font-size:13px;
+      font-weight:700;
+      white-space:nowrap;
+    }
 
-.section-note{
-font-size:12px;
-color:#64748b;
-}
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      margin-top:22px;
+    }
 
-.card-body{
-padding:16px;
-}
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:13px 18px;
+      font-size:14px;
+      font-weight:700;
+      cursor:pointer;
+      transition:.2s ease;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
 
-.grid-2{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:16px;
-}
+    .btn:hover{ transform:translateY(-1px); }
 
-.grid-3{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
-}
+    .btn-white{
+      background:white;
+      color:#0b5b55;
+    }
 
-.grid-4{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:14px;
-}
+    .btn-white:hover{ background:#f4f7ff; }
 
-.grid-5{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:14px;
-}
+    .btn-glass{
+      background:rgba(255,255,255,.12);
+      color:white;
+      border:1px solid rgba(255,255,255,.18);
+    }
 
-.field label{
-display:block;
-font-size:13px;
-color:#64748b;
-margin-bottom:8px;
-font-weight:700;
-}
+    .btn-glass:hover{ background:rgba(255,255,255,.18); }
 
-.field input,
-.field select{
-width:100%;
-padding:12px 14px;
-border-radius:14px;
-border:1px solid #dbe4f2;
-background:#fff;
-font-size:14px;
-outline:none;
-transition:.2s;
-}
+    .grid{
+      display:grid;
+      gap:18px;
+    }
 
-.field input:focus,
-.field select:focus{
-border-color:#16a34a;
-box-shadow:0 0 0 4px rgba(22,163,74,.08);
-}
+    .grid-2{ grid-template-columns:1fr 1fr; }
+    .grid-3{ grid-template-columns:repeat(3,1fr); }
+    .grid-4{ grid-template-columns:repeat(4,1fr); }
 
-.toolbar{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-margin-top:14px;
-}
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
 
-.btn{
-padding:12px 18px;
-border:none;
-border-radius:14px;
-font-size:14px;
-font-weight:800;
-cursor:pointer;
-transition:.2s;
-white-space:nowrap;
-}
+    .card-header{
+      padding:18px 20px 12px;
+      border-bottom:1px solid #edf2f7;
+    }
 
-.btn-primary{
-background:linear-gradient(180deg,#16a34a 0%,#15803d 100%);
-color:white;
-box-shadow:0 8px 16px rgba(21,128,61,.22);
-}
+    .card-header h2,
+    .card-header h3{
+      margin:0;
+      font-size:20px;
+    }
 
-.btn-secondary{
-background:linear-gradient(180deg,#3b82f6 0%,#2563eb 100%);
-color:white;
-}
+    .card-header p{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+    }
 
-.btn-dark{
-background:linear-gradient(180deg,#1e293b 0%,#0f172a 100%);
-color:white;
-}
+    .card-body{
+      padding:20px;
+    }
 
-.btn-brown{
-background:linear-gradient(180deg,#8b5e34 0%,#70461f 100%);
-color:white;
-}
+    .kpi{
+      background:linear-gradient(180deg,#ffffff 0%,#f8fbff 100%);
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      min-height:118px;
+    }
 
-.btn:hover{
-transform:translateY(-1px);
-}
+    .kpi-label{
+      font-size:14px;
+      color:var(--muted);
+      margin-bottom:8px;
+    }
 
-.info-box{
-padding:14px;
-border-radius:16px;
-border:1px solid #ecf2fb;
-background:#fbfdff;
-}
+    .kpi-value{
+      font-size:28px;
+      font-weight:800;
+      color:var(--text);
+    }
 
-.info-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:10px;
-color:#111827;
-}
+    .kpi-sub{
+      margin-top:8px;
+      font-size:13px;
+      color:#64748b;
+      line-height:1.8;
+    }
 
-.kpi{
-font-size:28px;
-font-weight:800;
-color:#111827;
-}
+    .feature-card{
+      border:1px solid var(--border);
+      border-radius:20px;
+      padding:18px;
+      background:linear-gradient(180deg,#ffffff 0%,#fbfdff 100%);
+      min-height:220px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
 
-.small{
-font-size:12px;
-color:#64748b;
-line-height:1.8;
-}
+    .feature-card h3{
+      margin:0 0 10px;
+      font-size:20px;
+    }
 
-.status-bar{
-margin-top:12px;
-padding:11px 12px;
-border-radius:14px;
-font-size:13px;
-background:#eef4ff;
-color:#334155;
-border:1px solid #dbe7ff;
-}
+    .feature-card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.9;
+      font-size:14px;
+    }
 
-.analysis-box{
-padding:14px;
-border-radius:18px;
-background:linear-gradient(180deg,#f8fbff 0%,#ffffff 100%);
-border:1px solid #e7edf8;
-line-height:2;
-font-size:14px;
-}
+    .feature-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
 
-.list{
-display:grid;
-gap:8px;
-}
+    .mini-btn{
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      padding:10px 12px;
+      font-size:13px;
+      font-weight:700;
+      border:1px solid #dbe5ef;
+      background:#fff;
+      color:#1d4ed8;
+      cursor:pointer;
+    }
 
-.list-item{
-padding:10px 12px;
-border-radius:14px;
-background:#fbfdff;
-border:1px solid #edf2fb;
-font-size:13px;
-}
+    .mini-btn:hover{
+      background:#f8fbff;
+    }
 
-.highlight{
-color:#0f172a;
-font-weight:800;
-}
+    .info-box{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:16px;
+      background:#fcfdff;
+      margin-bottom:14px;
+    }
 
-.preview-box{
-border:1px dashed #cbd5e1;
-border-radius:18px;
-padding:14px;
-background:#f8fbff;
-min-height:220px;
-display:flex;
-align-items:center;
-justify-content:center;
-overflow:hidden;
-}
+    .info-box:last-child{
+      margin-bottom:0;
+    }
 
-.preview-box img{
-max-width:100%;
-max-height:380px;
-border-radius:14px;
-display:block;
-}
+    .info-box h4{
+      margin:0 0 12px;
+      font-size:17px;
+    }
 
-.badge{
-display:inline-block;
-padding:4px 10px;
-border-radius:999px;
-font-size:12px;
-font-weight:800;
-color:white;
-}
+    .info-list{
+      display:grid;
+      gap:10px;
+    }
 
-.badge-green{background:#16a34a}
-.badge-orange{background:#d97706}
-.badge-red{background:#dc2626}
-.badge-gray{background:#64748b}
+    .info-item{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      padding-bottom:10px;
+      border-bottom:1px dashed #e5e7eb;
+    }
 
-.table-wrap{
-overflow:auto;
-}
+    .info-item:last-child{
+      border-bottom:none;
+      padding-bottom:0;
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-min-width:760px;
-}
+    .key{
+      color:var(--muted);
+      font-size:14px;
+    }
 
-th,td{
-padding:11px 10px;
-text-align:right;
-border-bottom:1px solid #edf2fb;
-font-size:13px;
-}
+    .value{
+      font-size:14px;
+      font-weight:800;
+      color:var(--text);
+      text-align:left;
+    }
 
-th{
-background:#f8fbff;
-color:#334155;
-font-weight:800;
-}
+    .list-box{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:grid;
+      gap:10px;
+    }
 
-.error-box{
-background:#fef2f2;
-border:1px solid #fecaca;
-color:#b91c1c;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .list-box li{
+      border:1px solid #edf2f7;
+      background:#fafcff;
+      border-radius:14px;
+      padding:12px 14px;
+      line-height:1.9;
+      font-size:14px;
+    }
 
-.ok-box{
-background:#ecfdf5;
-border:1px solid #a7f3d0;
-color:#047857;
-padding:12px;
-border-radius:14px;
-font-size:13px;
-}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+      font-weight:800;
+      white-space:nowrap;
+    }
 
-@media(max-width:1450px){
-.stats-grid{grid-template-columns:repeat(3,1fr)}
-.grid-5{grid-template-columns:repeat(2,1fr)}
-.grid-4{grid-template-columns:repeat(2,1fr)}
-.grid-3{grid-template-columns:1fr 1fr}
-.grid-2{grid-template-columns:1fr}
-}
+    .pill-low{
+      background:#ecfdf5;
+      color:#166534;
+    }
 
-@media(max-width:780px){
-.stats-grid,.grid-5,.grid-4,.grid-3{grid-template-columns:1fr}
-.hero-title{font-size:26px}
-}
-</style>
+    .pill-moderate{
+      background:#fff7ed;
+      color:#9a3412;
+    }
+
+    .pill-high{
+      background:#fef2f2;
+      color:#991b1b;
+    }
+
+    .pill-neutral{
+      background:#eff6ff;
+      color:#1d4ed8;
+    }
+
+    .footer-note{
+      text-align:center;
+      color:#64748b;
+      padding:18px 10px 8px;
+      font-size:13px;
+      line-height:1.8;
+    }
+
+    @media (max-width:1200px){
+      .grid-4, .grid-3, .grid-2{
+        grid-template-columns:1fr;
+      }
+    }
+  </style>
 </head>
 <body>
+  <div class="page">
 
-<div class="page">
+    <nav class="navbar">
+      <div class="brand">
+        <div class="brand-title">Phytologic AI</div>
+        <div class="brand-sub">الواجهة الرئيسية للمنصة الزراعية الذكية</div>
+      </div>
 
-  <div class="hero">
-    <h1 class="hero-title">التشخيص الذكي - Phytologic AI</h1>
-    <div class="hero-sub">
-      ارفع صورة النبات أو الجزء المصاب ليقوم النظام بتحليل الصورة وإظهار التشخيص، نسبة الثقة، شدة الإصابة، صورة Grad-CAM، توصيات المكافحة، وخيارات المبيد المقترحة، مع إمكانية تنزيل تقرير PDF.
-    </div>
-  </div>
+      <div class="nav-links">
+        <a href="/">الرئيسية</a>
+        <a href="/pages/dashboard">لوحة التحكم</a>
+        <a href="/pages/alerts">التنبيهات</a>
+        <a href="/pages/report_center">مركز التقارير</a>
+        <a href="/pages/farmers">المزارعون</a>
+      </div>
+    </nav>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">أفضل تشخيص</div>
-      <div class="stat-value" id="heroPrediction" style="font-size:20px">-</div>
-      <div class="stat-sub">أفضل نتيجة تصنيف</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">الثقة</div>
-      <div class="stat-value" id="heroConfidence">0%</div>
-      <div class="stat-sub">نسبة الثقة الأساسية</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">شدة الإصابة</div>
-      <div class="stat-value" id="heroSeverity">0%</div>
-      <div class="stat-sub">التقدير الآلي للشدة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">مستوى الشدة</div>
-      <div class="stat-value" id="heroSeverityLevel" style="font-size:20px">-</div>
-      <div class="stat-sub">منخفضة / متوسطة / مرتفعة</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">النبات</div>
-      <div class="stat-value" id="heroPlant" style="font-size:20px">-</div>
-      <div class="stat-sub">نوع النبات</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">المسبب</div>
-      <div class="stat-value" id="heroCause" style="font-size:20px">-</div>
-      <div class="stat-sub">سبب الإصابة</div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">بيانات الإدخال</div>
-      <div class="section-note">متوافقة مع /predict و /report</div>
-    </div>
-    <div class="card-body">
-
-      <div class="grid-5">
-        <div class="field">
-          <label>اسم المزارع</label>
-          <input id="farmer_name" type="text" placeholder="اسم المزارع">
+    <section class="hero">
+      <div class="hero-top">
+        <div>
+          <h1>Phytologic AI Platform</h1>
+          <p>
+            منصة متكاملة لتشخيص أمراض النبات من الصور، متابعة شدة الإصابة، توليد التقارير،
+            مراجعة الإحصائيات، مراقبة التنبيهات، وربط المزارعين بالبيانات التشغيلية في واجهة
+            رئيسية موحّدة وسهلة الاستخدام.
+          </p>
         </div>
 
-        <div class="field">
-          <label>اسم المزرعة</label>
-          <input id="farm_name" type="text" placeholder="اسم المزرعة">
-        </div>
-
-        <div class="field">
-          <label>المحصول</label>
-          <input id="crop" type="text" placeholder="مثال: الطماطم">
-        </div>
-
-        <div class="field">
-          <label>المنطقة</label>
-          <input id="region" type="text" placeholder="مثال: الرياض">
-        </div>
-
-        <div class="field">
-          <label>المدينة</label>
-          <input id="city" type="text" placeholder="مثال: الرياض">
+        <div class="status-chip" id="heroSystemChip">
+          <span>●</span>
+          <span>جاري التحقق من حالة النظام...</span>
         </div>
       </div>
 
-      <div class="grid-2" style="margin-top:14px">
-        <div class="field">
-          <label>اختر الصورة</label>
-          <input id="imageInput" type="file" accept="image/*">
-        </div>
-
-        <div class="field">
-          <label>حالة الملف</label>
-          <input id="fileState" type="text" value="لم يتم اختيار صورة بعد" readonly>
-        </div>
+      <div class="hero-actions">
+        <a class="btn btn-white" href="/pages/report_center">ابدأ من مركز التقارير</a>
+        <a class="btn btn-glass" href="/pages/dashboard">افتح لوحة التحكم</a>
+        <a class="btn btn-glass" href="/pages/alerts">راجع التنبيهات</a>
+        <a class="btn btn-glass" href="/pages/farmers">سجل مزارعًا</a>
+        <button class="btn btn-glass" onclick="checkHealth()">فحص النظام</button>
       </div>
+    </section>
 
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="runDiagnosis()">تشغيل التشخيص</button>
-        <button class="btn btn-secondary" onclick="downloadReport()">تنزيل التقرير PDF</button>
-        <button class="btn btn-dark" onclick="clearAll()">إعادة ضبط</button>
-        <button class="btn btn-brown" onclick="fillDemoData()">تعبئة بيانات تجريبية</button>
-      </div>
-
-      <div class="status-bar" id="statusBar">جاهز لرفع الصورة وتشغيل التحليل.</div>
-    </div>
-  </div>
-
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">الصورة الأصلية</div>
-        <div class="section-note">المرفوعة من المستخدم</div>
+    <section class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <h2>مؤشرات سريعة</h2>
+        <p>قراءة مختصرة من قاعدة البيانات والتنبيهات وحالة النظام.</p>
       </div>
       <div class="card-body">
-        <div class="preview-box" id="originalPreviewBox">
-          <span>لا توجد صورة بعد</span>
+        <div class="grid grid-4">
+          <div class="kpi">
+            <div class="kpi-label">إجمالي الحالات</div>
+            <div class="kpi-value" id="kpiTotalCases">--</div>
+            <div class="kpi-sub">عدد التشخيصات المخزنة في النظام</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">متوسط الشدة</div>
+            <div class="kpi-value" id="kpiAvgSeverity">--</div>
+            <div class="kpi-sub">متوسط شدة الإصابة المسجلة</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">إجمالي التنبيهات</div>
+            <div class="kpi-value" id="kpiTotalAlerts">--</div>
+            <div class="kpi-sub">عدد سجلات التنبيهات</div>
+          </div>
+
+          <div class="kpi">
+            <div class="kpi-label">جاهزية النظام</div>
+            <div class="kpi-value" id="kpiSystemStatus" style="font-size:22px;">--</div>
+            <div class="kpi-sub" id="kpiSystemVersion">--</div>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">Grad-CAM</div>
-        <div class="section-note">المسار البصري لموضع الاهتمام</div>
+    <section class="card" style="margin-bottom:18px;">
+      <div class="card-header">
+        <h2>الوحدات الرئيسية</h2>
+        <p>اختر القسم المناسب للعمل الذي تريد تنفيذه داخل المنصة.</p>
       </div>
       <div class="card-body">
-        <div class="preview-box" id="gradcamPreviewBox">
-          <span>ستظهر صورة Grad-CAM هنا</span>
+        <div class="grid grid-3">
+          <div class="feature-card">
+            <div>
+              <h3>لوحة التحكم</h3>
+              <p>
+                تعرض الإحصائيات، الأمراض الأكثر شيوعًا، المناطق الأعلى تسجيلًا، متوسطات الشدة،
+                وملخصات التنبيهات وصحة النظام.
+              </p>
+            </div>
+            <div class="feature-actions">
+              <a class="mini-btn" href="/pages/dashboard">فتح الصفحة</a>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div>
+              <h3>التنبيهات</h3>
+              <p>
+                صفحة مخصصة لمراجعة جميع التنبيهات الزراعية، مع فصل التنبيهات العالية والمتوسطة
+                والتوزيع حسب المناطق وتصدير JSON.
+              </p>
+            </div>
+            <div class="feature-actions">
+              <a class="mini-btn" href="/pages/alerts">فتح الصفحة</a>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div>
+              <h3>مركز التقارير</h3>
+              <p>
+                ارفع صورة النبات، نفّذ التشخيص، اعرض Grad-CAM وشدة الإصابة، ثم نزّل التقرير بصيغة PDF
+                مباشرة من نفس الصفحة.
+              </p>
+            </div>
+            <div class="feature-actions">
+              <a class="mini-btn" href="/pages/report_center">فتح الصفحة</a>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div>
+              <h3>المزارعون</h3>
+              <p>
+                سجل بيانات المزارعين والمزارع والمحاصيل والمناطق، لتسهيل ربطهم لاحقًا بالتشخيصات
+                والتنبيهات الميدانية.
+              </p>
+            </div>
+            <div class="feature-actions">
+              <a class="mini-btn" href="/pages/farmers">فتح الصفحة</a>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div>
+              <h3>التشخيص وإنتاج PDF</h3>
+              <p>
+                أسرع مسار عملي في المنصة يبدأ من مركز التقارير، حيث يتم تحليل الصورة وإخراج تقرير
+                منظم وقابل للتنزيل.
+              </p>
+            </div>
+            <div class="feature-actions">
+              <a class="mini-btn" href="/pages/report_center">ابدأ الآن</a>
+            </div>
+          </div>
+
+          <div class="feature-card">
+            <div>
+              <h3>فحص النظام</h3>
+              <p>
+                راقب حالة النظام، نموذج الصور، نموذج التنبؤ، قاعدة البيانات، وإعدادات الرسائل
+                النصية من الواجهة الرئيسية.
+              </p>
+            </div>
+            <div class="feature-actions">
+              <button class="mini-btn" onclick="checkHealth()">فحص الآن</button>
+            </div>
+          </div>
         </div>
       </div>
+    </section>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="card-header">
+          <h2>ملخص عام</h2>
+          <p>أهم القراءات الحالية من الحالات والتنبيهات.</p>
+        </div>
+        <div class="card-body">
+          <div class="info-box">
+            <h4>الحالات والإحصائيات</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">أكثر مرض شيوعًا</div>
+                <div class="value" id="topDiseaseName">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">عدد حالاته</div>
+                <div class="value" id="topDiseaseCount">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">أكثر منطقة تسجيلًا</div>
+                <div class="value" id="topRegionName">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">عدد الحالات فيها</div>
+                <div class="value" id="topRegionCount">--</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-box">
+            <h4>آخر تنبيه</h4>
+            <div class="info-list">
+              <div class="info-item">
+                <div class="key">المنطقة</div>
+                <div class="value" id="latestAlertRegion">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">المرض</div>
+                <div class="value" id="latestAlertDisease">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">الدرجة</div>
+                <div class="value" id="latestAlertScore">--</div>
+              </div>
+              <div class="info-item">
+                <div class="key">المستوى</div>
+                <div class="value" id="latestAlertLevel">--</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2>خريطة الاستخدام السريع</h2>
+          <p>اختر الصفحة المناسبة حسب المهمة التي تريد تنفيذها.</p>
+        </div>
+        <div class="card-body">
+          <ul class="list-box">
+            <li><strong>أريد رفع صورة وتشخيصها وتنزيل PDF:</strong> اذهب إلى مركز التقارير.</li>
+            <li><strong>أريد مراجعة الإحصائيات العامة:</strong> اذهب إلى لوحة التحكم.</li>
+            <li><strong>أريد متابعة التنبيهات الزراعية:</strong> اذهب إلى صفحة التنبيهات.</li>
+            <li><strong>أريد تسجيل بيانات مزارع:</strong> اذهب إلى صفحة المزارعين.</li>
+            <li><strong>أريد التأكد أن النظام يعمل:</strong> استخدم زر فحص النظام من هذه الصفحة.</li>
+          </ul>
+        </div>
+      </section>
     </div>
 
-  </div>
-
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">تقدير شدة الإصابة</div>
-        <div class="section-note">صورة توضح المناطق المصابة</div>
-      </div>
-      <div class="card-body">
-        <div class="preview-box" id="severityPreviewBox">
-          <span>ستظهر صورة الشدة هنا</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">النتيجة الأساسية</div>
-        <div class="section-note">أفضل تصنيف ومعلومات المرض</div>
-      </div>
-      <div class="card-body">
-
-        <div class="grid-4">
-          <div class="info-box">
-            <div class="info-title">أفضل تشخيص</div>
-            <div class="kpi" id="bestPrediction" style="font-size:20px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">الثقة</div>
-            <div class="kpi" id="confidence">0%</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">النبات</div>
-            <div class="kpi" id="plantName" style="font-size:20px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">المرض</div>
-            <div class="kpi" id="diseaseName" style="font-size:20px">-</div>
-          </div>
-        </div>
-
-        <div class="grid-4" style="margin-top:14px">
-          <div class="info-box">
-            <div class="info-title">التشخيص الأول</div>
-            <div class="kpi" id="top1Disease" style="font-size:18px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">ثقة التشخيص الأول</div>
-            <div class="kpi" id="top1Confidence">0%</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">التشخيص الثاني</div>
-            <div class="kpi" id="top2Disease" style="font-size:18px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">ثقة التشخيص الثاني</div>
-            <div class="kpi" id="top2Confidence">0%</div>
-          </div>
-        </div>
-
-        <div class="grid-4" style="margin-top:14px">
-          <div class="info-box">
-            <div class="info-title">مستوى الثقة</div>
-            <div class="kpi" id="confidenceLevel" style="font-size:18px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">حالة القرار</div>
-            <div class="kpi" id="decisionStatus" style="font-size:18px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">حالة التشابه</div>
-            <div class="kpi" id="similarCase" style="font-size:18px">-</div>
-          </div>
-          <div class="info-box">
-            <div class="info-title">Bullseye Pattern</div>
-            <div class="kpi" id="bullseyeDetected" style="font-size:18px">-</div>
-          </div>
-        </div>
-
-        <div style="margin-top:14px" class="analysis-box" id="coreInfoBox">
-          ستظهر هنا معلومات المرض الأساسية.
-        </div>
-
-      </div>
-    </div>
-
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">القرار التنفيذي النهائي</div>
-      <div class="section-note">خلاصة تشغيلية مباشرة للحالة</div>
-    </div>
-    <div class="card-body">
-      <div class="analysis-box" id="finalDecisionBox">
-        سيظهر هنا القرار التنفيذي النهائي بعد التشخيص.
-      </div>
-    </div>
-  </div>
-
-  <div class="card" id="questionCard" style="display:none;">
-    <div class="section-header">
-      <div class="section-title">أسئلة تأكيدية للتشخيص</div>
-      <div class="section-note">تظهر عند انخفاض الثقة أو وجود تشابه بين الأمراض</div>
-    </div>
-    <div class="card-body">
-
-      <div class="grid-2">
-        <div class="field">
-          <label>هل توجد حلقات دائرية متراكزة داخل البقع؟</label>
-          <select id="q_rings">
-            <option value="">اختر</option>
-            <option value="yes">نعم</option>
-            <option value="no">لا</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>هل البقع صغيرة وكثيرة ومتناثرة؟</label>
-          <select id="q_small_spots">
-            <option value="">اختر</option>
-            <option value="yes">نعم</option>
-            <option value="no">لا</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>هل يوجد مركز فاتح أو رمادي داخل البقعة؟</label>
-          <select id="q_gray_center">
-            <option value="">اختر</option>
-            <option value="yes">نعم</option>
-            <option value="no">لا</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>هل توجد نقاط سوداء دقيقة داخل مركز البقعة؟</label>
-          <select id="q_black_dots">
-            <option value="">اختر</option>
-            <option value="yes">نعم</option>
-            <option value="no">لا</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>هل البقع كبيرة نسبيًا وداكنة؟</label>
-          <select id="q_large_dark">
-            <option value="">اختر</option>
-            <option value="yes">نعم</option>
-            <option value="no">لا</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>هل بدأت الإصابة في الأوراق السفلية أو الأقدم؟</label>
-          <select id="q_lower_leaves">
-            <option value="">اختر</option>
-            <option value="yes">نعم</option>
-            <option value="no">لا</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>هل يوجد اصفرار واضح حول البقع؟</label>
-          <select id="q_yellow_halo">
-            <option value="">اختر</option>
-            <option value="yes">نعم</option>
-            <option value="no">لا</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="toolbar">
-        <button class="btn btn-primary" onclick="applyDiagnosticQuestions()">تطبيق الإجابات</button>
-      </div>
-
-      <div class="analysis-box" id="questionsResultBox">
-        ستظهر هنا نتيجة الترجيح بعد الإجابة.
-      </div>
+    <div class="footer-note">
+      Phytologic AI Index Home — واجهة رئيسية موحّدة تربط كل وحدات المنصة.
     </div>
   </div>
 
-  <div class="grid-2">
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">التوصيات الزراعية</div>
-        <div class="section-note">المأخوذة من disease_info.advice</div>
-      </div>
-      <div class="card-body">
-        <div class="analysis-box" id="adviceBox">
-          ستظهر هنا التوصيات بعد التشخيص.
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="section-header">
-        <div class="section-title">قرار الرش والمبيد الأساسي</div>
-        <div class="section-note">المبيد المقترح الرئيسي</div>
-      </div>
-      <div class="card-body">
-        <div class="analysis-box" id="pesticideMainBox">
-          ستظهر هنا توصية المبيد الأساسية.
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">الخيارات البديلة للمبيد</div>
-      <div class="section-note">من pesticide_options</div>
-    </div>
-    <div class="card-body">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>العنوان</th>
-              <th>المادة الفعالة</th>
-              <th>الاسم التجاري</th>
-              <th>النوع</th>
-              <th>الجرعة</th>
-              <th>فترة الأمان</th>
-              <th>قرار الرش</th>
-            </tr>
-          </thead>
-          <tbody id="pesticideOptionsTable">
-            <tr><td colspan="8">لا توجد بيانات بعد.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">أفضل 3 تنبؤات</div>
-      <div class="section-note">من top_3_predictions</div>
-    </div>
-    <div class="card-body">
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>الفئة</th>
-              <th>الثقة</th>
-            </tr>
-          </thead>
-          <tbody id="top3Table">
-            <tr><td colspan="3">لا توجد بيانات بعد.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="section-header">
-      <div class="section-title">التحليل التنفيذي المباشر</div>
-      <div class="section-note">خلاصة تشغيلية للتشخيص الحالي</div>
-    </div>
-    <div class="card-body">
-      <div class="analysis-box" id="executiveAnalysis">
-        بعد تشغيل التشخيص ستظهر هنا قراءة تنفيذية مباشرة.
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<script>
-const API = window.location.origin;
-let lastDiagnosis = null;
-let selectedFile = null;
-
-/* =========================
-   أدوات عامة
-========================= */
-function byId(id){
-  return document.getElementById(id);
-}
-
-function setHTML(id, html){
-  const el = byId(id);
-  if(el) el.innerHTML = html;
-}
-
-function setText(id, text){
-  const el = byId(id);
-  if(el) el.textContent = text;
-}
-
-function setValue(id, value){
-  const el = byId(id);
-  if(el) el.value = value;
-}
-
-function show(id){
-  const el = byId(id);
-  if(el) el.style.display = "";
-}
-
-function hide(id){
-  const el = byId(id);
-  if(el) el.style.display = "none";
-}
-
-function safeText(v, fallback = "-"){
-  return (v === null || v === undefined || v === "") ? fallback : v;
-}
-
-function safeNumber(v, fallback = 0){
-  const n = Number(v);
-  return isNaN(n) ? fallback : n;
-}
-
-function safePercent(v){
-  return `${safeNumber(v, 0).toFixed(2)}%`;
-}
-
-function imageFromBase64(base64){
-  return `data:image/png;base64,${base64}`;
-}
-
-function setStatus(msg){
-  const el = byId("statusBar");
-  if(el) el.textContent = msg;
-}
-
-function severityBadge(levelAr){
-  if(levelAr === "مرتفعة") return '<span class="badge badge-red">مرتفعة</span>';
-  if(levelAr === "متوسطة") return '<span class="badge badge-orange">متوسطة</span>';
-  if(levelAr === "منخفضة") return '<span class="badge badge-green">منخفضة</span>';
-  return '<span class="badge badge-gray">غير متاح</span>';
-}
-
-function fileToPreview(file){
-  const reader = new FileReader();
-  reader.onload = function(e){
-    setHTML("originalPreviewBox", `<img src="${e.target.result}" alt="original">`);
-  };
-  reader.readAsDataURL(file);
-}
-
-function currentFormData(){
-  return {
-    farmer_name: byId("farmer_name")?.value?.trim() || "غير محدد",
-    farm_name: byId("farm_name")?.value?.trim() || "غير محدد",
-    crop: byId("crop")?.value?.trim() || "غير محدد",
-    region: byId("region")?.value?.trim() || "غير محدد",
-    city: byId("city")?.value?.trim() || "غير محدد"
-  };
-}
-
-function fillDemoData(){
-  setValue("farmer_name", "مزارع تجريبي");
-  setValue("farm_name", "مزرعة نموذجية");
-  setValue("crop", "طماطم");
-  setValue("region", "الرياض");
-  setValue("city", "الرياض");
-  setStatus("تمت تعبئة بيانات تجريبية.");
-}
-
-/* =========================
-   التشخيص
-========================= */
-function buildFinalDecision(data){
-  const confidenceLevel = data.confidence_level || "";
-  const similarCase = data.similar_case === true;
-  const bullseyeDetected = data.bullseye_detected === true;
-  const top1 = data.top1_disease || "-";
-  const top2 = data.top2_disease || "-";
-
-  let title = "";
-  let action = "";
-  let note = "";
-  let boxClass = "ok-box";
-
-  if(confidenceLevel === "عالية" && !similarCase){
-    title = `تشخيص قوي: ${top1}`;
-    action = "يمكن البدء بالإجراء العلاجي أو الوقائي المقترح حسب التوصيات.";
-    note = "مستوى اليقين مرتفع ولا يوجد تشابه مؤثر.";
-    boxClass = "ok-box";
-  } else if(confidenceLevel === "متوسطة" && !similarCase){
-    title = `تشخيص مرجح: ${top1}`;
-    action = "ينصح بالبدء في البرنامج المقترح مع المتابعة الحقلية.";
-    note = "النتيجة جيدة لكن يفضل استمرار المتابعة.";
-    boxClass = "ok-box";
-  } else if(similarCase){
-    title = `تشخيص غير مؤكد: ${top1}`;
-    action = "يرجى الإجابة عن الأسئلة التأكيدية أو رفع صورة أقرب قبل اعتماد قرار الرش.";
-    note = `يوجد تشابه بين ${top1} و ${top2}.`;
-    boxClass = "error-box";
-  } else {
-    title = `تشخيص أولي: ${top1}`;
-    action = "يلزم تأكيد إضافي قبل اتخاذ قرار علاجي نهائي.";
-    note = "الثقة منخفضة أو المعطيات غير كافية.";
-    boxClass = "error-box";
-  }
-
-  if(bullseyeDetected){
-    note += " تم رصد نمط بصري داعم (Bullseye Pattern).";
-  }
-
-  return `
-    <div class="${boxClass}">
-      <div><strong>${title}</strong></div>
-      <div style="margin-top:8px;"><strong>الإجراء:</strong> ${action}</div>
-      <div style="margin-top:8px;"><strong>ملاحظة:</strong> ${note}</div>
-    </div>
-  `;
-}
-
-function clearAll(){
-  lastDiagnosis = null;
-  selectedFile = null;
-
-  setValue("imageInput", "");
-  setValue("fileState", "لم يتم اختيار صورة بعد");
-
-  setHTML("originalPreviewBox", "<span>لا توجد صورة بعد</span>");
-  setHTML("gradcamPreviewBox", "<span>ستظهر صورة Grad-CAM هنا</span>");
-  setHTML("severityPreviewBox", "<span>ستظهر صورة الشدة هنا</span>");
-
-  setText("bestPrediction", "-");
-  setText("confidence", "0%");
-  setText("plantName", "-");
-  setText("diseaseName", "-");
-
-  setText("top1Disease", "-");
-  setText("top1Confidence", "0%");
-  setText("top2Disease", "-");
-  setText("top2Confidence", "0%");
-  setText("confidenceLevel", "-");
-  setText("decisionStatus", "-");
-  setText("similarCase", "-");
-  setText("bullseyeDetected", "-");
-
-  setText("heroPrediction", "-");
-  setText("heroConfidence", "0%");
-  setText("heroSeverity", "0%");
-  setText("heroSeverityLevel", "-");
-  setText("heroPlant", "-");
-  setText("heroCause", "-");
-
-  setHTML("coreInfoBox", "ستظهر هنا معلومات المرض الأساسية.");
-  setHTML("adviceBox", "ستظهر هنا التوصيات بعد التشخيص.");
-  setHTML("pesticideMainBox", "ستظهر هنا توصية المبيد الأساسية.");
-  setHTML("pesticideOptionsTable", `<tr><td colspan="8">لا توجد بيانات بعد.</td></tr>`);
-  setHTML("top3Table", `<tr><td colspan="3">لا توجد بيانات بعد.</td></tr>`);
-  setHTML("executiveAnalysis", "بعد تشغيل التشخيص ستظهر هنا قراءة تنفيذية مباشرة.");
-  setHTML("finalDecisionBox", "سيظهر هنا القرار التنفيذي النهائي بعد التشخيص.");
-  setHTML("questionsResultBox", "ستظهر هنا نتيجة الترجيح بعد الإجابة.");
-
-  hide("questionCard");
-
-  [
-    "q_rings", "q_small_spots", "q_gray_center", "q_black_dots",
-    "q_large_dark", "q_lower_leaves", "q_yellow_halo"
-  ].forEach(id => {
-    if(byId(id)) byId(id).value = "";
-  });
-
-  setStatus("تمت إعادة ضبط الصفحة.");
-}
-
-function renderDiagnosis(data){
-  lastDiagnosis = data;
-
-  const bestPrediction = safeText(data.best_prediction?.class_name, data.pred_label);
-  const confidence = safeNumber(data.best_prediction?.confidence ?? (safeNumber(data.confidence) * 100), 0).toFixed(2);
-  const plant = safeText(data.disease_info?.plant);
-  const disease = safeText(data.disease_info?.disease_ar, data.pred_label);
-  const cause = safeText(data.disease_info?.cause);
-  const severityPercent = safeNumber(data.severity?.severity_percent_est, 0).toFixed(2);
-  const severityLevelAr = safeText(data.severity?.label?.ar);
-
-  const top1Disease = safeText(data.top1_disease, data.pred_class);
-  const top1Confidence = safeNumber(data.top1_confidence, 0) * 100;
-  const top2Disease = safeText(data.top2_disease);
-  const top2Confidence = safeNumber(data.top2_confidence, 0) * 100;
-  const confidenceLevel = safeText(data.confidence_level);
-  const decisionStatus = safeText(data.decision_status);
-  const decisionText = safeText(data.decision_text);
-  const similarCase = data.similar_case === true ? "نعم" : "لا";
-  const bullseyeDetected = data.bullseye_detected === true ? "نعم" : "لا";
-
-  setText("bestPrediction", bestPrediction);
-  setText("confidence", `${confidence}%`);
-  setText("plantName", plant);
-  setText("diseaseName", disease);
-
-  setText("top1Disease", top1Disease);
-  setText("top1Confidence", `${top1Confidence.toFixed(2)}%`);
-  setText("top2Disease", top2Disease);
-  setText("top2Confidence", `${top2Confidence.toFixed(2)}%`);
-  setText("confidenceLevel", confidenceLevel);
-  setText("decisionStatus", decisionStatus);
-  setText("similarCase", similarCase);
-  setText("bullseyeDetected", bullseyeDetected);
-
-  setText("heroPrediction", disease);
-  setText("heroConfidence", `${confidence}%`);
-  setText("heroSeverity", `${severityPercent}%`);
-  setHTML("heroSeverityLevel", severityBadge(severityLevelAr));
-  setText("heroPlant", plant);
-  setText("heroCause", cause);
-
-  if(data.gradcam_overlay_b64){
-    setHTML("gradcamPreviewBox", `<img src="${imageFromBase64(data.gradcam_overlay_b64)}" alt="gradcam">`);
-  }
-
-  if(data.severity?.severity_overlay_b64){
-    setHTML("severityPreviewBox", `<img src="${imageFromBase64(data.severity.severity_overlay_b64)}" alt="severity">`);
-  }
-
-  setHTML("coreInfoBox", `
-    <div class="list">
-      <div class="list-item"><span class="highlight">النبات:</span> ${plant}</div>
-      <div class="list-item"><span class="highlight">المرض:</span> ${disease}</div>
-      <div class="list-item"><span class="highlight">المسبب:</span> ${cause}</div>
-      <div class="list-item"><span class="highlight">شدة الإصابة:</span> ${severityPercent}% - ${severityBadge(severityLevelAr)}</div>
-      <div class="list-item"><span class="highlight">التشخيص الأول:</span> ${top1Disease} (${top1Confidence.toFixed(2)}%)</div>
-      <div class="list-item"><span class="highlight">التشخيص الثاني:</span> ${top2Disease} (${top2Confidence.toFixed(2)}%)</div>
-      <div class="list-item"><span class="highlight">مستوى الثقة:</span> ${confidenceLevel}</div>
-      <div class="list-item"><span class="highlight">حالة القرار:</span> ${decisionStatus}</div>
-      <div class="list-item"><span class="highlight">تفسير القرار:</span> ${decisionText}</div>
-      <div class="list-item"><span class="highlight">Bullseye Pattern:</span> ${bullseyeDetected}</div>
-    </div>
-  `);
-
-  const advice = Array.isArray(data.disease_info?.advice) ? data.disease_info.advice : [];
-  setHTML(
-    "adviceBox",
-    advice.length ? advice.map(a => `<div class="list-item">${a}</div>`).join("") : "لا توجد توصيات متاحة."
-  );
-
-  const mainP = data.pesticide_suggestion || {};
-  setHTML("pesticideMainBox", `
-    <div class="list">
-      <div class="list-item"><span class="highlight">العنوان:</span> ${safeText(mainP.title_ar)}</div>
-      <div class="list-item"><span class="highlight">المادة الفعالة:</span> ${safeText(mainP.active_ingredient)}</div>
-      <div class="list-item"><span class="highlight">الاسم التجاري:</span> ${safeText(mainP.trade_name)}</div>
-      <div class="list-item"><span class="highlight">النوع:</span> ${safeText(mainP.type)}</div>
-      <div class="list-item"><span class="highlight">الجرعة:</span> ${safeText(mainP.dose)}</div>
-      <div class="list-item"><span class="highlight">فترة الأمان:</span> ${safeText(mainP.phi)}</div>
-      <div class="list-item"><span class="highlight">قرار الرش:</span> ${safeText(mainP.spray_message_ar)}</div>
-    </div>
-  `);
-
-  const options = Array.isArray(data.pesticide_options) ? data.pesticide_options : [];
-  if(options.length){
-    setHTML("pesticideOptionsTable", options.map((o, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${safeText(o.title_ar)}</td>
-        <td>${safeText(o.active_ingredient)}</td>
-        <td>${safeText(o.trade_name)}</td>
-        <td>${safeText(o.type)}</td>
-        <td>${safeText(o.dose)}</td>
-        <td>${safeText(o.phi)}</td>
-        <td>${safeText(o.spray_message_ar)}</td>
-      </tr>
-    `).join(""));
-  } else {
-    setHTML("pesticideOptionsTable", `<tr><td colspan="8">لا توجد خيارات بديلة.</td></tr>`);
-  }
-
-  let top3 = Array.isArray(data.top_3_predictions) ? [...data.top_3_predictions] : [];
-  top3.sort((a, b) => safeNumber(b.confidence) - safeNumber(a.confidence));
-
-  if (data.top1_disease) {
-    const idx = top3.findIndex(p => p.class_name === data.top1_disease);
-    if (idx > 0) {
-      const item = top3.splice(idx, 1)[0];
-      top3.unshift(item);
-    }
-  }
-
-  if (data.top1_disease && !top3.some(p => p.class_name === data.top1_disease)) {
-    top3.unshift({
-      class_name: data.top1_disease,
-      confidence: safeNumber(data.top1_confidence) * 100
-    });
-  }
-
-  if (data.top2_disease && !top3.some(p => p.class_name === data.top2_disease)) {
-    top3.push({
-      class_name: data.top2_disease,
-      confidence: safeNumber(data.top2_confidence) * 100
-    });
-  }
-
-  top3 = top3.slice(0, 3);
-
-  if (top3.length) {
-    setHTML("top3Table", top3.map((p, i) => `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${safeText(p.class_name)}</td>
-        <td>${safeNumber(p.confidence).toFixed(2)}%</td>
-      </tr>
-    `).join(""));
-  } else {
-    setHTML("top3Table", `<tr><td colspan="3">لا توجد بيانات.</td></tr>`);
-  }
-
-  setHTML("executiveAnalysis", `
-    <div class="list">
-      <div class="list-item"><span class="highlight">أفضل تشخيص:</span> ${disease} بنسبة ثقة ${confidence}%.</div>
-      <div class="list-item"><span class="highlight">الوضع المرضي:</span> المسبب المصنّف هو ${cause} على نبات ${plant}.</div>
-      <div class="list-item"><span class="highlight">شدة الإصابة:</span> ${severityPercent}% بمستوى ${severityLevelAr}.</div>
-      <div class="list-item"><span class="highlight">التشخيص الأول:</span> ${top1Disease} (${top1Confidence.toFixed(2)}%).</div>
-      <div class="list-item"><span class="highlight">التشخيص الثاني:</span> ${top2Disease} (${top2Confidence.toFixed(2)}%).</div>
-      <div class="list-item"><span class="highlight">قرار المنصة:</span> ${decisionStatus} - ${decisionText}.</div>
-      <div class="list-item"><span class="highlight">Bullseye Pattern:</span> ${bullseyeDetected}.</div>
-      <div class="list-item"><span class="highlight">القرار التنفيذي:</span> ${
-        severityLevelAr === "مرتفعة"
-          ? "التدخل السريع ميدانيًا ضروري مع تطبيق برنامج مكافحة مناسب."
-          : severityLevelAr === "متوسطة"
-          ? "تحتاج الحالة إلى متابعة جيدة وبرنامج مكافحة أو وقاية حسب التوصيات."
-          : "الوضع منخفض نسبيًا ويكفي غالبًا الالتزام بالمراقبة والتوصيات الوقائية."
-      }</div>
-    </div>
-  `);
-
-  setHTML("finalDecisionBox", buildFinalDecision(data));
-
-  if(data.similar_case === true || data.confidence_level === "منخفضة"){
-    show("questionCard");
-  } else {
-    hide("questionCard");
-  }
-}
-
-function getAnswerValue(id){
-  return byId(id)?.value || "";
-}
-
-function applyDiagnosticQuestions(){
-  if(!lastDiagnosis){
-    setHTML("questionsResultBox", `<div class="error-box">يجب تشغيل التشخيص أولًا.</div>`);
-    return;
-  }
-
-  let earlyBlightScore = 0;
-  let septoriaScore = 0;
-
-  const rings = getAnswerValue("q_rings");
-  const smallSpots = getAnswerValue("q_small_spots");
-  const grayCenter = getAnswerValue("q_gray_center");
-  const blackDots = getAnswerValue("q_black_dots");
-  const largeDark = getAnswerValue("q_large_dark");
-  const lowerLeaves = getAnswerValue("q_lower_leaves");
-  const yellowHalo = getAnswerValue("q_yellow_halo");
-
-  if(rings === "yes") earlyBlightScore += 3;
-  if(smallSpots === "yes") septoriaScore += 2;
-  if(grayCenter === "yes") septoriaScore += 2;
-  if(blackDots === "yes") septoriaScore += 3;
-  if(largeDark === "yes") earlyBlightScore += 2;
-  if(lowerLeaves === "yes"){ earlyBlightScore += 1; septoriaScore += 1; }
-  if(yellowHalo === "yes") earlyBlightScore += 1;
-
-  const imgTop1 = safeNumber(lastDiagnosis.top1_confidence);
-  const imgTop2 = safeNumber(lastDiagnosis.top2_confidence);
-
-  let finalEarly = 0;
-  let finalSeptoria = 0;
-
-  if(lastDiagnosis.top1_disease === "Tomato_Early_blight" || lastDiagnosis.top2_disease === "Tomato_Early_blight"){
-    finalEarly += lastDiagnosis.top1_disease === "Tomato_Early_blight" ? imgTop1 : imgTop2;
-  }
-
-  if(lastDiagnosis.top1_disease === "Tomato Septoria leaf spot" || lastDiagnosis.top2_disease === "Tomato Septoria leaf spot"){
-    finalSeptoria += lastDiagnosis.top1_disease === "Tomato Septoria leaf spot" ? imgTop1 : imgTop2;
-  }
-
-  finalEarly += (earlyBlightScore * 0.05);
-  finalSeptoria += (septoriaScore * 0.05);
-
-  let finalDiagnosis = "غير مؤكد";
-  let finalNote = "";
-  let finalStatus = "";
-  let finalAction = "";
-
-  if(finalEarly > finalSeptoria){
-    const diff = finalEarly - finalSeptoria;
-    if(diff >= 0.15){
-      finalDiagnosis = "اللفحة المبكرة في الطماطم";
-      finalNote = "تم ترجيح اللفحة المبكرة بعد دمج الصورة مع الإجابات الوصفية.";
-      finalStatus = "تشخيص مرجح بقوة";
-      finalAction = "يمكن اعتماد اللفحة المبكرة كتشخيص نهائي عمليًا والبدء بالتوصيات المناسبة.";
-    } else {
-      finalDiagnosis = "اللفحة المبكرة في الطماطم (ترجيح مبدئي)";
-      finalNote = "اللفحة المبكرة أقرب، لكن ما زال يوجد تشابه.";
-      finalStatus = "تشخيص مرجح";
-      finalAction = "يفضل المتابعة الحقلية وصورة أقرب إذا لزم.";
-    }
-  } else if(finalSeptoria > finalEarly){
-    const diff = finalSeptoria - finalEarly;
-    if(diff >= 0.15){
-      finalDiagnosis = "تبقع السبتوريا في أوراق الطماطم";
-      finalNote = "تم ترجيح السبتوريا بعد دمج الصورة مع الإجابات الوصفية.";
-      finalStatus = "تشخيص مرجح بقوة";
-      finalAction = "يمكن اعتماد السبتوريا كتشخيص نهائي عمليًا والبدء بالتوصيات المناسبة.";
-    } else {
-      finalDiagnosis = "تبقع السبتوريا في أوراق الطماطم (ترجيح مبدئي)";
-      finalNote = "السبتيوريا أقرب، لكن ما زال يوجد تشابه.";
-      finalStatus = "تشخيص مرجح";
-      finalAction = "يفضل المتابعة الحقلية وصورة أقرب إذا لزم.";
-    }
-  } else {
-    finalDiagnosis = "ما زال التشخيص غير مؤكد";
-    finalNote = "الإجابات لم تحسم الفرق بين المرضين.";
-    finalStatus = "غير مؤكد";
-    finalAction = "يلزم صورة أقرب أو فحص إضافي قبل اتخاذ قرار نهائي.";
-  }
-
-  setHTML("questionsResultBox", `
-    <div class="list">
-      <div class="list-item"><span class="highlight">نقاط اللفحة المبكرة:</span> ${earlyBlightScore}</div>
-      <div class="list-item"><span class="highlight">نقاط السبتوريا:</span> ${septoriaScore}</div>
-      <div class="list-item"><span class="highlight">ترجيح الصورة + الأسئلة للّفحة:</span> ${finalEarly.toFixed(2)}</div>
-      <div class="list-item"><span class="highlight">ترجيح الصورة + الأسئلة للسبتيوريا:</span> ${finalSeptoria.toFixed(2)}</div>
-      <div class="list-item"><span class="highlight">النتيجة النهائية:</span> ${finalDiagnosis}</div>
-      <div class="list-item"><span class="highlight">التفسير:</span> ${finalNote}</div>
-    </div>
-  `);
-
-  setHTML("finalDecisionBox", `
-    <div class="ok-box">
-      <div><strong>${finalStatus}: ${finalDiagnosis}</strong></div>
-      <div style="margin-top:8px;"><strong>الإجراء:</strong> ${finalAction}</div>
-      <div style="margin-top:8px;"><strong>ملاحظة:</strong> ${finalNote}</div>
-    </div>
-  `);
-}
-
-async function runDiagnosis(){
-  try{
-    if(!selectedFile){
-      setStatus("يرجى اختيار صورة أولًا.");
-      return;
+  <script>
+    function safeText(v, fallback = "--") {
+      if (v === null || v === undefined || v === "") return fallback;
+      return v;
     }
 
-    setStatus("جاري رفع الصورة وتشغيل التشخيص...");
-
-    const formValues = currentFormData();
-    const params = new URLSearchParams(formValues);
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    const res = await fetch(`${API}/predict?${params.toString()}`, {
-      method:"POST",
-      body:formData
-    });
-
-    const data = await res.json();
-
-    if(!res.ok || data.success === false){
-      throw new Error(data.error || "فشل التشخيص");
+    function fmtNum(v, fallback = "--") {
+      if (v === null || v === undefined || isNaN(v)) return fallback;
+      return Number(v).toFixed(2);
     }
 
-    renderDiagnosis(data);
-    setStatus("تم التشخيص بنجاح.");
+    function riskPill(level) {
+      const val = String(level || "").toLowerCase();
 
-    // تحديث الأقسام التابعة بعد التشخيص
-    loadStatsSummary();
-    loadAlertsSummary();
-    loadMapSummary();
-  }catch(err){
-    console.error(err);
-    setHTML("executiveAnalysis", `<div class="error-box">تعذر تشغيل التشخيص: ${err.message}</div>`);
-    setStatus("تعذر تشغيل التشخيص.");
-  }
-}
-
-async function downloadReport(){
-  try{
-    if(!selectedFile){
-      setStatus("يرجى اختيار صورة أولًا لتنزيل التقرير.");
-      return;
-    }
-
-    setStatus("جاري إنشاء التقرير PDF...");
-
-    const formValues = currentFormData();
-    const params = new URLSearchParams(formValues);
-    const formData = new FormData();
-    formData.append("file", selectedFile);
-
-    const res = await fetch(`${API}/report?${params.toString()}`, {
-      method:"POST",
-      body:formData
-    });
-
-    if(!res.ok){
-      throw new Error("فشل إنشاء التقرير");
-    }
-
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "phytologic_report.pdf";
-    a.click();
-    URL.revokeObjectURL(url);
-
-    setStatus("تم تنزيل التقرير بنجاح.");
-  }catch(err){
-    console.error(err);
-    setStatus("تعذر تنزيل التقرير.");
-  }
-}
-
-/* =========================
-   الإحصاءات
-========================= */
-async function loadStatsSummary(){
-  try{
-    const res = await fetch(`${API}/stats/summary`);
-    const data = await res.json();
-    if(!res.ok) throw new Error(data.error || "فشل تحميل الإحصاءات");
-
-    setText("totalCases", safeText(data.total_cases, "0"));
-    setText("avgSeverity", safePercent(data.avg_severity || 0));
-    setText("topDiseaseName", safeText(data.top_disease?.name, "-"));
-    setText("topRegionName", safeText(data.top_region?.name, "-"));
-  }catch(err){
-    console.error(err);
-  }
-}
-
-async function loadStatsDiseases(){
-  try{
-    const res = await fetch(`${API}/stats/diseases`);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل أمراض الإحصاءات");
-
-    if(Array.isArray(data) && data.length){
-      setHTML("statsDiseasesTable", data.map((row, i) => `
-        <tr>
-          <td>${i+1}</td>
-          <td>${safeText(row.disease)}</td>
-          <td>${safeText(row.count, 0)}</td>
-        </tr>
-      `).join(""));
-    }
-  }catch(err){
-    console.error(err);
-  }
-}
-
-async function loadStatsRegions(){
-  try{
-    const res = await fetch(`${API}/stats/regions`);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل المناطق");
-
-    if(Array.isArray(data) && data.length){
-      setHTML("statsRegionsTable", data.map((row, i) => `
-        <tr>
-          <td>${i+1}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.count, 0)}</td>
-        </tr>
-      `).join(""));
-    }
-  }catch(err){
-    console.error(err);
-  }
-}
-
-async function loadStatsSeverity(){
-  try{
-    const res = await fetch(`${API}/stats/severity`);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل شدة الأمراض");
-
-    if(Array.isArray(data) && data.length){
-      setHTML("statsSeverityTable", data.map((row, i) => `
-        <tr>
-          <td>${i+1}</td>
-          <td>${safeText(row.disease)}</td>
-          <td>${safePercent(row.avg_severity)}</td>
-        </tr>
-      `).join(""));
-    }
-  }catch(err){
-    console.error(err);
-  }
-}
-
-/* =========================
-   التنبيهات
-========================= */
-async function loadAlertsSummary(){
-  try{
-    const res = await fetch(`${API}/alerts/summary`);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل ملخص التنبيهات");
-
-    setText("totalAlerts", safeText(data.total_alerts, "0"));
-    setText("highAlerts", safeText(data.high_alerts, "0"));
-    setText("moderateAlerts", safeText(data.moderate_alerts, "0"));
-    setText("latestAlertRegion", safeText(data.latest_alert?.region, "-"));
-    setText("latestAlertDisease", safeText(data.latest_alert?.disease_name, "-"));
-  }catch(err){
-    console.error(err);
-  }
-}
-
-async function loadAlerts(limit = 50){
-  try{
-    const res = await fetch(`${API}/alerts?limit=${limit}`);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل التنبيهات");
-
-    if(Array.isArray(data) && data.length){
-      setHTML("alertsTable", data.map((row, i) => `
-        <tr>
-          <td>${i+1}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.city)}</td>
-          <td>${safeText(row.disease_name)}</td>
-          <td>${safeNumber(row.risk_score).toFixed(2)}%</td>
-          <td>${safeText(row.risk_level)}</td>
-          <td>${safeText(row.created_at)}</td>
-        </tr>
-      `).join(""));
-    }
-  }catch(err){
-    console.error(err);
-  }
-}
-
-/* =========================
-   المزارعون
-========================= */
-async function loadFarmers(region = ""){
-  try{
-    const url = region ? `${API}/farmers?region=${encodeURIComponent(region)}` : `${API}/farmers`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل المزارعين");
-
-    if(Array.isArray(data) && data.length){
-      setHTML("farmersTable", data.map((row, i) => `
-        <tr>
-          <td>${i+1}</td>
-          <td>${safeText(row.name)}</td>
-          <td>${safeText(row.phone)}</td>
-          <td>${safeText(row.farm_name)}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.city)}</td>
-          <td>${safeText(row.crop)}</td>
-        </tr>
-      `).join(""));
-    }
-  }catch(err){
-    console.error(err);
-  }
-}
-
-async function registerFarmer(){
-  try{
-    const name = byId("farmerRegName")?.value?.trim() || "";
-    const phone = byId("farmerRegPhone")?.value?.trim() || "";
-    const farm_name = byId("farmerRegFarm")?.value?.trim() || "";
-    const region = byId("farmerRegRegion")?.value?.trim() || "";
-    const city = byId("farmerRegCity")?.value?.trim() || "";
-    const crop = byId("farmerRegCrop")?.value?.trim() || "";
-
-    if(!name || !phone || !farm_name || !region || !city || !crop){
-      alert("يرجى تعبئة جميع حقول تسجيل المزارع");
-      return;
-    }
-
-    const params = new URLSearchParams({name, phone, farm_name, region, city, crop});
-    const res = await fetch(`${API}/farmers/register?${params.toString()}`, {
-      method: "POST"
-    });
-    const data = await res.json();
-
-    if(!res.ok || data.success === false){
-      throw new Error(data.error || "فشل تسجيل المزارع");
-    }
-
-    alert("تم تسجيل المزارع بنجاح");
-    loadFarmers();
-  }catch(err){
-    console.error(err);
-    alert(err.message);
-  }
-}
-
-/* =========================
-   التوقعات والطقس
-========================= */
-async function loadWeatherCurrent(){
-  try{
-    const region = byId("region")?.value?.trim() || "غير محدد";
-    const city = byId("city")?.value?.trim() || "غير محدد";
-    const res = await fetch(`${API}/weather/current?region=${encodeURIComponent(region)}&city=${encodeURIComponent(city)}`);
-    const data = await res.json();
-    if(!res.ok || data.success === false) throw new Error(data.error || "فشل تحميل الطقس");
-
-    setText("weatherTemp", `${safeNumber(data.weather?.temperature).toFixed(1)}°C`);
-    setText("weatherHumidity", `${safeNumber(data.weather?.humidity).toFixed(1)}%`);
-    setText("weatherRain", `${safeNumber(data.weather?.rainfall).toFixed(1)} mm`);
-  }catch(err){
-    console.error(err);
-  }
-}
-
-async function loadForecastLiveRisk(){
-  try{
-    const form = currentFormData();
-    const disease = lastDiagnosis?.disease_info?.disease_ar || "الكل";
-    const params = new URLSearchParams({
-      region: form.region,
-      city: form.city,
-      disease: disease,
-      crop: form.crop,
-      save_if_high: "true"
-    });
-
-    const res = await fetch(`${API}/forecast/live-risk?${params.toString()}`);
-    const data = await res.json();
-    if(!res.ok || data.success === false) throw new Error(data.error || "فشل تحميل التوقع الحي");
-
-    setText("forecastScore", `${safeNumber(data.final_score).toFixed(2)}%`);
-    setText("forecastLevel", safeText(data.risk_level?.level_ar, "-"));
-    setHTML("forecastRecommendations",
-      Array.isArray(data.recommendations)
-        ? data.recommendations.map(x => `<div class="list-item">${x}</div>`).join("")
-        : "-"
-    );
-  }catch(err){
-    console.error(err);
-  }
-}
-
-/* =========================
-   الخريطة
-========================= */
-async function loadMapSummary(){
-  try{
-    const res = await fetch(`${API}/map/summary`);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل ملخص الخريطة");
-
-    if(Array.isArray(data) && data.length){
-      setHTML("mapSummaryTable", data.map((row, i) => `
-        <tr>
-          <td>${i+1}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.count, 0)}</td>
-          <td>${safePercent(row.avg_severity)}</td>
-          <td>${safeText(row.latitude)}</td>
-          <td>${safeText(row.longitude)}</td>
-        </tr>
-      `).join(""));
-    }
-  }catch(err){
-    console.error(err);
-  }
-}
-
-async function loadMapData(){
-  try{
-    const res = await fetch(`${API}/map/data`);
-    const data = await res.json();
-    if(!res.ok) throw new Error("فشل تحميل بيانات الخريطة");
-
-    if(Array.isArray(data) && data.length){
-      setHTML("mapDataTable", data.map((row, i) => `
-        <tr>
-          <td>${i+1}</td>
-          <td>${safeText(row.farmer_name)}</td>
-          <td>${safeText(row.farm_name)}</td>
-          <td>${safeText(row.crop)}</td>
-          <td>${safeText(row.disease)}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.city)}</td>
-          <td>${safePercent((safeNumber(row.confidence) * 100))}</td>
-          <td>${safePercent(row.severity)}</td>
-        </tr>
-      `).join(""));
-    }
-  }catch(err){
-    console.error(err);
-  }
-}
-
-/* =========================
-   التصدير
-========================= */
-function exportDiagnosesCSV(){
-  window.open(`${API}/export/diagnoses/csv`, "_blank");
-}
-
-function exportDiagnosesJSON(){
-  window.open(`${API}/export/diagnoses/json`, "_blank");
-}
-
-function exportAlertsCSV(){
-  window.open(`${API}/export/alerts/csv`, "_blank");
-}
-
-function exportAlertsJSON(){
-  window.open(`${API}/export/alerts/json`, "_blank");
-}
-
-/* =========================
-   تحميل تلقائي
-========================= */
-document.addEventListener("DOMContentLoaded", function(){
-  if(byId("imageInput")){
-    byId("imageInput").addEventListener("change", function(e){
-      const file = e.target.files[0];
-      if(file){
-        selectedFile = file;
-        setValue("fileState", file.name);
-        fileToPreview(file);
-        setStatus("تم اختيار الصورة بنجاح.");
+      if (val === "high" || val === "مرتفع") {
+        return `<span class="pill pill-high">${safeText(level)}</span>`;
       }
-    });
-  }
+      if (val === "moderate" || val === "متوسط") {
+        return `<span class="pill pill-moderate">${safeText(level)}</span>`;
+      }
+      if (val === "low" || val === "منخفض") {
+        return `<span class="pill pill-low">${safeText(level)}</span>`;
+      }
+      return `<span class="pill pill-neutral">${safeText(level)}</span>`;
+    }
 
-  // تحميل الأقسام إن وجدت في الصفحة
-  loadStatsSummary();
-  loadStatsDiseases();
-  loadStatsRegions();
-  loadStatsSeverity();
-  loadAlertsSummary();
-  loadAlerts();
-  loadFarmers();
-  loadWeatherCurrent();
-  loadForecastLiveRisk();
-  loadMapSummary();
-  loadMapData();
-});
-</script>
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      const data = await res.json();
 
+      if (!res.ok) {
+        throw new Error(data.error || `Request failed: ${url}`);
+      }
+
+      return data;
+    }
+
+    async function loadStatsSummary() {
+      const data = await fetchJson("/stats/summary");
+
+      document.getElementById("kpiTotalCases").textContent = safeText(data.total_cases, 0);
+      document.getElementById("kpiAvgSeverity").textContent = `${fmtNum(data.avg_severity, 0)}%`;
+
+      document.getElementById("topDiseaseName").textContent = safeText(data?.top_disease?.name);
+      document.getElementById("topDiseaseCount").textContent = safeText(data?.top_disease?.count, 0);
+      document.getElementById("topRegionName").textContent = safeText(data?.top_region?.name);
+      document.getElementById("topRegionCount").textContent = safeText(data?.top_region?.count, 0);
+    }
+
+    async function loadAlertsSummary() {
+      const data = await fetchJson("/alerts/summary");
+
+      document.getElementById("kpiTotalAlerts").textContent = safeText(data.total_alerts, 0);
+
+      const latest = data.latest_alert || {};
+      document.getElementById("latestAlertRegion").textContent = safeText(latest.region);
+      document.getElementById("latestAlertDisease").textContent = safeText(latest.disease_name);
+      document.getElementById("latestAlertScore").textContent =
+        latest.risk_score != null ? `${fmtNum(latest.risk_score)}%` : "--";
+      document.getElementById("latestAlertLevel").innerHTML = riskPill(latest.risk_level);
+    }
+
+    async function checkHealth() {
+      try {
+        const data = await fetchJson("/system/health");
+
+        document.getElementById("kpiSystemStatus").textContent =
+          data.status === "running" ? "جاهز" : safeText(data.status);
+
+        document.getElementById("kpiSystemVersion").textContent =
+          `الإصدار: ${safeText(data.version)}`;
+
+        document.getElementById("heroSystemChip").innerHTML =
+          `<span>●</span><span>النظام: ${safeText(data.status)} | الإصدار: ${safeText(data.version)}</span>`;
+      } catch (err) {
+        document.getElementById("heroSystemChip").innerHTML =
+          `<span>●</span><span>تعذر فحص حالة النظام</span>`;
+      }
+    }
+
+    async function refreshHome() {
+      try {
+        await Promise.all([
+          loadStatsSummary(),
+          loadAlertsSummary(),
+          checkHealth()
+        ]);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", refreshHome);
+  </script>
 </body>
 </html>
