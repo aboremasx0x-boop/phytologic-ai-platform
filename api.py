@@ -2,8 +2,8 @@ import io
 import os
 import json
 import base64
-from typing import Optional
 
+import cv2
 import numpy as np
 import torch
 import torch.nn as nn
@@ -51,7 +51,6 @@ model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
 model.to(DEVICE)
 model.eval()
 
-# آخر طبقة convolution لاستخدام Grad-CAM
 TARGET_LAYER = model.features[-1]
 
 # =========================================
@@ -153,12 +152,83 @@ def build_recommendations(class_name: str):
             "المتابعة اليومية",
             "التدخل السريع عند زيادة الأعراض"
         ],
+        "Potato___Late_blight": [
+            "إزالة النباتات أو الأوراق شديدة الإصابة",
+            "تقليل الرطوبة الحرة",
+            "رفع كفاءة الصرف والتهوية",
+            "المتابعة اليومية"
+        ],
     }
     return recs.get(class_name, [
         "افحص الأعراض ميدانيًا",
         "أعد التصوير بصورة أوضح إذا كانت الثقة منخفضة",
         "راجع برنامج المكافحة المناسب للمحصول"
     ])
+
+
+def generate_treatment_program(class_name: str, severity_pct: float):
+    program = {
+        "general": [
+            "تحسين التهوية بين النباتات",
+            "تقليل الرطوبة وبلل الأوراق",
+            "إزالة الأوراق أو الأجزاء المصابة",
+            "الاستمرار في المراقبة الحقلية"
+        ],
+        "specific": [],
+        "severity_action": "",
+        "pathogen_type": "غير محدد"
+    }
+
+    if "Early_blight" in class_name:
+        program["pathogen_type"] = "فطري"
+        program["specific"] = [
+            "استخدام مبيد فطري مناسب حسب التوصيات المحلية",
+            "تكرار الرش وفق البرنامج المعتمد",
+            "تقليل بقاء الأوراق مبللة لفترات طويلة"
+        ]
+    elif "Late_blight" in class_name:
+        program["pathogen_type"] = "فطري"
+        program["specific"] = [
+            "تدخل سريع بمبيد مناسب للّفحة المتأخرة",
+            "متابعة يومية للحقل",
+            "التخلص من الأنسجة شديدة الإصابة"
+        ]
+    elif "Bacterial_spot" in class_name:
+        program["pathogen_type"] = "بكتيري"
+        program["specific"] = [
+            "تعقيم الأدوات الزراعية",
+            "تقليل الرش العلوي",
+            "تجنب العمل في الحقل أثناء ابتلال الأوراق"
+        ]
+    elif "mosaic_virus" in class_name or "Yellow_Leaf_Curl_Virus" in class_name:
+        program["pathogen_type"] = "فيروسي"
+        program["specific"] = [
+            "إزالة النباتات شديدة الإصابة إن لزم",
+            "مكافحة الحشرات الناقلة",
+            "استخدام شتلات سليمة في المواسم التالية"
+        ]
+    elif "healthy" in class_name:
+        program["pathogen_type"] = "لا يوجد مرض"
+        program["specific"] = [
+            "الاستمرار في المراقبة الوقائية",
+            "الحفاظ على التسميد والري المتوازن",
+            "المتابعة الدورية للصور والحقل"
+        ]
+    else:
+        program["specific"] = [
+            "متابعة الأعراض ميدانيًا",
+            "الرجوع لمرجع فني للمحصول",
+            "إعادة التصوير إذا كانت الأعراض غير واضحة"
+        ]
+
+    if severity_pct > 15:
+        program["severity_action"] = "إصابة مرتفعة: يلزم تدخل سريع ومتابعة مكثفة"
+    elif severity_pct > 5:
+        program["severity_action"] = "إصابة متوسطة: يلزم برنامج مكافحة منتظم ومراقبة مستمرة"
+    else:
+        program["severity_action"] = "إصابة منخفضة: يكفي التدخل الوقائي والمتابعة"
+
+    return program
 
 
 def to_base64_pil(image: Image.Image) -> str:
@@ -224,11 +294,11 @@ def generate_gradcam(image: Image.Image):
         score = outputs[0, pred_idx.item()]
         score.backward()
 
-        act = activations[0]           # [1, C, H, W]
-        grad = gradients[0]            # [1, C, H, W]
+        act = activations[0]
+        grad = gradients[0]
 
-        weights = grad.mean(dim=(2, 3), keepdim=True)   # [1, C, 1, 1]
-        cam = (weights * act).sum(dim=1, keepdim=True)  # [1, 1, H, W]
+        weights = grad.mean(dim=(2, 3), keepdim=True)
+        cam = (weights * act).sum(dim=1, keepdim=True)
         cam = F.relu(cam)
 
         cam = cam.squeeze().cpu().numpy()
@@ -250,18 +320,16 @@ def colorize_heatmap(cam_2d: np.ndarray, out_size):
     cam_img = Image.fromarray(np.uint8(cam_2d * 255)).resize((w, h))
     cam_arr = np.array(cam_img).astype(np.float32) / 255.0
 
-    # heatmap بسيط: أحمر قوي، أخضر أقل، أزرق صفر
     heat = np.zeros((h, w, 3), dtype=np.uint8)
-    heat[..., 0] = np.uint8(cam_arr * 255)          # R
-    heat[..., 1] = np.uint8(cam_arr * 140)          # G
-    heat[..., 2] = 0                                # B
+    heat[..., 0] = np.uint8(cam_arr * 255)
+    heat[..., 1] = np.uint8(cam_arr * 140)
+    heat[..., 2] = 0
     return heat
 
 
 def overlay_gradcam(original_image: Image.Image, cam_2d: np.ndarray, alpha=0.4):
-    original = original_image.resize(original_image.size).convert("RGB")
+    original = original_image.convert("RGB")
     orig_arr = np.array(original).astype(np.float32)
-
     heat = colorize_heatmap(cam_2d, original.size).astype(np.float32)
 
     blended = (orig_arr * (1 - alpha) + heat * alpha).clip(0, 255).astype(np.uint8)
@@ -269,7 +337,6 @@ def overlay_gradcam(original_image: Image.Image, cam_2d: np.ndarray, alpha=0.4):
 
 
 def estimate_severity_from_cam(cam_2d: np.ndarray):
-    # تقدير تقريبي لنسبة الإصابة اعتمادًا على المساحات النشطة
     mask = cam_2d >= 0.45
     severity_pct = float(mask.mean() * 100)
 
@@ -281,6 +348,30 @@ def estimate_severity_from_cam(cam_2d: np.ndarray):
         label = "مرتفعة"
 
     return round(severity_pct, 2), label
+
+
+# =========================================
+# Bullseye Detection
+# =========================================
+def detect_bullseye(image: Image.Image):
+    img = np.array(image.convert("RGB"))
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+    gray = cv2.GaussianBlur(gray, (5, 5), 0)
+
+    circles = cv2.HoughCircles(
+        gray,
+        cv2.HOUGH_GRADIENT,
+        dp=1.2,
+        minDist=20,
+        param1=50,
+        param2=30,
+        minRadius=5,
+        maxRadius=60
+    )
+
+    if circles is not None:
+        return True, int(len(circles[0]))
+    return False, 0
 
 
 # =========================================
@@ -363,7 +454,7 @@ async def diagnose(
         result = predict_single_image(image)
 
         if result["best_confidence"] < 50:
-            response = {
+            return {
                 "status": "uncertain",
                 "message": "التشخيص غير مؤكد",
                 "confidence": result["best_confidence"],
@@ -378,7 +469,6 @@ async def diagnose(
                 },
                 "action": "يرجى إعادة التصوير بصورة أوضح أو من زاوية مختلفة"
             }
-            return response
 
         response = {
             "status": "success",
@@ -403,6 +493,9 @@ async def diagnose(
             "recommendations": build_recommendations(result["best_class"])
         }
 
+        severity_pct = 0.0
+        severity_label = "غير محددة"
+
         if return_gradcam:
             cam_2d, _, _ = generate_gradcam(image)
             gradcam_overlay = overlay_gradcam(image, cam_2d, alpha=0.4)
@@ -413,6 +506,22 @@ async def diagnose(
                 "severity_percent": severity_pct,
                 "severity_label": severity_label
             }
+
+        bullseye_detected, circle_count = detect_bullseye(image)
+        response["bullseye_analysis"] = {
+            "detected": bullseye_detected,
+            "circle_count": circle_count,
+            "interpretation": (
+                "يرجح وجود Bullseye pattern"
+                if bullseye_detected else
+                "لا يوجد نمط دائري واضح"
+            )
+        }
+
+        response["treatment_program"] = generate_treatment_program(
+            result["best_class"],
+            severity_pct
+        )
 
         if return_image:
             response["original_image_b64"] = to_base64_pil(image)
