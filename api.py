@@ -343,7 +343,9 @@ def health():
 # =========================
 @app.post("/diagnose")
 async def diagnose(
-    files: List[UploadFile] = File(...),
+    file1: UploadFile = File(...),
+    file2: UploadFile = File(None),
+    file3: UploadFile = File(None),
     farmer_name: str = Form(""),
     farm_name: str = Form(""),
     crop: str = Form(""),
@@ -354,11 +356,10 @@ async def diagnose(
     notes: str = Form("")
 ):
     try:
-        if not files or len(files) == 0:
-            return {"status": "error", "message": "يرجى رفع صورة واحدة على الأقل"}
+        files = [f for f in [file1, file2, file3] if f is not None]
 
-        if len(files) > 3:
-            return {"status": "error", "message": "الحد الأقصى في المرحلة 1 هو 3 صور"}
+        if len(files) == 0:
+            return {"status": "error", "message": "يرجى رفع صورة واحدة على الأقل"}
 
         original_images_b64 = []
         per_image_predictions = []
@@ -401,7 +402,6 @@ async def diagnose(
 
         return {
             "status": "success",
-
             "case_data": {
                 "farmer_name": farmer_name,
                 "farm_name": farm_name,
@@ -413,11 +413,9 @@ async def diagnose(
                 "notes": notes,
                 "uploaded_images_count": len(files),
             },
-
             "images": {
                 "original_images": original_images_b64
             },
-
             "quality": {
                 "average_quality_score": avg_quality,
                 "quality_label": (
@@ -428,7 +426,6 @@ async def diagnose(
                 ),
                 "per_image_quality": per_image_quality,
             },
-
             "prediction": {
                 "best_prediction": {
                     "class_name": agg_pred["best_class"],
@@ -448,13 +445,11 @@ async def diagnose(
                     "color": decision["decision_color"]
                 }
             },
-
             "crop_validation": {
                 "user_crop": crop,
                 "predicted_plant": plant_name,
                 "match": crop_match
             },
-
             "final_result": {
                 "plant_name": plant_name,
                 "disease_name_ar": disease_ar,
@@ -462,13 +457,9 @@ async def diagnose(
                 "recommended_action": decision["recommended_action"],
                 "rejection_reasons": decision["rejection_reasons"]
             },
-
             "recommendations": recommendations,
-
             "pesticide_program": pesticide_program,
-
             "diagnostic_questions": questions,
-
             "strict_retake_rules": {
                 "retake_required": decision["decision_status"] == "غير مؤكد",
                 "retake_message": (
