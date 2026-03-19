@@ -28,7 +28,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-MODEL_PATH = "plant_disease_model_v5.pth"
+MODEL_PATH = "plant_disease_model_v4.pth"
 CLASSES_PATH = "classes.json"
 DEVICE = torch.device("cpu")
 
