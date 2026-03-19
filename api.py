@@ -11,13 +11,6 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from torchvision import transforms, models
 
-from image_quality import assess_image_quality
-from disease_rules import (
-    crop_matches_prediction,
-    get_questions_for_class,
-    build_decision,
-)
-
 app = FastAPI(title="Phytologic AI")
 
 app.add_middleware(
@@ -28,22 +21,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ====== إعدادات أساسية ======
 MODEL_PATH = "plant_disease_model_v4.pth"
-CLASSES_PATH = "classes.json"
 DEVICE = torch.device("cpu")
 
-
-def load_classes():
-    if os.path.exists(CLASSES_PATH):
-        with open(CLASSES_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    return []
+# ❗ الحل الحاسم هنا
+NUM_CLASSES = 37
 
 
-CLASSES = load_classes()
-NUM_CLASSES = len(CLASSES) if CLASSES else 37
-
-
+# ====== تحويل الصورة ======
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -54,278 +40,69 @@ transform = transforms.Compose([
 ])
 
 
+# ====== تحميل الموديل ======
 def load_model():
     model = models.efficientnet_b0(weights=None)
     model.classifier[1] = torch.nn.Linear(
         model.classifier[1].in_features,
         NUM_CLASSES
     )
+
     state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
     model.load_state_dict(state_dict, strict=False)
+
     model.eval()
     return model
 
 
 try:
     model = load_model()
-    MODEL_READY = True
-    MODEL_ERROR = ""
+    print("✅ Model loaded successfully")
 except Exception as e:
     model = None
-    MODEL_READY = False
-    MODEL_ERROR = str(e)
-    print("Model loading error:", e)
+    print("❌ Model loading error:", e)
 
 
-def image_to_base64(image: Image.Image) -> str:
+# ====== تحويل صورة Base64 ======
+def image_to_base64(image):
     buffer = io.BytesIO()
     image.save(buffer, format="JPEG")
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
 
 
-def average_dict_scores(items, key):
-    vals = [x.get(key, 0.0) for x in items]
-    return round(sum(vals) / len(vals), 2) if vals else 0.0
-
-
-def confidence_label(conf: float) -> str:
-    if conf >= 90:
-        return "مرتفعة جدًا"
-    if conf >= 80:
-        return "مرتفعة"
-    if conf >= 70:
-        return "متوسطة"
-    return "منخفضة"
-
-
-def predict_single_image(image: Image.Image):
+# ====== التنبؤ ======
+def predict(image):
     if model is None:
-        raise RuntimeError(f"الموديل غير جاهز: {MODEL_ERROR}")
+        raise RuntimeError("Model not loaded")
 
-    img_tensor = transform(image).unsqueeze(0).to(DEVICE)
+    img = transform(image).unsqueeze(0)
 
     with torch.no_grad():
-        outputs = model(img_tensor)
-        probs = F.softmax(outputs, dim=1).squeeze(0)
+        outputs = model(img)
+        probs = F.softmax(outputs, dim=1)
 
-    top_probs, top_indices = torch.topk(probs, k=2)
-
-    best_idx = int(top_indices[0].item())
-    second_idx = int(top_indices[1].item())
-
-    best_conf = float(top_probs[0].item() * 100)
-    second_conf = float(top_probs[1].item() * 100)
-
-    best_class = CLASSES[best_idx] if CLASSES else f"class_{best_idx}"
-    second_class = CLASSES[second_idx] if CLASSES else f"class_{second_idx}"
+    top_probs, top_idxs = torch.topk(probs, 2)
 
     return {
-        "best_class": best_class,
-        "best_confidence": round(best_conf, 2),
-        "second_class": second_class,
-        "second_confidence": round(second_conf, 2),
+        "top1_class": int(top_idxs[0][0]),
+        "top1_conf": float(top_probs[0][0] * 100),
+        "top2_class": int(top_idxs[0][1]),
+        "top2_conf": float(top_probs[0][1] * 100),
     }
 
 
-def aggregate_multi_image_predictions(predictions):
-    class_scores = {}
-
-    for pred in predictions:
-        best_cls = pred["best_class"]
-        class_scores[best_cls] = class_scores.get(best_cls, 0.0) + pred["best_confidence"]
-
-    sorted_best = sorted(class_scores.items(), key=lambda x: x[1], reverse=True)
-    best_class = sorted_best[0][0]
-
-    best_conf_values = [p["best_confidence"] for p in predictions if p["best_class"] == best_class]
-    best_conf_avg = sum(best_conf_values) / len(best_conf_values) if best_conf_values else 0.0
-
-    merged_alt = {}
-    for pred in predictions:
-        for cls_name, conf in [
-            (pred["best_class"], pred["best_confidence"]),
-            (pred["second_class"], pred["second_confidence"])
-        ]:
-            if cls_name != best_class:
-                merged_alt[cls_name] = merged_alt.get(cls_name, 0.0) + conf
-
-    if merged_alt:
-        second_class = sorted(merged_alt.items(), key=lambda x: x[1], reverse=True)[0][0]
-        second_conf_avg = merged_alt[second_class] / len(predictions)
-    else:
-        second_class = best_class
-        second_conf_avg = 0.0
-
-    agreement_count = sum(1 for p in predictions if p["best_class"] == best_class)
-    agreement_ratio = agreement_count / len(predictions)
-
-    return {
-        "best_class": best_class,
-        "best_confidence": round(best_conf_avg, 2),
-        "second_class": second_class,
-        "second_confidence": round(second_conf_avg, 2),
-        "agreement_ratio": round(agreement_ratio * 100, 2),
-    }
-
-
-def infer_plant_from_class(class_name: str) -> str:
-    name = class_name.lower()
-
-    if name.startswith("tomato"):
-        return "طماطم"
-    if name.startswith("potato"):
-        return "بطاطس"
-    if name.startswith("apple"):
-        return "تفاح"
-    if name.startswith("grape"):
-        return "عنب"
-    if name.startswith("corn"):
-        return "ذرة"
-    if name.startswith("pepper") or name.startswith("bell_pepper"):
-        return "فلفل"
-    if name.startswith("strawberry"):
-        return "فراولة"
-    if name.startswith("peach"):
-        return "خوخ"
-    if name.startswith("blueberry"):
-        return "توت أزرق"
-    if name.startswith("cherry"):
-        return "كرز"
-    if name.startswith("raspberry"):
-        return "رازبيري"
-    if name.startswith("soybean") or name.startswith("soyabean"):
-        return "صويا"
-    if name.startswith("squash"):
-        return "اسكواش"
-
-    return "غير محدد"
-
-
-def infer_disease_name_ar(class_name: str) -> str:
-    mapping = {
-        "Tomato_Early_blight": "اللفحة المبكرة في الطماطم",
-        "Tomato_Septoria_leaf_spot": "تبقع السبتوريا في أوراق الطماطم",
-        "Tomato_Bacterial_spot": "التبقع البكتيري في الطماطم",
-        "Tomato_Late_blight": "اللفحة المتأخرة في الطماطم",
-        "Tomato_Leaf_Mold": "عفن الأوراق في الطماطم",
-        "Tomato_Target_Spot": "بقعة الهدف في الطماطم",
-        "Tomato_healthy": "طماطم سليمة",
-        "Tomato_Spider_mites_Two_spotted_spider_mite": "إصابة حلم العنكبوت الأحمر في الطماطم",
-        "Tomato_Tomato_mosaic_virus": "فيروس موزاييك الطماطم",
-        "Tomato_Tomato_YellowLeaf_Curl_Virus": "فيروس تجعد واصفرار أوراق الطماطم",
-        "Potato_Early_blight": "اللفحة المبكرة في البطاطس",
-        "Potato_Late_blight": "اللفحة المتأخرة في البطاطس",
-        "Potato_healthy": "بطاطس سليمة",
-        "Apple_Scab": "جرب التفاح",
-        "Apple_rust": "صدأ التفاح",
-        "Apple_healthy": "تفاح سليم",
-        "Grape_Black_rot": "العفن الأسود في العنب",
-        "Grape_healthy": "عنب سليم",
-        "Corn_Gray_leaf_spot": "التبقع الرمادي في الذرة",
-        "Corn_rust_leaf": "صدأ الذرة",
-        "Corn_leaf_blight": "لفحة أوراق الذرة",
-        "Pepper_bell_Bacterial_spot": "التبقع البكتيري في الفلفل",
-        "Pepper_bell_healthy": "فلفل سليم",
-        "Strawberry_healthy": "فراولة سليمة",
-        "Peach_healthy": "خوخ سليم",
-        "Blueberry_healthy": "توت أزرق سليم",
-        "Cherry_healthy": "كرز سليم",
-        "Raspberry_healthy": "رازبيري سليم",
-        "Soybean_healthy": "صويا سليمة",
-        "Squash_Powdery_mildew": "البياض الدقيقي في الاسكواش",
-    }
-    return mapping.get(class_name, class_name)
-
-
-def build_recommendations(class_name: str):
-    recs = {
-        "Tomato_Early_blight": [
-            "إزالة الأوراق السفلية المصابة",
-            "تقليل بلل الأوراق أثناء الري",
-            "تحسين التهوية بين النباتات",
-            "اتباع برنامج مكافحة مناسب عند الحاجة",
-        ],
-        "Tomato_Septoria_leaf_spot": [
-            "إزالة الأوراق شديدة الإصابة",
-            "منع تناثر ماء الري على الأوراق",
-            "تحسين التهوية وتقليل الرطوبة",
-            "متابعة تطور الإصابة ميدانيًا",
-        ],
-        "Tomato_Bacterial_spot": [
-            "تجنب العمل بين النباتات وهي مبللة",
-            "إزالة الأجزاء الشديدة الإصابة",
-            "تقليل الرش العلوي بالماء",
-            "تعقيم الأدوات المستخدمة",
-        ],
-        "Tomato_Late_blight": [
-            "مراقبة تطور الإصابة يوميًا",
-            "التخلص من الأوراق شديدة التضرر",
-            "تقليل الرطوبة حول المجموع الخضري",
-            "التدخل السريع عند انتشار الأعراض",
-        ],
-        "Potato_Late_blight": [
-            "إزالة المجموع الخضري شديد الإصابة",
-            "تقليل الرطوبة الحرة على الأوراق",
-            "رفع كفاءة الصرف والتهوية",
-            "متابعة الحقل بشكل يومي",
-        ],
-    }
-    return recs.get(class_name, [
-        "افحص الأعراض ميدانيًا",
-        "التقط صورًا أوضح عند الحاجة",
-        "راجع برنامج المكافحة المناسب للمحصول",
-    ])
-
-
-def build_pesticide_program(class_name: str):
-    programs = {
-        "Tomato_Early_blight": {
-            "material": "استشارة مختص",
-            "name": "-",
-            "dose": "-",
-            "note": "يوصى بالرجوع للمرشد الزراعي أو دليل المبيدات المحلي حسب بلدك."
-        },
-        "Tomato_Septoria_leaf_spot": {
-            "material": "استشارة مختص",
-            "name": "-",
-            "dose": "-",
-            "note": "يفضل اعتماد المبيد الموصى به رسميًا حسب التسجيل المحلي."
-        },
-        "Tomato_Bacterial_spot": {
-            "material": "استشارة مختص",
-            "name": "-",
-            "dose": "-",
-            "note": "الاختيار يعتمد على شدة الإصابة وتوصيات التسجيل المحلي."
-        }
-    }
-    return programs.get(class_name, {
-        "material": "استشارة مختص",
-        "name": "-",
-        "dose": "-",
-        "note": "لا يوجد برنامج محدد تلقائيًا لهذه الحالة في المرحلة 1."
-    })
-
+# ====== المسارات ======
 
 @app.get("/")
 def root():
-    return {
-        "status": "running",
-        "model_ready": MODEL_READY,
-        "model_path": MODEL_PATH,
-        "num_classes": NUM_CLASSES,
-        "model_error": MODEL_ERROR
-    }
+    return {"status": "running"}
 
 
 @app.get("/health")
 def health():
     return {
-        "status": "ok" if MODEL_READY else "model_error",
-        "model_loaded": MODEL_READY,
-        "classes_loaded": len(CLASSES),
-        "device": str(DEVICE),
-        "model_path": MODEL_PATH,
-        "model_error": MODEL_ERROR
+        "model_loaded": model is not None,
+        "num_classes": NUM_CLASSES
     }
 
 
@@ -334,145 +111,36 @@ async def diagnose(
     file1: UploadFile = File(...),
     file2: Optional[UploadFile] = File(None),
     file3: Optional[UploadFile] = File(None),
-    farmer_name: str = Form(""),
-    farm_name: str = Form(""),
-    crop: str = Form(""),
-    city: str = Form(""),
-    region: str = Form(""),
-    latitude: str = Form(""),
-    longitude: str = Form(""),
-    notes: str = Form("")
 ):
     try:
-        if model is None:
-            return {
-                "status": "error",
-                "message": f"الموديل غير جاهز: {MODEL_ERROR}"
-            }
+        files = [f for f in [file1, file2, file3] if f]
 
-        files = [f for f in [file1, file2, file3] if f is not None]
+        results = []
+        images_b64 = []
 
-        original_images_b64 = []
-        per_image_predictions = []
-        per_image_quality = []
+        for f in files:
+            img_bytes = await f.read()
+            img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
 
-        for file in files:
-            image_bytes = await file.read()
-            image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+            pred = predict(img)
+            results.append(pred)
 
-            original_images_b64.append({
-                "filename": file.filename,
-                "image_b64": image_to_base64(image)
-            })
-
-            pred = predict_single_image(image)
-            per_image_predictions.append(pred)
-
-            quality = assess_image_quality(image)
-            per_image_quality.append(quality)
-
-        agg_pred = aggregate_multi_image_predictions(per_image_predictions)
-        avg_quality = average_dict_scores(per_image_quality, "quality_score")
-        crop_match = crop_matches_prediction(crop, agg_pred["best_class"])
-
-        decision = build_decision(
-            best_confidence=agg_pred["best_confidence"],
-            second_confidence=agg_pred["second_confidence"],
-            quality_score=avg_quality,
-            crop_match=crop_match,
-            num_images=len(files)
-        )
-
-        plant_name = infer_plant_from_class(agg_pred["best_class"])
-        disease_ar = infer_disease_name_ar(agg_pred["best_class"])
-        recommendations = build_recommendations(agg_pred["best_class"])
-        pesticide_program = build_pesticide_program(agg_pred["best_class"])
-        questions = get_questions_for_class(agg_pred["best_class"])
+            images_b64.append(image_to_base64(img))
 
         return {
             "status": "success",
-            "case_data": {
-                "farmer_name": farmer_name,
-                "farm_name": farm_name,
-                "crop": crop,
-                "city": city,
-                "region": region,
-                "latitude": latitude,
-                "longitude": longitude,
-                "notes": notes,
-                "uploaded_images_count": len(files),
-            },
-            "images": {
-                "original_images": original_images_b64
-            },
-            "quality": {
-                "average_quality_score": avg_quality,
-                "quality_label": (
-                    "ممتازة" if avg_quality >= 85 else
-                    "جيدة" if avg_quality >= 65 else
-                    "متوسطة" if avg_quality >= 45 else
-                    "ضعيفة"
-                ),
-                "per_image_quality": per_image_quality,
-            },
-            "prediction": {
-                "best_prediction": {
-                    "class_name": agg_pred["best_class"],
-                    "class_name_ar": infer_disease_name_ar(agg_pred["best_class"]),
-                    "confidence": agg_pred["best_confidence"],
-                    "confidence_label": confidence_label(agg_pred["best_confidence"]),
-                },
-                "second_prediction": {
-                    "class_name": agg_pred["second_class"],
-                    "class_name_ar": infer_disease_name_ar(agg_pred["second_class"]),
-                    "confidence": agg_pred["second_confidence"],
-                    "confidence_label": confidence_label(agg_pred["second_confidence"]),
-                },
-                "agreement_ratio": agg_pred["agreement_ratio"],
-                "confidence_indicator": {
-                    "value": decision["final_score"],
-                    "color": decision["decision_color"]
-                }
-            },
-            "crop_validation": {
-                "user_crop": crop,
-                "predicted_plant": plant_name,
-                "match": crop_match
-            },
-            "final_result": {
-                "plant_name": plant_name,
-                "disease_name_ar": disease_ar,
-                "decision_status": decision["decision_status"],
-                "recommended_action": decision["recommended_action"],
-                "rejection_reasons": decision["rejection_reasons"]
-            },
-            "recommendations": recommendations,
-            "pesticide_program": pesticide_program,
-            "diagnostic_questions": questions,
-            "strict_retake_rules": {
-                "retake_required": decision["decision_status"] == "غير مؤكد",
-                "retake_message": (
-                    "يرجى إعادة التصوير بصورتين إلى ثلاث صور قريبة وواضحة للورقة المصابة"
-                    if decision["decision_status"] == "غير مؤكد"
-                    else "لا حاجة لإعادة التصوير حاليًا"
-                ),
-                "photo_instructions": [
-                    "التقط من 2 إلى 3 صور",
-                    "قرّب الكاميرا من الورقة المصابة",
-                    "اجعل البقع واضحة داخل الصورة",
-                    "استخدم إضاءة جيدة",
-                    "تجنب الظلال والصور المهزوزة"
-                ]
-            }
+            "predictions": results,
+            "images": images_b64
         }
 
     except Exception as e:
         return {
             "status": "error",
-            "message": f"حدث خطأ أثناء التشخيص: {str(e)}"
+            "message": str(e)
         }
 
 
+# ====== تشغيل Render ======
 if __name__ == "__main__":
     import uvicorn
     port = int(os.environ.get("PORT", 10000))
