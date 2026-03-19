@@ -22,19 +22,12 @@ app.add_middleware(
 )
 
 # =========================================================
-# اختر إعدادًا واحدًا فقط
+# إعدادات ثابتة
 # =========================================================
-
-# الخيار الحالي الموصى به عندك:
 MODEL_PATH = "plant_disease_model_v4.pth"
-NUM_CLASSES = 37
-
-# إذا أردت لاحقًا v5 بدلاً من v4:
-# MODEL_PATH = "plant_disease_model_v5.pth"
-# NUM_CLASSES = 38
-
 CLASSES_PATH = "classes.json"
 DEVICE = torch.device("cpu")
+NUM_CLASSES = 37
 
 
 # =========================================================
@@ -146,65 +139,78 @@ def infer_plant_from_class(class_name: str) -> str:
 
 def infer_disease_name_ar(class_name: str) -> str:
     mapping = {
-        "Tomato_Early_blight": "اللفحة المبكرة في الطماطم",
-        "Tomato_Septoria_leaf_spot": "تبقع السبتوريا في أوراق الطماطم",
-        "Tomato_Bacterial_spot": "التبقع البكتيري في الطماطم",
-        "Tomato_Late_blight": "اللفحة المتأخرة في الطماطم",
-        "Tomato_Leaf_Mold": "عفن الأوراق في الطماطم",
-        "Tomato_Target_Spot": "بقعة الهدف في الطماطم",
-        "Tomato_healthy": "طماطم سليمة",
-        "Tomato_Spider_mites_Two_spotted_spider_mite": "إصابة حلم العنكبوت الأحمر في الطماطم",
-        "Tomato_Tomato_mosaic_virus": "فيروس موزاييك الطماطم",
-        "Tomato_Tomato_YellowLeaf_Curl_Virus": "فيروس تجعد واصفرار أوراق الطماطم",
-        "Potato_Early_blight": "اللفحة المبكرة في البطاطس",
-        "Potato_Late_blight": "اللفحة المتأخرة في البطاطس",
-        "Potato_healthy": "بطاطس سليمة",
-        "Apple_Scab": "جرب التفاح",
-        "Apple_rust": "صدأ التفاح",
-        "Apple_healthy": "تفاح سليم",
-        "Grape_Black_rot": "العفن الأسود في العنب",
-        "Grape_healthy": "عنب سليم",
-        "Corn_Gray_leaf_spot": "التبقع الرمادي في الذرة",
-        "Corn_rust_leaf": "صدأ الذرة",
-        "Corn_leaf_blight": "لفحة أوراق الذرة",
-        "Pepper_bell_Bacterial_spot": "التبقع البكتيري في الفلفل",
-        "Pepper_bell_healthy": "فلفل سليم",
-        "Strawberry_healthy": "فراولة سليمة",
-        "Peach_healthy": "خوخ سليم",
-        "Blueberry_healthy": "توت أزرق سليم",
-        "Cherry_healthy": "كرز سليم",
-        "Raspberry_healthy": "رازبيري سليم",
-        "Soybean_healthy": "صويا سليمة",
-        "Squash_Powdery_mildew": "البياض الدقيقي في الاسكواش",
+        "Tomato___Early_blight": "اللفحة المبكرة في الطماطم",
+        "Tomato___Septoria_leaf_spot": "تبقع السبتوريا في أوراق الطماطم",
+        "Tomato___Bacterial_spot": "التبقع البكتيري في الطماطم",
+        "Tomato___Late_blight": "اللفحة المتأخرة في الطماطم",
+        "Tomato___Leaf_Mold": "عفن الأوراق في الطماطم",
+        "Tomato___Target_Spot": "بقعة الهدف في الطماطم",
+        "Tomato___healthy": "طماطم سليمة",
+        "Tomato___Spider_mites Two-spotted_spider_mite": "إصابة حلم العنكبوت الأحمر في الطماطم",
+        "Tomato___Tomato_mosaic_virus": "فيروس موزاييك الطماطم",
+        "Tomato___Tomato_Yellow_Leaf_Curl_Virus": "فيروس تجعد واصفرار أوراق الطماطم",
+        "Potato___Early_blight": "اللفحة المبكرة في البطاطس",
+        "Potato___Late_blight": "اللفحة المتأخرة في البطاطس",
+        "Potato___healthy": "بطاطس سليمة",
+        "Apple___Apple_scab": "جرب التفاح",
+        "Apple___Cedar_apple_rust": "صدأ التفاح",
+        "Apple___healthy": "تفاح سليم",
+        "Grape___Black_rot": "العفن الأسود في العنب",
+        "Grape___Esca_(Black_Measles)": "إسكا العنب",
+        "Grape___Leaf_blight_(Isariopsis_Leaf_Spot)": "لفحة أوراق العنب",
+        "Grape___healthy": "عنب سليم",
+        "Corn___Cercospora_leaf_spot Gray_leaf_spot": "التبقع الرمادي في الذرة",
+        "Corn___Common_rust": "صدأ الذرة",
+        "Corn___Northern_Leaf_Blight": "لفحة أوراق الذرة الشمالية",
+        "Corn___healthy": "ذرة سليمة",
+        "Pepper,_bell___Bacterial_spot": "التبقع البكتيري في الفلفل",
+        "Pepper,_bell___healthy": "فلفل سليم",
+        "Strawberry___Leaf_scorch": "لفحة أوراق الفراولة",
+        "Strawberry___healthy": "فراولة سليمة",
+        "Peach___Bacterial_spot": "التبقع البكتيري في الخوخ",
+        "Peach___healthy": "خوخ سليم",
+        "Blueberry___healthy": "توت أزرق سليم",
+        "Cherry___Powdery_mildew": "البياض الدقيقي في الكرز",
+        "Cherry___healthy": "كرز سليم",
+        "Raspberry___healthy": "رازبيري سليم",
+        "Soybean___healthy": "صويا سليمة",
+        "Squash___Powdery_mildew": "البياض الدقيقي في الاسكواش",
+        "Orange___Haunglongbing_(Citrus_greening)": "التخضير في الحمضيات",
     }
     return mapping.get(class_name, class_name)
 
 
 def build_recommendations(class_name: str):
     recs = {
-        "Tomato_Early_blight": [
+        "Tomato___Early_blight": [
             "إزالة الأوراق السفلية المصابة",
             "تقليل ملامسة الماء للأوراق",
             "تحسين التهوية بين النباتات",
-            "متابعة برنامج المكافحة المناسب",
+            "متابعة برنامج المكافحة المناسب"
         ],
-        "Tomato_Septoria_leaf_spot": [
+        "Tomato___Septoria_leaf_spot": [
             "إزالة الأوراق شديدة الإصابة",
             "تقليل الرطوبة على الأوراق",
             "تحسين التهوية",
-            "إعادة التصوير إذا زادت الأعراض",
+            "إعادة التصوير إذا زادت الأعراض"
         ],
-        "Tomato_Bacterial_spot": [
+        "Tomato___Bacterial_spot": [
             "تجنب لمس النبات وهو مبلل",
             "إزالة الأجزاء شديدة الإصابة",
             "تعقيم الأدوات",
-            "تقليل الرش العلوي",
+            "تقليل الرش العلوي"
         ],
+        "Tomato___Late_blight": [
+            "التخلص من الأوراق شديدة الإصابة",
+            "تقليل الرطوبة الحرة على الأوراق",
+            "متابعة الحقل بشكل يومي",
+            "التدخل السريع عند زيادة الأعراض"
+        ]
     }
     return recs.get(class_name, [
         "افحص الأعراض ميدانيًا",
         "التقط صورة أوضح إذا كانت الثقة منخفضة",
-        "راجع برنامج المكافحة المناسب للمحصول",
+        "راجع برنامج المكافحة المناسب للمحصول"
     ])
 
 
@@ -299,6 +305,25 @@ async def diagnose(
                 })
 
         main_result = results[0]
+
+        # قاعدة رفض ذكية إذا كانت الثقة منخفضة
+        if main_result["best_confidence"] < 50:
+            response = {
+                "status": "uncertain",
+                "message": "التشخيص غير مؤكد",
+                "confidence": main_result["best_confidence"],
+                "best_prediction": {
+                    "class_name": main_result["best_class"],
+                    "disease_name_ar": infer_disease_name_ar(main_result["best_class"]),
+                    "plant_name": infer_plant_from_class(main_result["best_class"])
+                },
+                "action": "يرجى إعادة التصوير بصورة أوضح أو من زاوية مختلفة أو استخدام 2 إلى 3 صور"
+            }
+
+            if return_images:
+                response["images"] = images_payload
+
+            return response
 
         response = {
             "status": "success",
