@@ -21,20 +21,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# =========================================================
+# اختر إعدادًا واحدًا فقط
+# =========================================================
+
+# الخيار الحالي الموصى به عندك:
 MODEL_PATH = "plant_disease_model_v4.pth"
-DEVICE = torch.device("cpu")
 NUM_CLASSES = 37
 
+# إذا أردت لاحقًا v5 بدلاً من v4:
+# MODEL_PATH = "plant_disease_model_v5.pth"
+# NUM_CLASSES = 38
 
+CLASSES_PATH = "classes.json"
+DEVICE = torch.device("cpu")
+
+
+# =========================================================
+# تحميل أسماء الأمراض
+# =========================================================
 def load_classes():
-    if os.path.exists("classes.json"):
-        with open("classes.json", "r", encoding="utf-8") as f:
-            return json.load(f)
+    if os.path.exists(CLASSES_PATH):
+        with open(CLASSES_PATH, "r", encoding="utf-8") as f:
+            classes = json.load(f)
+            if isinstance(classes, list) and len(classes) > 0:
+                return classes
     return [f"class_{i}" for i in range(NUM_CLASSES)]
 
 
 CLASSES = load_classes()
 
+
+# =========================================================
+# تحويل الصورة
+# =========================================================
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -45,12 +65,16 @@ transform = transforms.Compose([
 ])
 
 
+# =========================================================
+# تحميل الموديل
+# =========================================================
 def load_model():
     model = models.efficientnet_b0(weights=None)
     model.classifier[1] = torch.nn.Linear(
         model.classifier[1].in_features,
         NUM_CLASSES
     )
+
     state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
     model.load_state_dict(state_dict, strict=False)
     model.eval()
@@ -68,6 +92,9 @@ except Exception as e:
     print("Model loading error:", e)
 
 
+# =========================================================
+# أدوات مساعدة
+# =========================================================
 def image_to_base64(image: Image.Image) -> str:
     buffer = io.BytesIO()
     image.save(buffer, format="JPEG")
@@ -86,6 +113,7 @@ def confidence_label(conf: float) -> str:
 
 def infer_plant_from_class(class_name: str) -> str:
     name = class_name.lower()
+
     if name.startswith("tomato"):
         return "طماطم"
     if name.startswith("potato"):
@@ -100,6 +128,19 @@ def infer_plant_from_class(class_name: str) -> str:
         return "فلفل"
     if name.startswith("strawberry"):
         return "فراولة"
+    if name.startswith("peach"):
+        return "خوخ"
+    if name.startswith("blueberry"):
+        return "توت أزرق"
+    if name.startswith("cherry"):
+        return "كرز"
+    if name.startswith("raspberry"):
+        return "رازبيري"
+    if name.startswith("soybean") or name.startswith("soyabean"):
+        return "صويا"
+    if name.startswith("squash"):
+        return "اسكواش"
+
     return "غير محدد"
 
 
@@ -112,6 +153,9 @@ def infer_disease_name_ar(class_name: str) -> str:
         "Tomato_Leaf_Mold": "عفن الأوراق في الطماطم",
         "Tomato_Target_Spot": "بقعة الهدف في الطماطم",
         "Tomato_healthy": "طماطم سليمة",
+        "Tomato_Spider_mites_Two_spotted_spider_mite": "إصابة حلم العنكبوت الأحمر في الطماطم",
+        "Tomato_Tomato_mosaic_virus": "فيروس موزاييك الطماطم",
+        "Tomato_Tomato_YellowLeaf_Curl_Virus": "فيروس تجعد واصفرار أوراق الطماطم",
         "Potato_Early_blight": "اللفحة المبكرة في البطاطس",
         "Potato_Late_blight": "اللفحة المتأخرة في البطاطس",
         "Potato_healthy": "بطاطس سليمة",
@@ -120,6 +164,18 @@ def infer_disease_name_ar(class_name: str) -> str:
         "Apple_healthy": "تفاح سليم",
         "Grape_Black_rot": "العفن الأسود في العنب",
         "Grape_healthy": "عنب سليم",
+        "Corn_Gray_leaf_spot": "التبقع الرمادي في الذرة",
+        "Corn_rust_leaf": "صدأ الذرة",
+        "Corn_leaf_blight": "لفحة أوراق الذرة",
+        "Pepper_bell_Bacterial_spot": "التبقع البكتيري في الفلفل",
+        "Pepper_bell_healthy": "فلفل سليم",
+        "Strawberry_healthy": "فراولة سليمة",
+        "Peach_healthy": "خوخ سليم",
+        "Blueberry_healthy": "توت أزرق سليم",
+        "Cherry_healthy": "كرز سليم",
+        "Raspberry_healthy": "رازبيري سليم",
+        "Soybean_healthy": "صويا سليمة",
+        "Squash_Powdery_mildew": "البياض الدقيقي في الاسكواش",
     }
     return mapping.get(class_name, class_name)
 
@@ -130,24 +186,24 @@ def build_recommendations(class_name: str):
             "إزالة الأوراق السفلية المصابة",
             "تقليل ملامسة الماء للأوراق",
             "تحسين التهوية بين النباتات",
-            "متابعة تطور الإصابة خلال الأيام القادمة",
+            "متابعة برنامج المكافحة المناسب",
         ],
         "Tomato_Septoria_leaf_spot": [
             "إزالة الأوراق شديدة الإصابة",
             "تقليل الرطوبة على الأوراق",
             "تحسين التهوية",
-            "إعادة التصوير إذا زادت البقع",
+            "إعادة التصوير إذا زادت الأعراض",
         ],
         "Tomato_Bacterial_spot": [
-            "تجنب لمس النباتات وهي مبللة",
-            "إزالة الأوراق شديدة الإصابة",
+            "تجنب لمس النبات وهو مبلل",
+            "إزالة الأجزاء شديدة الإصابة",
             "تعقيم الأدوات",
-            "تقليل الرش العلوي بالماء",
+            "تقليل الرش العلوي",
         ],
     }
     return recs.get(class_name, [
         "افحص الأعراض ميدانيًا",
-        "التقط صورًا أوضح عند الحاجة",
+        "التقط صورة أوضح إذا كانت الثقة منخفضة",
         "راجع برنامج المكافحة المناسب للمحصول",
     ])
 
@@ -170,8 +226,8 @@ def predict_single_image(image: Image.Image):
     best_conf = float(top_probs[0].item() * 100)
     second_conf = float(top_probs[1].item() * 100)
 
-    best_class = CLASSES[best_idx]
-    second_class = CLASSES[second_idx]
+    best_class = CLASSES[best_idx] if best_idx < len(CLASSES) else f"class_{best_idx}"
+    second_class = CLASSES[second_idx] if second_idx < len(CLASSES) else f"class_{second_idx}"
 
     return {
         "best_class": best_class,
@@ -181,6 +237,9 @@ def predict_single_image(image: Image.Image):
     }
 
 
+# =========================================================
+# المسارات
+# =========================================================
 @app.get("/")
 def root():
     return {
@@ -188,6 +247,7 @@ def root():
         "model_ready": MODEL_READY,
         "model_path": MODEL_PATH,
         "num_classes": NUM_CLASSES,
+        "classes_loaded": len(CLASSES),
         "model_error": MODEL_ERROR
     }
 
@@ -197,6 +257,9 @@ def health():
     return {
         "status": "ok" if MODEL_READY else "model_error",
         "model_loaded": MODEL_READY,
+        "model_path": MODEL_PATH,
+        "num_classes": NUM_CLASSES,
+        "classes_loaded": len(CLASSES),
         "device": str(DEVICE),
         "model_error": MODEL_ERROR
     }
@@ -219,7 +282,6 @@ async def diagnose(
             }
 
         files = [f for f in [file1, file2, file3] if f is not None]
-
         results = []
         images_payload = []
 
@@ -236,7 +298,6 @@ async def diagnose(
                     "image_b64": image_to_base64(image)
                 })
 
-        # نأخذ أول صورة الآن كملخص مبدئي
         main_result = results[0]
 
         response = {
