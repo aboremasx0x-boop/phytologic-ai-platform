@@ -3,890 +3,870 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Phytologic AI | لوحة التحكم</title>
+  <title>Phytologic AI Dashboard</title>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 
   <style>
-    * {
-      box-sizing: border-box;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Tahoma,Arial,sans-serif;
+      background:linear-gradient(180deg,#eef4ff 0%,#f8fbff 100%);
+      color:#1f2937;
     }
 
-    :root {
-      --bg: #f4f7fb;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --primary: #0f766e;
-      --primary-dark: #0b5b55;
-      --secondary: #1d4ed8;
-      --warning: #d97706;
-      --danger: #dc2626;
-      --success: #15803d;
-      --shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
-      --radius: 22px;
+    .page{
+      max-width:1400px;
+      margin:20px auto;
+      padding:0 16px 30px;
     }
 
-    body {
-      margin: 0;
-      font-family: Tahoma, Arial, sans-serif;
-      background: linear-gradient(180deg, #eef5ff 0%, #f8fbff 100%);
-      color: var(--text);
-    }
-
-    .page {
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 18px;
-    }
-
-    .hero {
+    .hero{
       background:
-        linear-gradient(135deg, rgba(8, 47, 73, .97), rgba(15, 118, 110, .92)),
-        radial-gradient(circle at top left, rgba(255,255,255,.18), transparent 35%);
-      color: white;
-      border-radius: 28px;
-      padding: 28px;
-      box-shadow: var(--shadow);
-      margin-bottom: 18px;
+        linear-gradient(135deg,rgba(12,25,68,.97),rgba(16,97,73,.90)),
+        radial-gradient(circle at top left,rgba(255,255,255,.12),transparent 35%);
+      color:white;
+      border-radius:26px;
+      padding:24px 26px;
+      box-shadow:0 18px 40px rgba(0,0,0,.16);
+      margin-bottom:18px;
     }
 
-    .hero-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 18px;
-      align-items: center;
-      flex-wrap: wrap;
+    .hero h1{
+      margin:0 0 10px;
+      font-size:34px;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
 
-    .hero h1 {
-      margin: 0 0 10px;
-      font-size: 32px;
+    .hero p{
+      margin:0;
+      opacity:.95;
+      line-height:1.9;
     }
 
-    .hero p {
-      margin: 0;
-      line-height: 1.9;
-      max-width: 850px;
-      color: rgba(255,255,255,.9);
-      font-size: 15px;
+    .nav{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin:14px 0 18px;
     }
 
-    .hero-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-top: 20px;
+    .nav a{
+      text-decoration:none;
+      background:#0c5c45;
+      color:white;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:bold;
+      box-shadow:0 6px 14px rgba(0,0,0,.1);
     }
 
-    .btn {
-      border: none;
-      border-radius: 14px;
-      padding: 13px 18px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: .2s ease;
+    .nav a.alerts{
+      background:#b91c1c;
     }
 
-    .btn:hover {
-      transform: translateY(-1px);
+    .nav a.dashboard{
+      background:#1d4ed8;
     }
 
-    .btn-white {
-      background: white;
-      color: #0b5b55;
+    .top-grid{
+      display:grid;
+      grid-template-columns:340px 1fr;
+      gap:18px;
+      margin-bottom:18px;
     }
 
-    .btn-white:hover {
-      background: #f4f7ff;
+    @media (max-width:1100px){
+      .top-grid{grid-template-columns:1fr}
     }
 
-    .btn-glass {
-      background: rgba(255,255,255,.12);
-      color: white;
-      border: 1px solid rgba(255,255,255,.18);
+    .panel{
+      background:#fff;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.07);
+      border:1px solid #e5edf7;
     }
 
-    .btn-glass:hover {
-      background: rgba(255,255,255,.18);
+    .panel h2{
+      margin:0 0 16px;
+      font-size:22px;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
 
-    .status-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.18);
-      font-size: 13px;
-      font-weight: 700;
-      white-space: nowrap;
+    .field{
+      margin-bottom:14px;
     }
 
-    .grid {
-      display: grid;
-      gap: 18px;
+    .field label{
+      display:block;
+      margin-bottom:8px;
+      font-weight:bold;
     }
 
-    .grid-2 {
-      grid-template-columns: 1fr 1fr;
+    .field input[type="text"],
+    .field input[type="file"],
+    .field input[type="number"]{
+      width:100%;
+      padding:12px 14px;
+      border-radius:12px;
+      border:1px solid #cfd8e3;
+      background:#fff;
+      font-size:14px;
     }
 
-    .grid-3 {
-      grid-template-columns: repeat(3, 1fr);
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
     }
 
-    .grid-4 {
-      grid-template-columns: repeat(4, 1fr);
+    button{
+      border:none;
+      cursor:pointer;
+      border-radius:12px;
+      padding:12px 16px;
+      font-weight:bold;
+      font-size:14px;
+      transition:.2s ease;
     }
 
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
+    button:hover{
+      transform:translateY(-2px);
+      box-shadow:0 8px 16px rgba(0,0,0,.12);
     }
 
-    .card-header {
-      padding: 18px 20px 12px;
-      border-bottom: 1px solid #edf2f7;
+    .btn-primary{
+      background:#0c5c45;
+      color:#fff;
     }
 
-    .card-header h2,
-    .card-header h3 {
-      margin: 0;
-      font-size: 20px;
+    .btn-secondary{
+      background:#eef2f7;
+      color:#111827;
     }
 
-    .card-header p {
-      margin: 8px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.8;
+    .status-box{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:12px;
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      font-size:14px;
     }
 
-    .card-body {
-      padding: 20px;
+    .loader{
+      margin-top:12px;
+      padding:14px;
+      border-radius:12px;
+      background:#eefaf4;
+      color:#0c5c45;
+      font-weight:bold;
+      display:none;
     }
 
-    .kpi {
-      background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 18px;
-      min-height: 118px;
+    .loader.show{
+      display:block;
     }
 
-    .kpi-label {
-      font-size: 14px;
-      color: var(--muted);
-      margin-bottom: 8px;
+    .preview-box{
+      margin-top:14px;
+      border:1px dashed #d1d5db;
+      border-radius:16px;
+      background:#fafcff;
+      min-height:180px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:10px;
     }
 
-    .kpi-value {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text);
+    .preview-box img{
+      max-width:100%;
+      max-height:260px;
+      object-fit:contain;
+      border-radius:12px;
     }
 
-    .kpi-sub {
-      margin-top: 8px;
-      font-size: 13px;
-      color: #64748b;
-      line-height: 1.8;
+    .placeholder{
+      color:#6b7280;
+      text-align:center;
+      line-height:1.8;
+      font-size:14px;
     }
 
-    .toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
+    .kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:14px;
+      margin-bottom:18px;
     }
 
-    .toolbar-left,
-    .toolbar-right {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
+    @media (max-width:1000px){
+      .kpi-grid{grid-template-columns:repeat(2,1fr)}
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 8px 12px;
-      font-size: 12px;
-      font-weight: 800;
-      white-space: nowrap;
+    @media (max-width:600px){
+      .kpi-grid{grid-template-columns:1fr}
     }
 
-    .pill-low {
-      background: #ecfdf5;
-      color: #166534;
+    .kpi{
+      background:#fff;
+      border-radius:18px;
+      padding:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+      border:1px solid #e5edf7;
     }
 
-    .pill-moderate {
-      background: #fff7ed;
-      color: #9a3412;
+    .kpi .title{
+      color:#6b7280;
+      margin-bottom:8px;
+      font-size:14px;
     }
 
-    .pill-high {
-      background: #fef2f2;
-      color: #991b1b;
+    .kpi .value{
+      font-size:28px;
+      font-weight:bold;
     }
 
-    .pill-neutral {
-      background: #eff6ff;
-      color: #1d4ed8;
+    .main-grid{
+      display:grid;
+      grid-template-columns:1.2fr 1fr;
+      gap:18px;
     }
 
-    .table-wrap {
-      overflow-x: auto;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      background: white;
+    @media (max-width:1100px){
+      .main-grid{grid-template-columns:1fr}
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      min-width: 760px;
+    .card{
+      background:#fff;
+      border-radius:20px;
+      padding:18px;
+      box-shadow:0 10px 24px rgba(0,0,0,.06);
+      border:1px solid #e5edf7;
+      margin-bottom:18px;
     }
 
-    thead {
-      background: #f8fbff;
+    .card h3{
+      margin:0 0 14px;
+      font-size:22px;
+      display:flex;
+      align-items:center;
+      gap:10px;
     }
 
-    th, td {
-      text-align: right;
-      padding: 14px 16px;
-      border-bottom: 1px solid #edf2f7;
-      font-size: 14px;
-      vertical-align: top;
+    .mini-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
     }
 
-    th {
-      color: #334155;
-      font-weight: 800;
+    @media (max-width:700px){
+      .mini-grid{grid-template-columns:1fr}
     }
 
-    tr:hover td {
-      background: #fbfdff;
+    .mini-box{
+      background:#f9fbfd;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      padding:14px;
     }
 
-    .mini-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 14px;
+    .kv{
+      margin:7px 0;
+      line-height:1.8;
+      font-size:15px;
     }
 
-    .info-box {
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 16px;
-      background: #fcfdff;
+    .tag{
+      display:inline-block;
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:bold;
+      background:#ecfdf5;
+      color:#065f46;
     }
 
-    .info-box h4 {
-      margin: 0 0 12px;
-      font-size: 17px;
+    .tag.warn{
+      background:#fff7ed;
+      color:#b45309;
     }
 
-    .info-list {
-      display: grid;
-      gap: 10px;
+    .tag.danger{
+      background:#fef2f2;
+      color:#b91c1c;
     }
 
-    .info-item {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px dashed #e5e7eb;
+    ul{
+      margin:6px 0 0;
+      padding-right:18px;
     }
 
-    .info-item:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
+    li{
+      margin:6px 0;
+      line-height:1.8;
     }
 
-    .key {
-      color: var(--muted);
-      font-size: 14px;
+    #map{
+      width:100%;
+      height:420px;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid #e5e7eb;
     }
 
-    .value {
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text);
-      text-align: left;
+    .weather-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
     }
 
-    .list-box {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-      display: grid;
-      gap: 10px;
+    @media (max-width:700px){
+      .weather-grid{grid-template-columns:1fr}
     }
 
-    .list-box li {
-      border: 1px solid #edf2f7;
-      background: #fafcff;
-      border-radius: 14px;
-      padding: 12px 14px;
-      line-height: 1.9;
-      font-size: 14px;
+    .weather-box{
+      background:#f9fbfd;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      padding:14px;
     }
 
-    .empty {
-      color: var(--muted);
-      text-align: center;
-      padding: 24px 10px;
-      line-height: 1.8;
-      font-size: 14px;
+    .gradcam-box{
+      min-height:220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:16px;
+      border:1px solid #e5e7eb;
+      background:#fafcff;
+      padding:10px;
     }
 
-    .footer-note {
-      text-align: center;
-      color: #64748b;
-      padding: 18px 10px 8px;
-      font-size: 13px;
-      line-height: 1.8;
+    .gradcam-box img{
+      width:100%;
+      max-height:420px;
+      object-fit:contain;
+      border-radius:12px;
     }
 
-    @media (max-width: 1200px) {
-      .grid-4,
-      .grid-3,
-      .grid-2,
-      .mini-grid {
-        grid-template-columns: 1fr;
-      }
+    .footer-note{
+      text-align:center;
+      color:#6b7280;
+      font-size:13px;
+      margin-top:18px;
     }
   </style>
 </head>
 <body>
   <div class="page">
 
-    <section class="hero">
-      <div class="hero-top">
-        <div>
-          <h1>لوحة تحكم Phytologic AI</h1>
-          <p>
-            لوحة تشغيل ومتابعة تعرض ملخص التشخيصات، الأمراض الأكثر شيوعًا، المناطق الأكثر تسجيلًا،
-            متوسطات الشدة، التنبيهات، وصحة النظام بشكل مباشر من الـ API.
-          </p>
+    <div class="hero">
+      <h1><i class="fa-solid fa-chart-line"></i> Phytologic AI Dashboard</h1>
+      <p>
+        لوحة تحكم عالمية لعرض نتائج تشخيص أمراض النبات، توزيع الحالات على الخريطة، وWeather AI
+        لتحليل تأثير الظروف الجوية على احتمالية انتشار المرض.
+      </p>
+    </div>
+
+    <div class="nav">
+      <a href="index.html"><i class="fa-solid fa-house"></i> الرئيسية</a>
+      <a href="alerts.html" class="alerts"><i class="fa-solid fa-bell"></i> التنبيهات</a>
+      <a href="dashboard.html" class="dashboard"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+    </div>
+
+    <div class="top-grid">
+      <div class="panel">
+        <h2><i class="fa-solid fa-upload"></i> إدخال الحالة</h2>
+
+        <div class="field">
+          <label for="imageInput">صورة النبات</label>
+          <input type="file" id="imageInput" accept="image/*">
         </div>
 
-        <div class="status-chip" id="heroSystemChip">
-          <span>●</span>
-          <span>جاري التحقق من النظام...</span>
+        <div class="field">
+          <label for="apiBase">رابط الـ API</label>
+          <input type="text" id="apiBase" value="https://phytologic-ai.onrender.com">
+        </div>
+
+        <div class="field">
+          <label for="latInput">خط العرض</label>
+          <input type="number" id="latInput" value="21.5433" step="0.0001">
+        </div>
+
+        <div class="field">
+          <label for="lngInput">خط الطول</label>
+          <input type="number" id="lngInput" value="39.1728" step="0.0001">
+        </div>
+
+        <div class="field">
+          <label for="tempInput">درجة الحرارة °C</label>
+          <input type="number" id="tempInput" value="31">
+        </div>
+
+        <div class="field">
+          <label for="humInput">الرطوبة %</label>
+          <input type="number" id="humInput" value="68">
+        </div>
+
+        <div class="field">
+          <label for="windInput">سرعة الرياح km/h</label>
+          <input type="number" id="windInput" value="12">
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" onclick="analyzeDashboard()">
+            <i class="fa-solid fa-microscope"></i> تحليل شامل
+          </button>
+          <button class="btn-secondary" onclick="downloadReport()">
+            <i class="fa-solid fa-file-pdf"></i> تنزيل التقرير
+          </button>
+        </div>
+
+        <div class="loader" id="loader">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          جاري التحليل...
+        </div>
+
+        <div class="status-box" id="statusBox">جاهز.</div>
+
+        <div class="preview-box">
+          <img id="previewImage" style="display:none" alt="preview">
+          <div class="placeholder" id="previewPlaceholder">
+            <i class="fa-regular fa-image" style="font-size:34px;"></i><br>
+            لم يتم اختيار صورة بعد
+          </div>
         </div>
       </div>
 
-      <div class="hero-actions">
-        <button class="btn btn-white" onclick="refreshAll()">تحديث كامل</button>
-        <button class="btn btn-glass" onclick="checkHealth()">فحص النظام</button>
-        <button class="btn btn-glass" onclick="loadAlerts()">تحديث التنبيهات</button>
-        <button class="btn btn-glass" onclick="window.location.href='/'">العودة للرئيسية</button>
-      </div>
-    </section>
-
-    <section class="card" style="margin-bottom:18px;">
-      <div class="card-header">
-        <h2>المؤشرات الرئيسية</h2>
-        <p>أهم القيم المستخرجة من قاعدة البيانات الحالية والتنبيهات.</p>
-      </div>
-      <div class="card-body">
-        <div class="grid grid-4">
+      <div>
+        <div class="kpi-grid">
           <div class="kpi">
-            <div class="kpi-label">إجمالي الحالات</div>
-            <div class="kpi-value" id="kpiTotalCases">--</div>
-            <div class="kpi-sub">عدد جميع التشخيصات المخزنة</div>
+            <div class="title">الثقة</div>
+            <div class="value" id="kpiConfidence">-</div>
           </div>
-
           <div class="kpi">
-            <div class="kpi-label">متوسط شدة الإصابة</div>
-            <div class="kpi-value" id="kpiAvgSeverity">--</div>
-            <div class="kpi-sub">متوسط النسبة المسجلة عبر الحالات</div>
+            <div class="title">شدة الإصابة</div>
+            <div class="value" id="kpiSeverity">-</div>
           </div>
-
           <div class="kpi">
-            <div class="kpi-label">إجمالي التنبيهات</div>
-            <div class="kpi-value" id="kpiTotalAlerts">--</div>
-            <div class="kpi-sub">عدد التنبيهات المسجلة في جدول alerts</div>
+            <div class="title">نوع القرار</div>
+            <div class="value" id="kpiDecision">-</div>
           </div>
-
           <div class="kpi">
-            <div class="kpi-label">التنبيهات العالية</div>
-            <div class="kpi-value" id="kpiHighAlerts">--</div>
-            <div class="kpi-sub">الحالات ذات مستوى الخطر المرتفع</div>
+            <div class="title">مستوى الخطر</div>
+            <div class="value" id="kpiRisk">-</div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <div class="grid grid-2">
-      <section class="card">
-        <div class="card-header">
-          <h2>ملخص الحالة العامة</h2>
-          <p>عرض سريع لأكثر مرض ومنطقة وآخر تنبيه وصحة الخدمات.</p>
+        <div class="card">
+          <h3><i class="fa-solid fa-cloud-sun"></i> Weather AI</h3>
+          <div class="weather-grid">
+            <div class="weather-box">
+              <div class="kv"><b>الحرارة:</b> <span id="weatherTemp">-</span></div>
+              <div class="kv"><b>الرطوبة:</b> <span id="weatherHum">-</span></div>
+            </div>
+            <div class="weather-box">
+              <div class="kv"><b>الرياح:</b> <span id="weatherWind">-</span></div>
+              <div class="kv"><b>تقدير الخطورة الجوية:</b> <span id="weatherRisk">-</span></div>
+            </div>
+            <div class="weather-box">
+              <div class="kv"><b>تفسير الذكاء الجوي:</b></div>
+              <div id="weatherInterpretation">-</div>
+            </div>
+          </div>
         </div>
-        <div class="card-body">
+
+        <div class="card">
+          <h3><i class="fa-solid fa-map-location-dot"></i> خريطة الانتشار</h3>
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div>
+        <div class="card">
+          <h3><i class="fa-solid fa-dna"></i> نتيجة التشخيص</h3>
           <div class="mini-grid">
-            <div class="info-box">
-              <h4>أكثر مرض شيوعًا</h4>
-              <div class="info-list">
-                <div class="info-item">
-                  <div class="key">اسم المرض</div>
-                  <div class="value" id="topDiseaseName">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">عدد الحالات</div>
-                  <div class="value" id="topDiseaseCount">--</div>
-                </div>
-              </div>
+            <div class="mini-box">
+              <div class="kv"><b>النبات:</b> <span id="plantName">-</span></div>
+              <div class="kv"><b>المرض:</b> <span id="diseaseName">-</span></div>
+              <div class="kv"><b>الثقة:</b> <span id="confidence">-</span></div>
+              <div class="kv"><b>تصنيف الثقة:</b> <span id="confidenceLabel">-</span></div>
             </div>
-
-            <div class="info-box">
-              <h4>أكثر منطقة تسجيلًا</h4>
-              <div class="info-list">
-                <div class="info-item">
-                  <div class="key">اسم المنطقة</div>
-                  <div class="value" id="topRegionName">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">عدد الحالات</div>
-                  <div class="value" id="topRegionCount">--</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="info-box">
-              <h4>آخر تنبيه</h4>
-              <div class="info-list">
-                <div class="info-item">
-                  <div class="key">المنطقة</div>
-                  <div class="value" id="latestAlertRegion">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">المرض</div>
-                  <div class="value" id="latestAlertDisease">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">الدرجة</div>
-                  <div class="value" id="latestAlertScore">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">المستوى</div>
-                  <div class="value" id="latestAlertLevel">--</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="info-box">
-              <h4>صحة النظام</h4>
-              <div class="info-list">
-                <div class="info-item">
-                  <div class="key">الحالة</div>
-                  <div class="value" id="healthStatus">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">نموذج الصور</div>
-                  <div class="value" id="healthAi">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">نموذج التنبؤ</div>
-                  <div class="value" id="healthForecast">--</div>
-                </div>
-                <div class="info-item">
-                  <div class="key">SMS</div>
-                  <div class="value" id="healthSms">--</div>
-                </div>
-              </div>
+            <div class="mini-box">
+              <div class="kv"><b>التشخيص الثاني:</b> <span id="secondDisease">-</span></div>
+              <div class="kv"><b>الثقة الثانية:</b> <span id="secondConfidence">-</span></div>
+              <div class="kv"><b>فرق الثقة:</b> <span id="confidenceDiff">-</span></div>
+              <div class="kv"><b>القرار:</b> <span id="decisionTag" class="tag">-</span></div>
             </div>
           </div>
         </div>
-      </section>
 
-      <section class="card">
-        <div class="card-header">
-          <h2>ملاحظات تشغيلية</h2>
-          <p>قائمة سريعة تساعدك في متابعة عمل المنصة ميدانيًا وإداريًا.</p>
+        <div class="card">
+          <h3><i class="fa-solid fa-fire"></i> Grad-CAM</h3>
+          <div class="gradcam-box">
+            <img id="gradcamImage" style="display:none" alt="gradcam">
+            <div class="placeholder" id="gradcamPlaceholder">لا توجد صورة Grad-CAM بعد</div>
+          </div>
         </div>
-        <div class="card-body">
-          <ul class="list-box" id="operationalNotes">
-            <li>راجع بطاقة "أكثر مرض شيوعًا" يوميًا لتحديد اتجاه الحالات السائدة.</li>
-            <li>إذا زادت التنبيهات العالية، افحص جدول التنبيهات فورًا وراجع المناطق المتأثرة.</li>
-            <li>تأكد من أن صحة النظام تعرض: running / loaded / connected.</li>
-            <li>يمكن تحديث اللوحة بالكامل من زر "تحديث كامل" في أعلى الصفحة.</li>
-          </ul>
+      </div>
+
+      <div>
+        <div class="card">
+          <h3><i class="fa-solid fa-bullseye"></i> Bullseye Analysis</h3>
+          <div class="kv"><b>تم الكشف:</b> <span id="bullseyeDetected">-</span></div>
+          <div class="kv"><b>عدد الدوائر:</b> <span id="circleCount">-</span></div>
+          <div class="kv"><b>التفسير:</b> <span id="bullseyeInterpretation">-</span></div>
         </div>
-      </section>
+
+        <div class="card">
+          <h3><i class="fa-solid fa-lightbulb"></i> التوصيات</h3>
+          <ul id="recommendationsList"></ul>
+        </div>
+
+        <div class="card">
+          <h3><i class="fa-solid fa-shield-virus"></i> برنامج المكافحة</h3>
+          <div class="kv"><b>نوع المسبب:</b> <span id="pathogenType">-</span></div>
+          <div class="kv"><b>إجراء حسب الشدة:</b> <span id="severityAction">-</span></div>
+
+          <div class="kv"><b>عام:</b></div>
+          <ul id="generalProgram"></ul>
+
+          <div class="kv"><b>مخصص:</b></div>
+          <ul id="specificProgram"></ul>
+        </div>
+      </div>
     </div>
-
-    <section class="card" style="margin-top:18px;">
-      <div class="card-header">
-        <h2>جدول الأمراض</h2>
-        <p>عدد الحالات حسب المرض المسجل في جدول التشخيصات.</p>
-      </div>
-      <div class="card-body">
-        <div class="toolbar">
-          <div class="toolbar-left">
-            <span class="pill pill-neutral">مصدر: /stats/diseases</span>
-          </div>
-          <div class="toolbar-right">
-            <button class="btn btn-white" style="color:#1d4ed8;" onclick="loadDiseases()">تحديث جدول الأمراض</button>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المرض</th>
-                <th>عدد الحالات</th>
-                <th>النسبة التقريبية</th>
-              </tr>
-            </thead>
-            <tbody id="diseasesTableBody">
-              <tr>
-                <td colspan="4" class="empty">جاري تحميل البيانات...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <div class="grid grid-2" style="margin-top:18px;">
-      <section class="card">
-        <div class="card-header">
-          <h2>جدول المناطق</h2>
-          <p>عدد الحالات حسب المنطقة.</p>
-        </div>
-        <div class="card-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>المنطقة</th>
-                  <th>عدد الحالات</th>
-                </tr>
-              </thead>
-              <tbody id="regionsTableBody">
-                <tr>
-                  <td colspan="3" class="empty">جاري تحميل البيانات...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="card-header">
-          <h2>متوسط الشدة حسب المرض</h2>
-          <p>متوسط شدة الإصابة المسجلة لكل مرض.</p>
-        </div>
-        <div class="card-body">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>المرض</th>
-                  <th>متوسط الشدة</th>
-                </tr>
-              </thead>
-              <tbody id="severityTableBody">
-                <tr>
-                  <td colspan="3" class="empty">جاري تحميل البيانات...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <section class="card" style="margin-top:18px;">
-      <div class="card-header">
-        <h2>ملخص الخريطة</h2>
-        <p>عدد الحالات ومتوسط الشدة لكل منطقة كما يظهر من /map/summary.</p>
-      </div>
-      <div class="card-body">
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المنطقة</th>
-                <th>عدد الحالات</th>
-                <th>متوسط الشدة</th>
-              </tr>
-            </thead>
-            <tbody id="mapSummaryTableBody">
-              <tr>
-                <td colspan="4" class="empty">جاري تحميل البيانات...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <section class="card" style="margin-top:18px;">
-      <div class="card-header">
-        <h2>التنبيهات</h2>
-        <p>عرض أحدث التنبيهات مع مستويات الخطر والدرجات المسجلة.</p>
-      </div>
-      <div class="card-body">
-        <div class="toolbar">
-          <div class="toolbar-left">
-            <span class="pill pill-high">High Alerts</span>
-            <span class="pill pill-moderate">Moderate Alerts</span>
-            <span class="pill pill-neutral">مصدر: /alerts/all</span>
-          </div>
-          <div class="toolbar-right">
-            <button class="btn btn-white" style="color:#1d4ed8;" onclick="loadAlerts()">تحديث التنبيهات</button>
-          </div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>المنطقة</th>
-                <th>المدينة</th>
-                <th>المرض</th>
-                <th>المحصول</th>
-                <th>درجة الخطر</th>
-                <th>المستوى</th>
-                <th>التاريخ</th>
-              </tr>
-            </thead>
-            <tbody id="alertsTableBody">
-              <tr>
-                <td colspan="8" class="empty">جاري تحميل التنبيهات...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
 
     <div class="footer-note">
-      Phytologic AI Dashboard — لوحة إدارية وتشغيلية متصلة مباشرة بواجهات الـ API.
+      Dashboard عالمي متوافق بالكامل مع API الحالي.
     </div>
   </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    function safeText(v, fallback = "--") {
-      if (v === null || v === undefined || v === "") return fallback;
-      return v;
-    }
+    let lastSelectedFile = null;
+    let map;
+    let currentMarker = null;
+    let spreadCircle = null;
 
-    function fmtNum(v, fallback = "--") {
-      if (v === null || v === undefined || isNaN(v)) return fallback;
-      return Number(v).toFixed(2);
-    }
+    const imageInput = document.getElementById("imageInput");
+    const previewImage = document.getElementById("previewImage");
+    const previewPlaceholder = document.getElementById("previewPlaceholder");
+    const statusBox = document.getElementById("statusBox");
+    const loader = document.getElementById("loader");
 
-    function riskPill(level) {
-      const val = String(level || "").toLowerCase();
+    imageInput.addEventListener("change", function () {
+      const file = this.files[0];
+      lastSelectedFile = file || null;
 
-      if (val === "high" || val === "مرتفع") {
-        return `<span class="pill pill-high">${level}</span>`;
+      if (file) {
+        const url = URL.createObjectURL(file);
+        previewImage.src = url;
+        previewImage.style.display = "block";
+        previewPlaceholder.style.display = "none";
+        statusBox.textContent = "تم اختيار الصورة.";
+      } else {
+        previewImage.style.display = "none";
+        previewPlaceholder.style.display = "block";
+        previewImage.src = "";
       }
-      if (val === "moderate" || val === "متوسط") {
-        return `<span class="pill pill-moderate">${level}</span>`;
+    });
+
+    function apiBase() {
+      return document.getElementById("apiBase").value.trim().replace(/\/$/, "");
+    }
+
+    function setStatus(text) {
+      statusBox.textContent = text;
+    }
+
+    function fillList(id, items) {
+      const ul = document.getElementById(id);
+      ul.innerHTML = "";
+      (items || []).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        ul.appendChild(li);
+      });
+    }
+
+    function setDecisionTag(text) {
+      const tag = document.getElementById("decisionTag");
+      tag.textContent = text || "-";
+      tag.className = "tag";
+      if (text && text.includes("غير مؤكد")) {
+        tag.classList.add("danger");
+      } else if (text && text.includes("تشابه")) {
+        tag.classList.add("warn");
       }
-      if (val === "low" || val === "منخفض") {
-        return `<span class="pill pill-low">${level}</span>`;
-      }
-      return `<span class="pill pill-neutral">${safeText(level)}</span>`;
     }
 
-    async function fetchJson(url) {
-      const res = await fetch(url);
-      const data = await res.json();
+    function getWeatherRisk(temp, hum, wind) {
+      let score = 0;
 
-      if (!res.ok) {
-        throw new Error(data.error || `Request failed: ${url}`);
-      }
+      if (temp >= 22 && temp <= 32) score += 2;
+      if (hum >= 60) score += 2;
+      if (wind <= 20) score += 1;
 
-      return data;
-    }
-
-    async function loadSummary() {
-      const data = await fetchJson("/stats/summary");
-
-      document.getElementById("kpiTotalCases").textContent = safeText(data.total_cases, 0);
-      document.getElementById("kpiAvgSeverity").textContent = `${fmtNum(data.avg_severity, 0)}%`;
-
-      document.getElementById("topDiseaseName").textContent = safeText(data?.top_disease?.name);
-      document.getElementById("topDiseaseCount").textContent = safeText(data?.top_disease?.count, 0);
-
-      document.getElementById("topRegionName").textContent = safeText(data?.top_region?.name);
-      document.getElementById("topRegionCount").textContent = safeText(data?.top_region?.count, 0);
-    }
-
-    async function loadAlertsSummary() {
-      const data = await fetchJson("/alerts/summary");
-
-      document.getElementById("kpiTotalAlerts").textContent = safeText(data.total_alerts, 0);
-      document.getElementById("kpiHighAlerts").textContent = safeText(data.high_alerts, 0);
-
-      const latest = data.latest_alert || {};
-      document.getElementById("latestAlertRegion").textContent = safeText(latest.region);
-      document.getElementById("latestAlertDisease").textContent = safeText(latest.disease_name);
-      document.getElementById("latestAlertScore").textContent = latest.risk_score != null ? `${fmtNum(latest.risk_score)}%` : "--";
-      document.getElementById("latestAlertLevel").innerHTML = riskPill(latest.risk_level);
-    }
-
-    async function loadDiseases() {
-      const data = await fetchJson("/stats/diseases");
-      const body = document.getElementById("diseasesTableBody");
-
-      if (!Array.isArray(data) || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="4" class="empty">لا توجد بيانات أمراض حاليًا.</td></tr>`;
-        return;
-      }
-
-      const total = data.reduce((sum, row) => sum + Number(row.count || 0), 0);
-
-      body.innerHTML = data.map((row, i) => {
-        const percent = total > 0 ? ((Number(row.count || 0) / total) * 100) : 0;
-        return `
-          <tr>
-            <td>${i + 1}</td>
-            <td>${safeText(row.disease)}</td>
-            <td>${safeText(row.count, 0)}</td>
-            <td>${fmtNum(percent, 0)}%</td>
-          </tr>
-        `;
-      }).join("");
-    }
-
-    async function loadRegions() {
-      const data = await fetchJson("/stats/regions");
-      const body = document.getElementById("regionsTableBody");
-
-      if (!Array.isArray(data) || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="3" class="empty">لا توجد بيانات مناطق حاليًا.</td></tr>`;
-        return;
+      if (score >= 4) {
+        return {
+          level: "مرتفع",
+          text: "الظروف الجوية قد تساعد على بقاء الرطوبة وزيادة احتمال تطور الإصابة."
+        };
       }
 
-      body.innerHTML = data.map((row, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.count, 0)}</td>
-        </tr>
-      `).join("");
-    }
-
-    async function loadSeverity() {
-      const data = await fetchJson("/stats/severity");
-      const body = document.getElementById("severityTableBody");
-
-      if (!Array.isArray(data) || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="3" class="empty">لا توجد بيانات شدة حاليًا.</td></tr>`;
-        return;
+      if (score >= 2) {
+        return {
+          level: "متوسط",
+          text: "بعض الظروف الجوية مناسبة جزئيًا لانتشار المرض، وتحتاج متابعة."
+        };
       }
 
-      body.innerHTML = data.map((row, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(row.disease)}</td>
-          <td>${fmtNum(row.avg_severity, 0)}%</td>
-        </tr>
-      `).join("");
+      return {
+        level: "منخفض",
+        text: "الظروف الجوية الحالية أقل ملاءمة لانتشار سريع للمرض."
+      };
     }
 
-    async function loadMapSummary() {
-      const data = await fetchJson("/map/summary");
-      const body = document.getElementById("mapSummaryTableBody");
+    function calculateOverallRisk(confidence, severity, weatherLevel, decision) {
+      let score = 0;
 
-      if (!Array.isArray(data) || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="4" class="empty">لا توجد بيانات خريطة حاليًا.</td></tr>`;
-        return;
+      if (confidence >= 90) score += 3;
+      else if (confidence >= 75) score += 2;
+      else score += 1;
+
+      if (severity >= 15) score += 3;
+      else if (severity >= 5) score += 2;
+      else score += 1;
+
+      if (weatherLevel === "مرتفع") score += 2;
+      else if (weatherLevel === "متوسط") score += 1;
+
+      if (decision && decision.includes("تشخيص واضح")) score += 1;
+
+      if (score >= 8) return "مرتفع";
+      if (score >= 5) return "متوسط";
+      return "منخفض";
+    }
+
+    function initMap() {
+      const lat = parseFloat(document.getElementById("latInput").value || "21.5433");
+      const lng = parseFloat(document.getElementById("lngInput").value || "39.1728");
+
+      map = L.map('map').setView([lat, lng], 8);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+      }).addTo(map);
+
+      currentMarker = L.marker([lat, lng]).addTo(map);
+      spreadCircle = L.circle([lat, lng], {
+        radius: 3000,
+        color: '#dc2626',
+        fillColor: '#ef4444',
+        fillOpacity: 0.25
+      }).addTo(map);
+    }
+
+    function updateMap(lat, lng, severityPercent) {
+      const radius = Math.max(2000, severityPercent * 400);
+
+      if (currentMarker) {
+        currentMarker.setLatLng([lat, lng]);
+      } else {
+        currentMarker = L.marker([lat, lng]).addTo(map);
       }
 
-      body.innerHTML = data.map((row, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.count, 0)}</td>
-          <td>${fmtNum(row.avg_severity, 0)}%</td>
-        </tr>
-      `).join("");
-    }
-
-    async function loadAlerts() {
-      const data = await fetchJson("/alerts/all");
-      const body = document.getElementById("alertsTableBody");
-
-      if (!Array.isArray(data) || data.length === 0) {
-        body.innerHTML = `<tr><td colspan="8" class="empty">لا توجد تنبيهات حاليًا.</td></tr>`;
-        return;
+      if (spreadCircle) {
+        spreadCircle.setLatLng([lat, lng]);
+        spreadCircle.setRadius(radius);
+      } else {
+        spreadCircle = L.circle([lat, lng], {
+          radius: radius,
+          color: '#dc2626',
+          fillColor: '#ef4444',
+          fillOpacity: 0.25
+        }).addTo(map);
       }
 
-      body.innerHTML = data.map((row, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${safeText(row.region)}</td>
-          <td>${safeText(row.city)}</td>
-          <td>${safeText(row.disease_name)}</td>
-          <td>${safeText(row.crop)}</td>
-          <td>${row.risk_score != null ? `${fmtNum(row.risk_score)}%` : "--"}</td>
-          <td>${riskPill(row.risk_level)}</td>
-          <td>${safeText(row.created_at)}</td>
-        </tr>
-      `).join("");
+      map.setView([lat, lng], 9);
     }
 
-    async function checkHealth() {
-      const data = await fetchJson("/system/health");
-
-      document.getElementById("healthStatus").textContent = safeText(data.status);
-      document.getElementById("healthAi").textContent = safeText(data.ai_model);
-      document.getElementById("healthForecast").textContent = safeText(data.forecast_model);
-      document.getElementById("healthSms").textContent = data.sms_configured ? "configured" : "not configured";
-
-      const chip = document.getElementById("heroSystemChip");
-      chip.innerHTML = `<span>●</span><span>النظام: ${safeText(data.status)} | الإصدار: ${safeText(data.version)}</span>`;
-    }
-
-    async function refreshAll() {
+    async function analyzeDashboard() {
       try {
-        await Promise.all([
-          loadSummary(),
-          loadAlertsSummary(),
-          loadDiseases(),
-          loadRegions(),
-          loadSeverity(),
-          loadMapSummary(),
-          loadAlerts(),
-          checkHealth()
-        ]);
-      } catch (err) {
-        console.error(err);
-        document.getElementById("heroSystemChip").innerHTML =
-          `<span>●</span><span>حدث خطأ أثناء تحديث البيانات</span>`;
+        if (!lastSelectedFile) {
+          setStatus("اختر صورة أولاً.");
+          return;
+        }
+
+        loader.classList.add("show");
+        setStatus("جاري التحليل الشامل...");
+
+        const formData = new FormData();
+        formData.append("file", lastSelectedFile);
+        formData.append("return_gradcam", "true");
+
+        const response = await fetch(`${apiBase()}/diagnose`, {
+          method: "POST",
+          body: formData
+        });
+
+        const data = await response.json();
+        loader.classList.remove("show");
+
+        if (!response.ok || data.status === "error") {
+          setStatus(data.message || "حدث خطأ أثناء التحليل.");
+          return;
+        }
+
+        if (data.status === "rejected" || data.status === "uncertain") {
+          setStatus(data.message || data.reason || "الحالة غير مؤكدة.");
+          return;
+        }
+
+        setStatus("تم التحليل بنجاح.");
+
+        // diagnosis
+        document.getElementById("plantName").textContent = data.prediction?.plant_name || "-";
+        document.getElementById("diseaseName").textContent = data.prediction?.disease_name_ar || "-";
+        document.getElementById("confidence").textContent = (data.prediction?.confidence ?? "-") + "%";
+        document.getElementById("confidenceLabel").textContent = data.prediction?.confidence_label || "-";
+
+        document.getElementById("secondDisease").textContent = data.second_prediction?.disease_name_ar || "-";
+        document.getElementById("secondConfidence").textContent = (data.second_prediction?.confidence ?? "-") + "%";
+        document.getElementById("confidenceDiff").textContent = data.decision_analysis?.confidence_diff ?? "-";
+        setDecisionTag(data.decision_analysis?.decision || "-");
+
+        // bullseye
+        document.getElementById("bullseyeDetected").textContent = data.bullseye_analysis?.detected ? "نعم" : "لا";
+        document.getElementById("circleCount").textContent = data.bullseye_analysis?.circle_count ?? "-";
+        document.getElementById("bullseyeInterpretation").textContent = data.bullseye_analysis?.interpretation || "-";
+
+        // recommendations
+        fillList("recommendationsList", data.recommendations || []);
+
+        // treatment
+        document.getElementById("pathogenType").textContent = data.treatment_program?.pathogen_type || "-";
+        document.getElementById("severityAction").textContent = data.treatment_program?.severity_action || "-";
+        fillList("generalProgram", data.treatment_program?.general || []);
+        fillList("specificProgram", data.treatment_program?.specific || []);
+
+        // gradcam
+        const severity = Number(data.gradcam?.severity_percent || 0);
+        document.getElementById("gradcamImage").src = data.gradcam?.image_url || "";
+        document.getElementById("gradcamImage").style.display = data.gradcam?.image_url ? "block" : "none";
+        document.getElementById("gradcamPlaceholder").style.display = data.gradcam?.image_url ? "none" : "block";
+
+        // weather ai
+        const temp = Number(document.getElementById("tempInput").value || 0);
+        const hum = Number(document.getElementById("humInput").value || 0);
+        const wind = Number(document.getElementById("windInput").value || 0);
+
+        document.getElementById("weatherTemp").textContent = temp + " °C";
+        document.getElementById("weatherHum").textContent = hum + " %";
+        document.getElementById("weatherWind").textContent = wind + " km/h";
+
+        const weatherRisk = getWeatherRisk(temp, hum, wind);
+        document.getElementById("weatherRisk").textContent = weatherRisk.level;
+        document.getElementById("weatherInterpretation").textContent = weatherRisk.text;
+
+        // kpis
+        document.getElementById("kpiConfidence").textContent = (data.prediction?.confidence ?? "-") + "%";
+        document.getElementById("kpiSeverity").textContent = severity + "%";
+        document.getElementById("kpiDecision").textContent = data.decision_analysis?.decision || "-";
+
+        const overallRisk = calculateOverallRisk(
+          Number(data.prediction?.confidence || 0),
+          severity,
+          weatherRisk.level,
+          data.decision_analysis?.decision || ""
+        );
+        document.getElementById("kpiRisk").textContent = overallRisk;
+
+        // severity labels
+        document.getElementById("severityPercent").textContent = severity + "%";
+        document.getElementById("severityLabel").textContent = data.gradcam?.severity_label || "-";
+
+        // map
+        const lat = Number(document.getElementById("latInput").value || 21.5433);
+        const lng = Number(document.getElementById("lngInput").value || 39.1728);
+        updateMap(lat, lng, severity);
+
+      } catch (error) {
+        loader.classList.remove("show");
+        setStatus("حدث خطأ غير متوقع.");
+        console.error(error);
       }
     }
 
-    window.addEventListener("DOMContentLoaded", refreshAll);
+    async function downloadReport() {
+      try {
+        if (!lastSelectedFile) {
+          setStatus("اختر صورة أولاً لتنزيل التقرير.");
+          return;
+        }
+
+        setStatus("جاري إنشاء التقرير PDF...");
+
+        const formData = new FormData();
+        formData.append("file", lastSelectedFile);
+
+        const response = await fetch(`${apiBase()}/generate-report`, {
+          method: "POST",
+          body: formData
+        });
+
+        if (!response.ok) {
+          setStatus("فشل إنشاء التقرير.");
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "report.pdf";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        setStatus("تم تنزيل التقرير بنجاح.");
+      } catch (error) {
+        setStatus("حدث خطأ أثناء تنزيل التقرير.");
+        console.error(error);
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initMap();
+    });
+
+    imageInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (!file) return;
+      lastSelectedFile = file;
+      const url = URL.createObjectURL(file);
+      previewImage.src = url;
+      previewImage.style.display = "block";
+      previewPlaceholder.style.display = "none";
+      setStatus("تم اختيار الصورة.");
+    });
   </script>
 </body>
 </html>
