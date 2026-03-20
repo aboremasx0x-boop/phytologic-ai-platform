@@ -1,8 +1,9 @@
 import io
 import os
 import json
-import base64
+import uuid
 import tempfile
+from typing import Dict, Any
 
 import cv2
 import numpy as np
@@ -13,14 +14,14 @@ from PIL import Image
 
 from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from torchvision import transforms, models
 
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import A4
 
-app = FastAPI(title="Phytologic AI Pro")
+app = FastAPI(title="Phytologic AI Pro", version="1.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,38 +31,31 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# =========================================
-# الإعدادات
-# =========================================
 MODEL_PATH = "plant_disease_model_v5.pth"
 CLASSES_PATH = "classes.json"
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+BASE_URL = os.environ.get("BASE_URL", "https://phytologic-ai.onrender.com").rstrip("/")
 
-# =========================================
-# تحميل الكلاسات
-# =========================================
 if not os.path.exists(CLASSES_PATH):
     raise FileNotFoundError(f"لم يتم العثور على {CLASSES_PATH}")
 
 with open(CLASSES_PATH, "r", encoding="utf-8") as f:
     CLASSES = json.load(f)
 
+if not isinstance(CLASSES, list) or not CLASSES:
+    raise ValueError("classes.json غير صحيح")
+
 NUM_CLASSES = len(CLASSES)
 
-# =========================================
-# بناء الموديل
-# =========================================
 model = models.efficientnet_b0(weights=None)
 model.classifier[1] = nn.Linear(model.classifier[1].in_features, NUM_CLASSES)
-model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
+state_dict = torch.load(MODEL_PATH, map_location=DEVICE)
+model.load_state_dict(state_dict, strict=True)
 model.to(DEVICE)
 model.eval()
 
 TARGET_LAYER = model.features[-1]
 
-# =========================================
-# التحويل
-# =========================================
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
@@ -71,9 +65,7 @@ transform = transforms.Compose([
     )
 ])
 
-# =========================================
-# أدوات مساعدة
-# =========================================
+
 def confidence_label(conf: float) -> str:
     if conf >= 90:
         return "مرتفعة جدًا"
@@ -144,7 +136,7 @@ def build_recommendations(class_name: str):
             "إزالة الأوراق شديدة الإصابة",
             "تقليل الرطوبة على الأوراق",
             "تحسين التهوية",
-            "إعادة التصوير إذا زادت الأعراض"
+            "متابعة تطور البقع"
         ],
         "Tomato___Bacterial_spot": [
             "تجنب لمس النباتات وهي مبللة",
@@ -195,7 +187,7 @@ def generate_treatment_program(class_name: str, severity_pct: float):
     elif "Late_blight" in class_name:
         program["pathogen_type"] = "فطري"
         program["specific"] = [
-            "تدخل سريع بمبيد مناسب للّفحة المتأخرة",
+            "تدخل سريع بمبيد مناسب لللفحة المتأخرة",
             "متابعة يومية للحقل",
             "التخلص من الأنسجة شديدة الإصابة"
         ]
@@ -218,7 +210,7 @@ def generate_treatment_program(class_name: str, severity_pct: float):
         program["specific"] = [
             "الاستمرار في المراقبة الوقائية",
             "الحفاظ على التسميد والري المتوازن",
-            "المتابعة الدورية للصور والحقل"
+            "المتابعة الدورية"
         ]
     else:
         program["specific"] = [
@@ -237,16 +229,9 @@ def generate_treatment_program(class_name: str, severity_pct: float):
     return program
 
 
-def to_base64_pil(image: Image.Image) -> str:
-    buffer = io.BytesIO()
-    image.save(buffer, format="JPEG")
-    return base64.b64encode(buffer.getvalue()).decode()
-
-
 def check_image_quality(image: Image.Image):
     arr = np.array(image).astype(np.float32)
     brightness = float(arr.mean())
-
     gray = np.array(image.convert("L")).astype(np.float32)
     blur_score = float(gray.var())
 
@@ -259,7 +244,6 @@ def check_image_quality(image: Image.Image):
 
 def smart_decision(best_conf: float, second_conf: float):
     diff = best_conf - second_conf
-
     if best_conf < 50:
         decision = "غير مؤكد"
     elif diff < 5:
@@ -268,20 +252,24 @@ def smart_decision(best_conf: float, second_conf: float):
         decision = "تشابه متوسط"
     else:
         decision = "تشخيص واضح"
-
     return decision, round(diff, 2)
 
-# =========================================
-# Grad-CAM
-# =========================================
+
+def save_image(image: Image.Image):
+    filename = f"img_{uuid.uuid4().hex}.jpg"
+    path = f"/tmp/{filename}"
+    image.save(path)
+    return filename, path
+
+
 def generate_gradcam(image: Image.Image):
     activations = []
     gradients = []
 
-    def forward_hook(module, inp, out):
+    def forward_hook(module, _inp, out):
         activations.append(out.detach())
 
-    def backward_hook(module, grad_input, grad_output):
+    def backward_hook(module, _grad_input, grad_output):
         gradients.append(grad_output[0].detach())
 
     fh = TARGET_LAYER.register_forward_hook(forward_hook)
@@ -305,7 +293,6 @@ def generate_gradcam(image: Image.Image):
         weights = grad.mean(dim=(2, 3), keepdim=True)
         cam = (weights * act).sum(dim=1, keepdim=True)
         cam = F.relu(cam)
-
         cam = cam.squeeze().cpu().numpy()
 
         if cam.max() > 0:
@@ -313,8 +300,7 @@ def generate_gradcam(image: Image.Image):
         else:
             cam = np.zeros_like(cam)
 
-        return cam, pred_idx.item(), float(confidence.item()) * 100
-
+        return cam
     finally:
         fh.remove()
         bh.remove()
@@ -333,10 +319,8 @@ def colorize_heatmap(cam_2d: np.ndarray, out_size):
 
 
 def overlay_gradcam(original_image: Image.Image, cam_2d: np.ndarray, alpha=0.4):
-    original = original_image.convert("RGB")
-    orig_arr = np.array(original).astype(np.float32)
-    heat = colorize_heatmap(cam_2d, original.size).astype(np.float32)
-
+    orig_arr = np.array(original_image.convert("RGB")).astype(np.float32)
+    heat = colorize_heatmap(cam_2d, original_image.size).astype(np.float32)
     blended = (orig_arr * (1 - alpha) + heat * alpha).clip(0, 255).astype(np.uint8)
     return Image.fromarray(blended)
 
@@ -344,19 +328,15 @@ def overlay_gradcam(original_image: Image.Image, cam_2d: np.ndarray, alpha=0.4):
 def estimate_severity_from_cam(cam_2d: np.ndarray):
     mask = cam_2d >= 0.45
     severity_pct = float(mask.mean() * 100)
-
     if severity_pct < 5:
         label = "منخفضة"
     elif severity_pct < 15:
         label = "متوسطة"
     else:
         label = "مرتفعة"
-
     return round(severity_pct, 2), label
 
-# =========================================
-# Bullseye Detection
-# =========================================
+
 def detect_bullseye(image: Image.Image):
     img = np.array(image.convert("RGB"))
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
@@ -377,10 +357,8 @@ def detect_bullseye(image: Image.Image):
         return True, int(len(circles[0]))
     return False, 0
 
-# =========================================
-# التنبؤ
-# =========================================
-def predict_single_image(image: Image.Image):
+
+def predict_single_image(image: Image.Image) -> Dict[str, Any]:
     image_tensor = transform(image).unsqueeze(0).to(DEVICE)
 
     with torch.no_grad():
@@ -388,7 +366,6 @@ def predict_single_image(image: Image.Image):
         probs = F.softmax(outputs, dim=1)
 
     top_probs, top_idxs = torch.topk(probs, 2)
-
     best_conf = float(top_probs[0][0].item()) * 100
     second_conf = float(top_probs[0][1].item()) * 100
 
@@ -397,7 +374,6 @@ def predict_single_image(image: Image.Image):
 
     predicted_class = CLASSES[best_idx]
     second_class = CLASSES[second_idx]
-
     decision, diff = smart_decision(best_conf, second_conf)
 
     return {
@@ -409,9 +385,56 @@ def predict_single_image(image: Image.Image):
         "decision": decision
     }
 
-# =========================================
-# PDF Report
-# =========================================
+
+def build_report_payload(image: Image.Image):
+    result = predict_single_image(image)
+    cam_2d = generate_gradcam(image)
+    gradcam_overlay = overlay_gradcam(image, cam_2d)
+    severity_pct, severity_label = estimate_severity_from_cam(cam_2d)
+    filename, img_path = save_image(gradcam_overlay)
+    bullseye_detected, circle_count = detect_bullseye(image)
+
+    return {
+        "status": "success",
+        "api_version": "1.0",
+        "model_version": "v5_pro",
+        "prediction": {
+            "class_name": result["best_class"],
+            "disease_name_ar": infer_disease_name_ar(result["best_class"]),
+            "plant_name": infer_plant(result["best_class"]),
+            "confidence": result["best_confidence"],
+            "confidence_label": confidence_label(result["best_confidence"])
+        },
+        "second_prediction": {
+            "class_name": result["second_class"],
+            "disease_name_ar": infer_disease_name_ar(result["second_class"]),
+            "plant_name": infer_plant(result["second_class"]),
+            "confidence": result["second_confidence"],
+            "confidence_label": confidence_label(result["second_confidence"])
+        },
+        "decision_analysis": {
+            "decision": result["decision"],
+            "confidence_diff": result["confidence_diff"]
+        },
+        "recommendations": build_recommendations(result["best_class"]),
+        "gradcam": {
+            "image_url": f"{BASE_URL}/gradcam/{filename}",
+            "image_path": img_path,
+            "severity_percent": severity_pct,
+            "severity_label": severity_label
+        },
+        "bullseye_analysis": {
+            "detected": bullseye_detected,
+            "circle_count": circle_count,
+            "interpretation": "يرجح وجود Bullseye pattern" if bullseye_detected else "لا يوجد نمط دائري واضح"
+        },
+        "treatment_program": generate_treatment_program(
+            result["best_class"],
+            severity_pct
+        )
+    }
+
+
 def generate_pdf_report(data):
     temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
     doc = SimpleDocTemplate(temp_file.name, pagesize=A4)
@@ -420,7 +443,6 @@ def generate_pdf_report(data):
 
     elements.append(Paragraph("Plant Disease Diagnosis Report", styles["Title"]))
     elements.append(Spacer(1, 12))
-
     elements.append(Paragraph(f"Plant: {data['prediction']['plant_name']}", styles["Normal"]))
     elements.append(Paragraph(f"Disease: {data['prediction']['disease_name_ar']}", styles["Normal"]))
     elements.append(Paragraph(f"Confidence: {data['prediction']['confidence']}%", styles["Normal"]))
@@ -431,54 +453,44 @@ def generate_pdf_report(data):
     elements.append(Paragraph(f"Confidence Difference: {data['decision_analysis']['confidence_diff']}", styles["Normal"]))
     elements.append(Spacer(1, 12))
 
-    if "bullseye_analysis" in data:
-        elements.append(Paragraph("Bullseye Analysis", styles["Heading2"]))
-        elements.append(Paragraph(f"Detected: {data['bullseye_analysis']['detected']}", styles["Normal"]))
-        elements.append(Paragraph(f"Circle Count: {data['bullseye_analysis']['circle_count']}", styles["Normal"]))
-        elements.append(Paragraph(f"Interpretation: {data['bullseye_analysis']['interpretation']}", styles["Normal"]))
-        elements.append(Spacer(1, 12))
+    elements.append(Paragraph("Bullseye Analysis", styles["Heading2"]))
+    elements.append(Paragraph(f"Detected: {data['bullseye_analysis']['detected']}", styles["Normal"]))
+    elements.append(Paragraph(f"Circle Count: {data['bullseye_analysis']['circle_count']}", styles["Normal"]))
+    elements.append(Paragraph(f"Interpretation: {data['bullseye_analysis']['interpretation']}", styles["Normal"]))
+    elements.append(Spacer(1, 12))
 
-    if "gradcam" in data:
-        elements.append(Paragraph("Severity Analysis", styles["Heading2"]))
-        elements.append(Paragraph(f"Severity Percent: {data['gradcam']['severity_percent']}%", styles["Normal"]))
-        elements.append(Paragraph(f"Severity Label: {data['gradcam']['severity_label']}", styles["Normal"]))
-        elements.append(Spacer(1, 12))
+    elements.append(Paragraph("Severity Analysis", styles["Heading2"]))
+    elements.append(Paragraph(f"Severity Percent: {data['gradcam']['severity_percent']}%", styles["Normal"]))
+    elements.append(Paragraph(f"Severity Label: {data['gradcam']['severity_label']}", styles["Normal"]))
+    elements.append(Spacer(1, 12))
 
-        img_b64 = data["gradcam"]["overlay_b64"]
-        img_bytes = base64.b64decode(img_b64)
-        img_path = tempfile.NamedTemporaryFile(delete=False, suffix=".jpg").name
-        with open(img_path, "wb") as f:
-            f.write(img_bytes)
-
+    if data["gradcam"].get("image_path"):
         elements.append(Paragraph("Grad-CAM", styles["Heading2"]))
-        elements.append(RLImage(img_path, width=300, height=300))
+        elements.append(RLImage(data["gradcam"]["image_path"], width=300, height=300))
         elements.append(Spacer(1, 12))
 
-    if "treatment_program" in data:
-        elements.append(Paragraph("Treatment Program", styles["Heading2"]))
-        elements.append(Paragraph(f"Pathogen Type: {data['treatment_program']['pathogen_type']}", styles["Normal"]))
-        elements.append(Paragraph("General:", styles["Normal"]))
-        for item in data["treatment_program"]["general"]:
-            elements.append(Paragraph(f"- {item}", styles["Normal"]))
-
-        elements.append(Paragraph("Specific:", styles["Normal"]))
-        for item in data["treatment_program"]["specific"]:
-            elements.append(Paragraph(f"- {item}", styles["Normal"]))
-
-        elements.append(Paragraph(f"Severity Action: {data['treatment_program']['severity_action']}", styles["Normal"]))
+    elements.append(Paragraph("Treatment Program", styles["Heading2"]))
+    elements.append(Paragraph(f"Pathogen Type: {data['treatment_program']['pathogen_type']}", styles["Normal"]))
+    elements.append(Paragraph("General:", styles["Normal"]))
+    for item in data["treatment_program"]["general"]:
+        elements.append(Paragraph(f"- {item}", styles["Normal"]))
+    elements.append(Paragraph("Specific:", styles["Normal"]))
+    for item in data["treatment_program"]["specific"]:
+        elements.append(Paragraph(f"- {item}", styles["Normal"]))
+    elements.append(Paragraph(f"Severity Action: {data['treatment_program']['severity_action']}", styles["Normal"]))
 
     doc.build(elements)
     return temp_file.name
 
-# =========================================
-# Routes
-# =========================================
+
 @app.get("/")
 def root():
     return {
         "status": "running",
         "model_path": MODEL_PATH,
-        "num_classes": NUM_CLASSES
+        "num_classes": NUM_CLASSES,
+        "api_version": "1.0",
+        "model_version": "v5_pro"
     }
 
 
@@ -491,15 +503,22 @@ def health():
         "num_classes": NUM_CLASSES,
         "classes_loaded": len(CLASSES),
         "device": str(DEVICE),
-        "classes_error": "",
-        "model_error": ""
+        "api_version": "1.0",
+        "model_version": "v5_pro"
     }
+
+
+@app.get("/gradcam/{filename}")
+def get_gradcam(filename: str):
+    path = f"/tmp/{filename}"
+    if not os.path.exists(path):
+        return JSONResponse(status_code=404, content={"status": "error", "message": "الصورة غير موجودة"})
+    return FileResponse(path)
 
 
 @app.post("/diagnose")
 async def diagnose(
     file: UploadFile = File(...),
-    return_image: bool = Form(False),
     return_gradcam: bool = Form(True)
 ):
     try:
@@ -511,11 +530,12 @@ async def diagnose(
             return {
                 "status": "rejected",
                 "reason": quality_msg,
-                "action": "يرجى إعادة التصوير بصورة أوضح"
+                "action": "يرجى إعادة التصوير بصورة أوضح",
+                "api_version": "1.0",
+                "model_version": "v5_pro"
             }
 
         result = predict_single_image(image)
-
         if result["best_confidence"] < 50:
             return {
                 "status": "uncertain",
@@ -530,70 +550,25 @@ async def diagnose(
                     "decision": result["decision"],
                     "confidence_diff": result["confidence_diff"]
                 },
-                "action": "يرجى إعادة التصوير بصورة أوضح أو من زاوية مختلفة"
+                "action": "يرجى إعادة التصوير بصورة أوضح أو من زاوية مختلفة",
+                "api_version": "1.0",
+                "model_version": "v5_pro"
             }
 
-        response = {
-            "status": "success",
-            "prediction": {
-                "class_name": result["best_class"],
-                "disease_name_ar": infer_disease_name_ar(result["best_class"]),
-                "plant_name": infer_plant(result["best_class"]),
-                "confidence": result["best_confidence"],
-                "confidence_label": confidence_label(result["best_confidence"])
-            },
-            "second_prediction": {
-                "class_name": result["second_class"],
-                "disease_name_ar": infer_disease_name_ar(result["second_class"]),
-                "plant_name": infer_plant(result["second_class"]),
-                "confidence": result["second_confidence"],
-                "confidence_label": confidence_label(result["second_confidence"])
-            },
-            "decision_analysis": {
-                "decision": result["decision"],
-                "confidence_diff": result["confidence_diff"]
-            },
-            "recommendations": build_recommendations(result["best_class"])
-        }
+        payload = build_report_payload(image)
 
-        severity_pct = 0.0
+        if not return_gradcam and "gradcam" in payload:
+            payload["gradcam"].pop("image_url", None)
+            payload["gradcam"].pop("image_path", None)
 
-        if return_gradcam:
-            cam_2d, _, _ = generate_gradcam(image)
-            gradcam_overlay = overlay_gradcam(image, cam_2d, alpha=0.4)
-            severity_pct, severity_label = estimate_severity_from_cam(cam_2d)
-
-            response["gradcam"] = {
-                "overlay_b64": to_base64_pil(gradcam_overlay),
-                "severity_percent": severity_pct,
-                "severity_label": severity_label
-            }
-
-        bullseye_detected, circle_count = detect_bullseye(image)
-        response["bullseye_analysis"] = {
-            "detected": bullseye_detected,
-            "circle_count": circle_count,
-            "interpretation": (
-                "يرجح وجود Bullseye pattern"
-                if bullseye_detected else
-                "لا يوجد نمط دائري واضح"
-            )
-        }
-
-        response["treatment_program"] = generate_treatment_program(
-            result["best_class"],
-            severity_pct
-        )
-
-        if return_image:
-            response["original_image_b64"] = to_base64_pil(image)
-
-        return response
+        return payload
 
     except Exception as e:
         return {
             "status": "error",
-            "message": str(e)
+            "message": str(e),
+            "api_version": "1.0",
+            "model_version": "v5_pro"
         }
 
 
@@ -602,53 +577,15 @@ async def generate_report(file: UploadFile = File(...)):
     try:
         image_bytes = await file.read()
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-
-        result = predict_single_image(image)
-
-        cam_2d, _, _ = generate_gradcam(image)
-        gradcam_overlay = overlay_gradcam(image, cam_2d)
-        severity_pct, severity_label = estimate_severity_from_cam(cam_2d)
-
-        bullseye_detected, circle_count = detect_bullseye(image)
-
-        data = {
-            "prediction": {
-                "class_name": result["best_class"],
-                "disease_name_ar": infer_disease_name_ar(result["best_class"]),
-                "plant_name": infer_plant(result["best_class"]),
-                "confidence": result["best_confidence"]
-            },
-            "decision_analysis": {
-                "decision": result["decision"],
-                "confidence_diff": result["confidence_diff"]
-            },
-            "gradcam": {
-                "overlay_b64": to_base64_pil(gradcam_overlay),
-                "severity_percent": severity_pct,
-                "severity_label": severity_label
-            },
-            "bullseye_analysis": {
-                "detected": bullseye_detected,
-                "circle_count": circle_count,
-                "interpretation": (
-                    "يرجح وجود Bullseye pattern"
-                    if bullseye_detected else
-                    "لا يوجد نمط دائري واضح"
-                )
-            },
-            "treatment_program": generate_treatment_program(
-                result["best_class"],
-                severity_pct
-            )
-        }
-
+        data = build_report_payload(image)
         pdf_path = generate_pdf_report(data)
         return FileResponse(pdf_path, filename="report.pdf", media_type="application/pdf")
-
     except Exception as e:
         return {
             "status": "error",
-            "message": str(e)
+            "message": str(e),
+            "api_version": "1.0",
+            "model_version": "v5_pro"
         }
 
 
